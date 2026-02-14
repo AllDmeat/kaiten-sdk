@@ -374,6 +374,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Card'
+        '400':
+          description: Validation error
         '401':
           description: Unauthorized
   /cards/{card_id}:
@@ -437,6 +439,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Card'
+        '400':
+          description: Validation error
         '401':
           description: Unauthorized
         '404':
