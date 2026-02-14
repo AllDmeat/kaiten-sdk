@@ -23,7 +23,8 @@ public struct KaitenClient: Sendable {
 
         self.client = Client(
             serverURL: url,
-            transport: URLSessionTransport()
+            transport: URLSessionTransport(),
+            middlewares: [AuthenticationMiddleware(token: config.token)]
         )
     }
 }
