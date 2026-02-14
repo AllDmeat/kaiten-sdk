@@ -117,6 +117,42 @@ struct KaitenConfiguration: Sendable {
     }
 }
 
+// MARK: - Custom Properties
+
+extension KaitenClient {
+    /// List all custom property definitions for the company.
+    public func listCustomProperties() async throws -> [Components.Schemas.CustomProperty] {
+        let response = try await client.get_list_of_properties()
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+
+    /// Get a single custom property definition.
+    public func getCustomProperty(id: Int) async throws -> Components.Schemas.CustomProperty {
+        let response = try await client.get_property(path: .init(id: id))
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .notFound(_):
+            throw KaitenError.notFound(resource: "customProperty", id: id)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+}
+
 // MARK: - Errors
 
 // MARK: - Helpers
