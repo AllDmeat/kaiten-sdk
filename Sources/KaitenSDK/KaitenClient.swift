@@ -223,6 +223,38 @@ extension KaitenClient {
     }
 }
 
+// MARK: - Spaces
+
+extension KaitenClient {
+    /// Lists all spaces.
+    public func listSpaces() async throws -> [Components.Schemas.Space] {
+        let response = try await client.retrieve_list_of_spaces()
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+
+    /// Lists boards in a space.
+    public func listBoards(spaceId: Int) async throws -> [Components.Schemas.BoardInSpace] {
+        let response = try await client.get_list_of_boards(path: .init(space_id: spaceId))
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+}
+
 // MARK: - Errors
 
 // MARK: - Helpers
