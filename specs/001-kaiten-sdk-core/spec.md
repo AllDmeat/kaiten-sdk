@@ -86,7 +86,7 @@
 
 - Что происходит при сетевой ошибке (timeout, DNS)? → типизированная ошибка, без крэша
 - Что если API вернул неизвестные поля? → игнорируются (forward compatibility)
-- Что если API вернул 429 (rate limit)? → ошибка с информацией о retry-after
+- Что если API вернул 429 (rate limit)? → автоматический retry с задержкой через `Task.retrying`
 - Что если custom property имеет неизвестный тип? → сохраняется как raw value
 
 ## Requirements
@@ -102,6 +102,7 @@
 - **FR-007**: SDK MUST компилироваться на macOS, Linux и Windows
 - **FR-008**: SDK MUST поддерживать async/await
 - **FR-009**: SDK MUST использовать `swift-tools-version: 6.2` с `.swiftLanguageMode(.v6)` на каждом таргете
+- **FR-010**: SDK MUST автоматически ретраить запросы при 429 (rate limit) с задержкой, используя паттерн `Task.retrying` (async retry с configurable max retries и delay)
 
 ### Key Entities
 
