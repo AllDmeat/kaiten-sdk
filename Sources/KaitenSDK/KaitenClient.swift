@@ -36,6 +36,21 @@ public struct KaitenClient: Sendable {
 
     // MARK: - Initialization
 
+    /// Internal initializer for testing with a custom transport.
+    init(transport: any ClientTransport) throws {
+        self.config = try KaitenConfiguration.resolve()
+        let url = try URL(string: config.baseURL)
+            .orThrow(KaitenError.invalidURL(config.baseURL))
+        self.client = Client(
+            serverURL: url,
+            transport: transport,
+            middlewares: [
+                AuthenticationMiddleware(token: config.token),
+                RetryMiddleware(),
+            ]
+        )
+    }
+
     public init() throws {
         self.config = try KaitenConfiguration.resolve()
 
@@ -147,6 +162,61 @@ extension KaitenClient {
             throw KaitenError.unexpectedResponse(statusCode: 403)
         case .notFound(_):
             throw KaitenError.notFound(resource: "customProperty", id: id)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+}
+
+// MARK: - Boards
+
+extension KaitenClient {
+    /// Fetches a board by its identifier.
+    public func getBoard(id: Int) async throws -> Components.Schemas.Board {
+        let response = try await client.get_board(path: .init(id: id))
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .notFound(_):
+            throw KaitenError.notFound(resource: "board", id: id)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+
+    /// Fetches columns for a board.
+    public func getBoardColumns(boardId: Int) async throws -> [Components.Schemas.Column] {
+        let response = try await client.get_list_of_columns(path: .init(board_id: boardId))
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .notFound(_):
+            throw KaitenError.notFound(resource: "board", id: boardId)
+        case .undocumented(statusCode: let code, _):
+            throw KaitenError.unexpectedResponse(statusCode: code)
+        }
+    }
+
+    /// Fetches lanes for a board.
+    public func getBoardLanes(boardId: Int) async throws -> [Components.Schemas.Lane] {
+        let response = try await client.get_list_of_lanes(path: .init(board_id: boardId))
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        case .unauthorized(_):
+            throw KaitenError.unauthorized
+        case .forbidden(_):
+            throw KaitenError.unexpectedResponse(statusCode: 403)
+        case .notFound(_):
+            throw KaitenError.notFound(resource: "board", id: boardId)
         case .undocumented(statusCode: let code, _):
             throw KaitenError.unexpectedResponse(statusCode: code)
         }
