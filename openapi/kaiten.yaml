@@ -74,8 +74,7 @@ paths:
                       type: string
                       description: 1 – card's count, 2 – card's size
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
                     default_tags:
                       type: string
@@ -90,12 +89,10 @@ paths:
                       type: integer
                       description: Warning appears on stale cards
                     months_to_hide_cards:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: '[Deprecated] Hide cards not moved for the last N months'
                     card_hide_after_days:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: Hide cards not moved for the last N days
                     pause_sla:
                       type: boolean
@@ -157,15 +154,13 @@ paths:
                       type: integer
                       description: Board id
                     default_card_type_id:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: Default card type for new cards in lane
                     wip_limit_type:
                       type: string
                       description: 1 – card's count, 2 – card's size
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
                     default_tags:
                       type: string
@@ -222,12 +217,10 @@ paths:
                   cell_wip_limits:
                     type: array
                     items:
-                      type: object
-                    nullable: true
+                      type: ["object", "null"]
                     description: JSON containing wip limits rules for cells
                   external_id:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: External id
                   default_card_type_id:
                     type: integer
@@ -242,8 +235,7 @@ paths:
                     type: boolean
                     description: Automatically move parent cards to done when their children cards on this board is done
                   default_tags:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Default tags
                   first_image_is_cover:
                     type: boolean
@@ -270,8 +262,7 @@ paths:
                   card_properties:
                     type: array
                     items:
-                      type: object
-                    nullable: true
+                      type: ["object", "null"]
                     description: 'Properties of the board cards suggested for filling '
                   columns:
                     type: array
@@ -505,8 +496,7 @@ paths:
                     type: string
                     description: Checklist name
                   policy_id:
-                    type: integer
-                    nullable: true
+                    type: ["integer", "null"]
                     description: Template checklist id
                   items:
                     type: array
@@ -652,16 +642,14 @@ paths:
                     type: boolean
                     description: Deleted flag
                   sd_external_recipients_cc:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Service desk external recipients
                   sd_description:
                     type: boolean
                     description: Flag indicating that the comment is used as a request description when the card is a service
                       desk request
                   notification_sent:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Notification sent date
                   author:
                     type: object
@@ -707,8 +695,7 @@ paths:
                     type: string
                     description: Default user avatar
                   avatar_uploaded_url:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: User uploaded avatar url
                   initials:
                     type: string
@@ -775,8 +762,7 @@ paths:
                       type: string
                       description: Default user avatar
                     avatar_uploaded_url:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: User uploaded avatar url
                     initials:
                       type: string
@@ -1006,8 +992,7 @@ paths:
                       type: string
                       description: 1 – card's count, 2 – card's size
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
                     default_tags:
                       type: string
@@ -1022,12 +1007,10 @@ paths:
                       type: integer
                       description: Warning appears on stale cards
                     months_to_hide_cards:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: '[Deprecated] Hide cards not moved for the last N months'
                     card_hide_after_days:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: Hide cards not moved for the last N months
         '401':
           description: Invalid token
@@ -1062,8 +1045,7 @@ paths:
                       type: string
                       description: Should render multiline text field
                     fields_settings:
-                      type: object
-                      nullable: true
+                      type: ["object", "null"]
                       description: Field settings for catalog type
                     author_id:
                       type: integer
@@ -1094,27 +1076,22 @@ paths:
                       description: Used for select properties. Determines if users with writer role are able to create new
                         select property values.
                     data:
-                      type: object
-                      nullable: true
+                      type: ["object", "null"]
                       description: Additional custom property data
                     values_type:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Type of values
                     vote_variant:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Type of vote or collective vote custom properties
                     protected:
                       type: boolean
                       description: Protected flag
                     color:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: Color of catalog custom property
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
         '401':
           description: Invalid token
@@ -1152,8 +1129,7 @@ paths:
                     type: string
                     description: Should render multiline text field
                   fields_settings:
-                    type: object
-                    nullable: true
+                    type: ["object", "null"]
                     description: Field settings for catalog type
                   author_id:
                     type: integer
@@ -1184,27 +1160,22 @@ paths:
                     description: Used for select properties. Determines if users with writer role are able to create new select
                       property values.
                   data:
-                    type: object
-                    nullable: true
+                    type: ["object", "null"]
                     description: Additional custom property data
                   values_type:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Type of values
                   vote_variant:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Type of vote or collective vote custom properties
                   protected:
                     type: boolean
                     description: Protected flag
                   color:
-                    type: integer
-                    nullable: true
+                    type: ["integer", "null"]
                     description: Color of catalog custom property
                   external_id:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: External id
         '401':
           description: Invalid token
@@ -1260,8 +1231,7 @@ paths:
                       type: number
                       description: Space sort order
                     parent_entity_uid:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Parent entity uid
                     company_id:
                       type: integer
@@ -1269,12 +1239,10 @@ paths:
                     allowed_card_type_ids:
                       type: array
                       items:
-                        type: object
-                      nullable: true
+                        type: ["object", "null"]
                       description: Allowed card types for this space
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
                     settings:
                       type: object
@@ -1348,8 +1316,7 @@ paths:
                     type: number
                     description: Space sort order
                   parent_entity_uid:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Parent entity uid
                   company_id:
                     type: integer
@@ -1357,12 +1324,10 @@ paths:
                   allowed_card_type_ids:
                     type: array
                     items:
-                      type: object
-                    nullable: true
+                      type: ["object", "null"]
                     description: Allowed card types for this space
                   external_id:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: External id
                   settings:
                     type: object
@@ -1409,12 +1374,10 @@ paths:
                     cell_wip_limits:
                       type: array
                       items:
-                        type: object
-                      nullable: true
+                        type: ["object", "null"]
                       description: JSON containing wip limits rules for cells
                     external_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: External id
                     default_card_type_id:
                       type: integer
@@ -1429,8 +1392,7 @@ paths:
                       type: boolean
                       description: Automatically move parent cards to done when their children cards on this board is done
                     default_tags:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Default tags
                     first_image_is_cover:
                       type: boolean
@@ -1457,8 +1419,7 @@ paths:
                     card_properties:
                       type: array
                       items:
-                        type: object
-                      nullable: true
+                        type: ["object", "null"]
                       description: 'Properties of the board cards suggested for filling '
                     columns:
                       type: array
@@ -1557,8 +1518,7 @@ paths:
                       type: string
                       description: Default user avatar
                     avatar_uploaded_url:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: User uploaded avatar url
                     initials:
                       type: string
@@ -1594,8 +1554,7 @@ paths:
                       type: integer
                       description: User id
                     default_space_id:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: Default space
                     permissions:
                       type: integer
@@ -1610,16 +1569,13 @@ paths:
                       type: object
                       description: Email settings
                     slack_id:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: User slack id
                     slack_settings:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Slack settings
                     notification_settings:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Notification settings
                     notification_enabled_channels:
                       type: array
@@ -1627,8 +1583,7 @@ paths:
                         type: object
                       description: List of enabled channels for notifications
                     slack_private_channel_id:
-                      type: integer
-                      nullable: true
+                      type: ["integer", "null"]
                       description: User slack private channel id
                     telegram_sd_bot_enabled:
                       type: boolean
@@ -1646,12 +1601,10 @@ paths:
                       type: boolean
                       description: Is user external
                     last_request_date:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Date of last request
                     last_request_method:
-                      type: string
-                      nullable: true
+                      type: ["string", "null"]
                       description: Type of last request
                     include_inactive:
                       type: boolean
@@ -1690,8 +1643,7 @@ paths:
                     type: string
                     description: Default user avatar
                   avatar_uploaded_url:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: User uploaded avatar url
                   initials:
                     type: string
@@ -1733,8 +1685,7 @@ paths:
                     type: integer
                     description: User id
                   default_space_id:
-                    type: integer
-                    nullable: true
+                    type: ["integer", "null"]
                     description: Default space
                   permissions:
                     type: integer
@@ -1749,16 +1700,13 @@ paths:
                     type: object
                     description: Email settings
                   slack_id:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: User slack id
                   slack_settings:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Slack settings
                   notification_settings:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Notification settings
                   notification_enabled_channels:
                     type: array
@@ -1766,8 +1714,7 @@ paths:
                       type: object
                     description: List of enabled channels for notifications
                   slack_private_channel_id:
-                    type: integer
-                    nullable: true
+                    type: ["integer", "null"]
                     description: User slack private channel id
                   telegram_sd_bot_enabled:
                     type: boolean
@@ -1785,12 +1732,10 @@ paths:
                     type: boolean
                     description: Is user external
                   last_request_date:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Date of last request
                   last_request_method:
-                    type: string
-                    nullable: true
+                    type: ["string", "null"]
                     description: Type of last request
                   has_password:
                     type: boolean
@@ -1820,8 +1765,7 @@ components:
           type: string
           description: Card title
         description:
-          type: string
-          nullable: true
+          type: ["string", "null"]
           description: Card description (markdown)
         state:
           type: integer
@@ -1836,19 +1780,16 @@ components:
           type: integer
           description: Column ID
         lane_id:
-          type: integer
-          nullable: true
+          type: ["integer", "null"]
           description: Lane ID
         sort_order:
           type: number
           description: Sort order in column
         type_id:
-          type: integer
-          nullable: true
+          type: ["integer", "null"]
           description: Card type ID
         size_text:
-          type: string
-          nullable: true
+          type: ["string", "null"]
           description: Size text
         created:
           type: string
@@ -1891,8 +1832,7 @@ components:
             type: integer
           description: IDs of related cards
         condition:
-          type: object
-          nullable: true
+          type: ["object", "null"]
           description: Card condition/deadline info
     CardMember:
       type: object
@@ -1926,5 +1866,4 @@ components:
         name:
           type: string
         color:
-          type: integer
-          nullable: true
+          type: ["integer", "null"]
