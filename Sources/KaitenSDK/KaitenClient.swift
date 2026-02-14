@@ -52,14 +52,6 @@ struct KaitenConfiguration: Sendable {
 
 // MARK: - Errors
 
-/// Errors thrown by the Kaiten SDK.
-public enum KaitenError: Error, Sendable {
-    /// A required configuration value is missing.
-    case missingConfiguration(String)
-    /// The provided URL is invalid.
-    case invalidURL(String)
-}
-
 // MARK: - Helpers
 
 extension Optional {
