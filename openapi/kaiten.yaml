@@ -1,0 +1,1930 @@
+openapi: 3.1.0
+info:
+  title: Kaiten API
+  description: Kaiten project management API. Extracted from developers.kaiten.ru.
+  version: 1.0.0
+servers:
+- url: https://{company}.kaiten.ru/api/latest
+  variables:
+    company:
+      default: your-company
+      description: Your Kaiten company subdomain
+security:
+- bearerAuth: []
+paths:
+  /boards/{board_id}/columns:
+    get:
+      summary: Get list of columns
+      operationId: get_list_of_columns
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    id:
+                      type: integer
+                      description: Column id
+                    title:
+                      type: string
+                      description: Column title
+                    sort_order:
+                      type: number
+                      description: Position
+                    col_count:
+                      type: integer
+                      description: Width
+                    wip_limit:
+                      type: integer
+                      description: Recommended limit for column
+                    type:
+                      type: string
+                      description: 1 - queue, 2 – in progress, 3 – done
+                    rules:
+                      type: integer
+                      description: 'Bit mask for column rules. Rules: 1 - checklists must be checked, 2 - display FIFO order'
+                    board_id:
+                      type: integer
+                      description: Board id
+                    column_id:
+                      type: string
+                      description: Parent column id
+                    archive_after_days:
+                      type: integer
+                      description: Specify amont of days after which cards will be automatically archived. Works only for
+                        columns with type **done**
+                    wip_limit_type:
+                      type: string
+                      description: 1 – card's count, 2 – card's size
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+                    default_tags:
+                      type: string
+                      description: Default tags
+                    last_moved_warning_after_days:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_hours:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_minutes:
+                      type: integer
+                      description: Warning appears on stale cards
+                    months_to_hide_cards:
+                      type: integer
+                      nullable: true
+                      description: '[Deprecated] Hide cards not moved for the last N months'
+                    card_hide_after_days:
+                      type: integer
+                      nullable: true
+                      description: Hide cards not moved for the last N days
+                    pause_sla:
+                      type: boolean
+                      description: Indicates whether the SLA timer should be paused in this column
+                    subcolumns:
+                      type: array
+                      items:
+                        type: object
+                      description: Column subcolumns
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /boards/{board_id}/lanes:
+    get:
+      summary: Get list of lanes
+      operationId: get_list_of_lanes
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    id:
+                      type: string
+                      description: Lane id
+                    title:
+                      type: string
+                      description: Lane title
+                    sort_order:
+                      type: number
+                      description: Position
+                    row_count:
+                      type: integer
+                      description: Height
+                    wip_limit:
+                      type: integer
+                      description: Recommended limit for column
+                    board_id:
+                      type: integer
+                      description: Board id
+                    default_card_type_id:
+                      type: integer
+                      nullable: true
+                      description: Default card type for new cards in lane
+                    wip_limit_type:
+                      type: string
+                      description: 1 – card's count, 2 – card's size
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+                    default_tags:
+                      type: string
+                      description: Default tags
+                    last_moved_warning_after_days:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_hours:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_minutes:
+                      type: integer
+                      description: Warning appears on stale cards
+                    condition:
+                      type: string
+                      description: 1 - live, 2 - archived, 3 - deleted
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /boards/{id}:
+    get:
+      summary: Get board
+      operationId: get_board
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: string
+                    description: Create date
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  id:
+                    type: integer
+                    description: Board id
+                  title:
+                    type: string
+                    description: Board title
+                  cell_wip_limits:
+                    type: array
+                    items:
+                      type: object
+                    nullable: true
+                    description: JSON containing wip limits rules for cells
+                  external_id:
+                    type: string
+                    nullable: true
+                    description: External id
+                  default_card_type_id:
+                    type: integer
+                    description: Default card type for new cards on board
+                  description:
+                    type: string
+                    description: Board description
+                  email_key:
+                    type: string
+                    description: Email key
+                  move_parents_to_done:
+                    type: boolean
+                    description: Automatically move parent cards to done when their children cards on this board is done
+                  default_tags:
+                    type: string
+                    nullable: true
+                    description: Default tags
+                  first_image_is_cover:
+                    type: boolean
+                    description: Automatically mark first uploaded card's image as card's cover
+                  reset_lane_spent_time:
+                    type: boolean
+                    description: Reset lane spent time when card changed lane
+                  backward_moves_enabled:
+                    type: boolean
+                    description: Allow automatic backward movement for summary boards
+                  hide_done_policies:
+                    type: boolean
+                    description: Hide done checklist policies
+                  hide_done_policies_in_done_column:
+                    type: boolean
+                    description: Hide done checklist policies only in done column
+                  automove_cards:
+                    type: boolean
+                    description: Automatically move cards depending on their children state
+                  auto_assign_enabled:
+                    type: boolean
+                    description: Automatically assign a user to the card when he/she moves the card if the user is not a member
+                      of the card
+                  card_properties:
+                    type: array
+                    items:
+                      type: object
+                    nullable: true
+                    description: 'Properties of the board cards suggested for filling '
+                  columns:
+                    type: array
+                    items:
+                      type: object
+                    description: Board columns
+                  lanes:
+                    type: array
+                    items:
+                      type: object
+                    description: Board lanes
+                  cards:
+                    type: array
+                    items:
+                      type: object
+                    description: Board cards
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /cards:
+    get:
+      summary: Get list of cards
+      operationId: get_cards
+      parameters:
+      - name: board_id
+        in: query
+        schema:
+          type: integer
+        description: Filter by board ID
+      - name: column_id
+        in: query
+        schema:
+          type: integer
+        description: Filter by column ID
+      - name: lane_id
+        in: query
+        schema:
+          type: integer
+        description: Filter by lane ID
+      - name: offset
+        in: query
+        schema:
+          type: integer
+        description: Offset for pagination
+      - name: limit
+        in: query
+        schema:
+          type: integer
+        description: Limit for pagination
+      responses:
+        '200':
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create new card
+      operationId: create_card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - title
+              - board_id
+              - column_id
+              properties:
+                title:
+                  type: string
+                  description: Card title
+                board_id:
+                  type: integer
+                  description: Board ID
+                column_id:
+                  type: integer
+                  description: Column ID
+                lane_id:
+                  type: integer
+                  description: Lane ID
+                description:
+                  type: string
+                  description: Card description
+                type_id:
+                  type: integer
+                  description: Card type ID
+                sort_order:
+                  type: number
+                  description: Sort order
+                size_text:
+                  type: string
+                  description: Size text
+                properties:
+                  type: object
+                  description: Custom properties
+      responses:
+        '200':
+          description: Created card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '401':
+          description: Unauthorized
+  /cards/{card_id}:
+    get:
+      summary: Get card
+      operationId: get_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: Card details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Card not found
+    patch:
+      summary: Update card
+      operationId: update_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                column_id:
+                  type: integer
+                lane_id:
+                  type: integer
+                sort_order:
+                  type: number
+                size_text:
+                  type: string
+                properties:
+                  type: object
+                  description: Custom properties
+      responses:
+        '200':
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Card not found
+    delete:
+      summary: Delete card
+      operationId: delete_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '204':
+          description: Card deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Card not found
+  /cards/{card_id}/checklists/{id}:
+    get:
+      summary: Retrieve card checklist
+      operationId: retrieve_card_checklist
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card CheckList ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  id:
+                    type: integer
+                    description: Card checklist id
+                  name:
+                    type: string
+                    description: Checklist name
+                  policy_id:
+                    type: integer
+                    nullable: true
+                    description: Template checklist id
+                  items:
+                    type: array
+                    items:
+                      type: object
+                    description: Checklist items
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/comments:
+    post:
+      summary: Add comment
+      operationId: add_comment
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  id:
+                    type: integer
+                    description: Comment id
+                  uid:
+                    type: integer
+                    description: Comment uid
+                  text:
+                    type: string
+                    description: Comment text
+                  type:
+                    type: string
+                    description: 1-markdown, 2-html
+                  edited:
+                    type: boolean
+                    description: Is comment edited
+                  card_id:
+                    type: integer
+                    description: Card id
+                  author_id:
+                    type: integer
+                    description: Author id
+                  email_addresses_to:
+                    type: string
+                    description: Mail addresses to send comment
+                  internal:
+                    type: boolean
+                    description: Internal flag
+                  deleted:
+                    type: boolean
+                    description: Deleted flag
+                  sd_external_recipients_cc:
+                    type: string
+                    description: Service desk external recipients
+                  sd_description:
+                    type: boolean
+                    description: Flag indicating that the comment is used as a request description when the card is a service
+                      desk request
+                  notification_sent:
+                    type: string
+                    description: Notification_sent date
+                  attacments:
+                    type: array
+                    items:
+                      type: object
+                    description: Comment attacments
+        '400':
+          description: validation Error
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    get:
+      summary: Retrieve card comments
+      operationId: retrieve_card_comments
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  id:
+                    type: integer
+                    description: Comment id
+                  uid:
+                    type: integer
+                    description: Comment uid
+                  text:
+                    type: string
+                    description: Comment text
+                  type:
+                    type: string
+                    description: 1-markdown, 2-html
+                  edited:
+                    type: boolean
+                    description: Is comment edited
+                  card_id:
+                    type: integer
+                    description: Card id
+                  author_id:
+                    type: integer
+                    description: Author id
+                  email_addresses_to:
+                    type: string
+                    description: Mail addresses to send comment
+                  internal:
+                    type: boolean
+                    description: Internal flag
+                  deleted:
+                    type: boolean
+                    description: Deleted flag
+                  sd_external_recipients_cc:
+                    type: string
+                    nullable: true
+                    description: Service desk external recipients
+                  sd_description:
+                    type: boolean
+                    description: Flag indicating that the comment is used as a request description when the card is a service
+                      desk request
+                  notification_sent:
+                    type: string
+                    nullable: true
+                    description: Notification sent date
+                  author:
+                    type: object
+                    description: Author info
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/members:
+    post:
+      summary: Add member to card
+      operationId: add_member_to_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: User id
+                  full_name:
+                    type: string
+                    description: User full name
+                  email:
+                    type: string
+                    description: User email
+                  username:
+                    type: string
+                    description: Username for mentions and login
+                  avatar_initials_url:
+                    type: string
+                    description: Default user avatar
+                  avatar_uploaded_url:
+                    type: string
+                    nullable: true
+                    description: User uploaded avatar url
+                  initials:
+                    type: string
+                    description: User initials
+                  avatar_type:
+                    type: string
+                    description: 1 – gravatar, 2 – initials, 3 - uploaded
+                  lng:
+                    type: string
+                    description: Language
+                  timezone:
+                    type: string
+                    description: Time zone
+                  theme:
+                    type: string
+                    description: light - light color theme, dark - dark color theme, auto - color theme based on OS settings
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  type:
+                    type: integer
+                    description: 1 - member
+        '400':
+          description: validation Error
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    get:
+      summary: Retrieve list of card members
+      operationId: retrieve_list_of_card_members
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: User id
+                    full_name:
+                      type: string
+                      description: User full name
+                    email:
+                      type: string
+                      description: User email
+                    username:
+                      type: string
+                      description: Username for mentions and login
+                    avatar_initials_url:
+                      type: string
+                      description: Default user avatar
+                    avatar_uploaded_url:
+                      type: string
+                      nullable: true
+                      description: User uploaded avatar url
+                    initials:
+                      type: string
+                      description: User initials
+                    avatar_type:
+                      type: string
+                      description: 1 – gravatar, 2 – initials, 3 - uploaded
+                    lng:
+                      type: string
+                      description: Language
+                    timezone:
+                      type: string
+                      description: Time zone
+                    theme:
+                      type: string
+                      description: light - light color theme, dark - dark color theme, auto - color theme based on OS settings
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    activated:
+                      type: boolean
+                      description: User activated flag
+                    ui_version:
+                      type: string
+                      description: 1 - old ui. 2 - new ui
+                    virtual:
+                      type: boolean
+                      description: Virtual user flag
+                    card_id:
+                      type: integer
+                      description: Card id
+                    user_id:
+                      type: integer
+                      description: User id
+                    type:
+                      type: string
+                      description: 1 - member, 2 - responsible
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+  /cards/{card_id}/members/{id}:
+    patch:
+      summary: Update member role
+      operationId: update_member_role
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  card_id:
+                    type: integer
+                    description: Card id
+                  user_id:
+                    type: integer
+                    description: User id
+                  type:
+                    type: integer
+                    description: 2 - responsible
+        '400':
+          description: validation Error
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove member from card
+      operationId: remove_member_from_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Removed user id
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/tags:
+    get:
+      summary: Rertrieve list of tags
+      operationId: rertrieve_list_of_tags
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Card tag id
+                    name:
+                      type: string
+                      description: Card tag name
+                    color:
+                      type: integer
+                      description: Card tag color number
+                    card_id:
+                      type: integer
+                      description: Card id
+                    tag_id:
+                      type: integer
+                      description: Card tag id
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /columns/{column_id}/subcolumns:
+    get:
+      summary: Get list of subcolumns
+      operationId: get_list_of_subcolumns
+      parameters:
+      - name: column_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    id:
+                      type: integer
+                      description: Column id
+                    title:
+                      type: string
+                      description: Column title
+                    sort_order:
+                      type: number
+                      description: Position
+                    col_count:
+                      type: integer
+                      description: Width
+                    wip_limit:
+                      type: integer
+                      description: Recommended limit for column
+                    type:
+                      type: string
+                      description: 1 - queue, 2 – in progress, 3 – done
+                    rules:
+                      type: integer
+                      description: 'Bit mask for column rules. Rules: 1 - checklists must be checked, 2 - display FIFO order'
+                    board_id:
+                      type: integer
+                      description: Board id
+                    column_id:
+                      type: integer
+                      description: Parent column id
+                    archive_after_days:
+                      type: integer
+                      description: Specify amont of days after which cards will be automatically archived. Works only for
+                        columns with type **done**
+                    wip_limit_type:
+                      type: string
+                      description: 1 – card's count, 2 – card's size
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+                    default_tags:
+                      type: string
+                      description: Default tags
+                    last_moved_warning_after_days:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_hours:
+                      type: integer
+                      description: Warning appears on stale cards
+                    last_moved_warning_after_minutes:
+                      type: integer
+                      description: Warning appears on stale cards
+                    months_to_hide_cards:
+                      type: integer
+                      nullable: true
+                      description: '[Deprecated] Hide cards not moved for the last N months'
+                    card_hide_after_days:
+                      type: integer
+                      nullable: true
+                      description: Hide cards not moved for the last N months
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /company/custom-properties:
+    get:
+      summary: Get list of properties
+      operationId: get_list_of_properties
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Custom property name
+                    type:
+                      type: string
+                      description: Custom property type
+                    show_on_facade:
+                      type: string
+                      description: Should show property on card's facade
+                    multiline:
+                      type: string
+                      description: Should render multiline text field
+                    fields_settings:
+                      type: object
+                      nullable: true
+                      description: Field settings for catalog type
+                    author_id:
+                      type: integer
+                      description: Author_id
+                    company_id:
+                      type: integer
+                      description: Company_id
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    id:
+                      type: integer
+                      description: Custom property id
+                    condition:
+                      type: string
+                      description: Custom property condition
+                    colorful:
+                      type: boolean
+                      description: Used for select properties. Determines should select color when creating new select value.
+                    multi_select:
+                      type: boolean
+                      description: Used for select properties. Determines is select property used as multi select
+                    values_creatable_by_users:
+                      type: boolean
+                      description: Used for select properties. Determines if users with writer role are able to create new
+                        select property values.
+                    data:
+                      type: object
+                      nullable: true
+                      description: Additional custom property data
+                    values_type:
+                      type: string
+                      nullable: true
+                      description: Type of values
+                    vote_variant:
+                      type: string
+                      nullable: true
+                      description: Type of vote or collective vote custom properties
+                    protected:
+                      type: boolean
+                      description: Protected flag
+                    color:
+                      type: integer
+                      nullable: true
+                      description: Color of catalog custom property
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+  /company/custom-properties/{id}:
+    get:
+      summary: Get property
+      operationId: get_property
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: CustomProperty ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Custom property name
+                  type:
+                    type: string
+                    description: Custom property type
+                  show_on_facade:
+                    type: string
+                    description: Should show property on card's facade
+                  multiline:
+                    type: string
+                    description: Should render multiline text field
+                  fields_settings:
+                    type: object
+                    nullable: true
+                    description: Field settings for catalog type
+                  author_id:
+                    type: integer
+                    description: Author_id
+                  company_id:
+                    type: integer
+                    description: Company_id
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  id:
+                    type: integer
+                    description: Custom property id
+                  condition:
+                    type: string
+                    description: Custom property condition
+                  colorful:
+                    type: boolean
+                    description: Used for select properties. Determines should select color when creating new select value.
+                  multi_select:
+                    type: boolean
+                    description: Used for select properties. Determines is select property used as multi select
+                  values_creatable_by_users:
+                    type: boolean
+                    description: Used for select properties. Determines if users with writer role are able to create new select
+                      property values.
+                  data:
+                    type: object
+                    nullable: true
+                    description: Additional custom property data
+                  values_type:
+                    type: string
+                    nullable: true
+                    description: Type of values
+                  vote_variant:
+                    type: string
+                    nullable: true
+                    description: Type of vote or collective vote custom properties
+                  protected:
+                    type: boolean
+                    description: Protected flag
+                  color:
+                    type: integer
+                    nullable: true
+                    description: Color of catalog custom property
+                  external_id:
+                    type: string
+                    nullable: true
+                    description: External id
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /spaces:
+    get:
+      summary: Retrieve list of spaces
+      operationId: retrieve_list_of_spaces
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Space id
+                    uid:
+                      type: string
+                      description: Space uid
+                    title:
+                      type: string
+                      description: Space title
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    archived:
+                      type: boolean
+                      description: Space archived flag
+                    access:
+                      type: string
+                      description: Space access
+                    for_everyone_access_role_id:
+                      type: string
+                      description: Role id for everyone access
+                    entity_type:
+                      type: string
+                      description: Entity type
+                    path:
+                      type: string
+                      description: Inner path to entity
+                    sort_order:
+                      type: number
+                      description: Space sort order
+                    parent_entity_uid:
+                      type: string
+                      nullable: true
+                      description: Parent entity uid
+                    company_id:
+                      type: integer
+                      description: Company id
+                    allowed_card_type_ids:
+                      type: array
+                      items:
+                        type: object
+                      nullable: true
+                      description: Allowed card types for this space
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+                    settings:
+                      type: object
+                      description: Space settings
+                    boards:
+                      type: array
+                      items:
+                        type: object
+                      description: Space boards
+                    entity_uid:
+                      type: string
+                      description: Entity uid
+                    user_id:
+                      type: integer
+                      description: User id
+                    access_mod:
+                      type: string
+                      description: User access modifier
+        '401':
+          description: Invalid token
+  /spaces/{space_id}:
+    get:
+      summary: Retrieve space
+      operationId: retrieve_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Space id
+                  uid:
+                    type: string
+                    description: Space uid
+                  title:
+                    type: string
+                    description: Space title
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  archived:
+                    type: boolean
+                    description: Space archived flag
+                  access:
+                    type: string
+                    description: Space access
+                  for_everyone_access_role_id:
+                    type: string
+                    description: Role id for everyone access
+                  entity_type:
+                    type: string
+                    description: Entity type
+                  path:
+                    type: string
+                    description: Inner path to entity
+                  sort_order:
+                    type: number
+                    description: Space sort order
+                  parent_entity_uid:
+                    type: string
+                    nullable: true
+                    description: Parent entity uid
+                  company_id:
+                    type: integer
+                    description: Company id
+                  allowed_card_type_ids:
+                    type: array
+                    items:
+                      type: object
+                    nullable: true
+                    description: Allowed card types for this space
+                  external_id:
+                    type: string
+                    nullable: true
+                    description: External id
+                  settings:
+                    type: object
+                    description: Space settings
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /spaces/{space_id}/boards:
+    get:
+      summary: Get list of boards
+      operationId: get_list_of_boards
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    created:
+                      type: string
+                      description: Create date
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    id:
+                      type: integer
+                      description: Board  id
+                    title:
+                      type: string
+                      description: Board title
+                    cell_wip_limits:
+                      type: array
+                      items:
+                        type: object
+                      nullable: true
+                      description: JSON containing wip limits rules for cells
+                    external_id:
+                      type: string
+                      nullable: true
+                      description: External id
+                    default_card_type_id:
+                      type: integer
+                      description: Default card type for new cards on board
+                    description:
+                      type: string
+                      description: Board description
+                    email_key:
+                      type: string
+                      description: Email key
+                    move_parents_to_done:
+                      type: boolean
+                      description: Automatically move parent cards to done when their children cards on this board is done
+                    default_tags:
+                      type: string
+                      nullable: true
+                      description: Default tags
+                    first_image_is_cover:
+                      type: boolean
+                      description: Automatically mark first uploaded card's image as card's cover
+                    reset_lane_spent_time:
+                      type: boolean
+                      description: Reset lane spent time when card changed lane
+                    backward_moves_enabled:
+                      type: boolean
+                      description: Allow automatic backward movement for summary boards
+                    hide_done_policies:
+                      type: boolean
+                      description: Hide done checklist policies
+                    hide_done_policies_in_done_column:
+                      type: boolean
+                      description: Hide done checklist policies only in done column
+                    automove_cards:
+                      type: boolean
+                      description: Automatically move cards depending on their children state
+                    auto_assign_enabled:
+                      type: boolean
+                      description: Automatically assign a user to the card when he/she moves the card if the user is not a
+                        member of the card
+                    card_properties:
+                      type: array
+                      items:
+                        type: object
+                      nullable: true
+                      description: 'Properties of the board cards suggested for filling '
+                    columns:
+                      type: array
+                      items:
+                        type: object
+                      description: Board columns
+                    lanes:
+                      type: array
+                      items:
+                        type: object
+                      description: Board lanes
+                    top:
+                      type: integer
+                      description: Y coordinate of the board on space
+                    left:
+                      type: integer
+                      description: X coordinate of the board on space
+                    sort_order:
+                      type: number
+                      description: Position
+                    type:
+                      type: integer
+                      description: 1 - place on space with coordinates (top, left), 5 - attach to space as sidebar
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+  /tags:
+    get:
+      summary: Retrieve list of tags
+      operationId: retrieve_list_of_tags
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    id:
+                      type: integer
+                      description: Tag id
+                    name:
+                      type: string
+                      description: Tag name
+                    company_id:
+                      type: integer
+                      description: Company id
+                    color:
+                      type: integer
+                      description: Color number
+                    archived:
+                      type: boolean
+                      description: Archived flag
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+  /users:
+    get:
+      summary: Retrieve list of users
+      operationId: retrieve_list_of_users
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: User id
+                    full_name:
+                      type: string
+                      description: User full name
+                    email:
+                      type: string
+                      description: User email
+                    username:
+                      type: string
+                      description: Username for mentions and login
+                    avatar_initials_url:
+                      type: string
+                      description: Default user avatar
+                    avatar_uploaded_url:
+                      type: string
+                      nullable: true
+                      description: User uploaded avatar url
+                    initials:
+                      type: string
+                      description: User initials
+                    avatar_type:
+                      type: string
+                      description: 1 – gravatar, 2 – initials, 3 - uploaded
+                    lng:
+                      type: string
+                      description: Language
+                    timezone:
+                      type: string
+                      description: Time zone
+                    theme:
+                      type: string
+                      description: light - light color theme, dark - dark color theme, auto - color theme based on OS settings
+                    updated:
+                      type: string
+                      description: Last update timestamp
+                    created:
+                      type: string
+                      description: Create date
+                    activated:
+                      type: boolean
+                      description: User activated flag
+                    ui_version:
+                      type: string
+                      description: 1 - old ui. 2 - new ui
+                    company_id:
+                      type: integer
+                      description: Company id
+                    user_id:
+                      type: integer
+                      description: User id
+                    default_space_id:
+                      type: integer
+                      nullable: true
+                      description: Default space
+                    permissions:
+                      type: integer
+                      description: User company permissions
+                    role:
+                      type: string
+                      description: User role in company:\n 1 - owner,\n 2 - user,\n 3 - deactivated
+                    email_frequency:
+                      type: string
+                      description: 1 - never, 2 – instantly
+                    email_settings:
+                      type: object
+                      description: Email settings
+                    slack_id:
+                      type: string
+                      nullable: true
+                      description: User slack id
+                    slack_settings:
+                      type: string
+                      nullable: true
+                      description: Slack settings
+                    notification_settings:
+                      type: string
+                      nullable: true
+                      description: Notification settings
+                    notification_enabled_channels:
+                      type: array
+                      items:
+                        type: object
+                      description: List of enabled channels for notifications
+                    slack_private_channel_id:
+                      type: integer
+                      nullable: true
+                      description: User slack private channel id
+                    telegram_sd_bot_enabled:
+                      type: boolean
+                      description: Telegram bot enable flag
+                    invite_last_sent_at:
+                      type: string
+                      description: Last invite date
+                    apps_permissions:
+                      type: string
+                      description: 0 - no access,\n 1 - full access to {{projectName}}, access to service desk denied.\n 2
+                        - guest access to {{projectName}}, access to service desk denied.\n 4 - access only to service desk.\n
+                        5 - full access to {{projectName}} and service desk.\n 6 - guest access to {{projectName}}, access
+                        to service desk
+                    external:
+                      type: boolean
+                      description: Is user external
+                    last_request_date:
+                      type: string
+                      nullable: true
+                      description: Date of last request
+                    last_request_method:
+                      type: string
+                      nullable: true
+                      description: Type of last request
+                    include_inactive:
+                      type: boolean
+                      description: Includes in the list of deactivated users
+        '400':
+          description: validation Error
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+  /users/current:
+    get:
+      summary: Retrieve current user
+      operationId: retrieve_current_user
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: User id
+                  full_name:
+                    type: string
+                    description: User full name
+                  email:
+                    type: string
+                    description: User email
+                  username:
+                    type: string
+                    description: Username for mentions and login
+                  avatar_initials_url:
+                    type: string
+                    description: Default user avatar
+                  avatar_uploaded_url:
+                    type: string
+                    nullable: true
+                    description: User uploaded avatar url
+                  initials:
+                    type: string
+                    description: User initials
+                  avatar_type:
+                    type: string
+                    description: 1 – gravatar, 2 – initials, 3 - uploaded
+                  lng:
+                    type: string
+                    description: Language
+                  timezone:
+                    type: string
+                    description: Time zone
+                  theme:
+                    type: string
+                    description: light - light color theme, dark - dark color theme, auto - color theme based on OS settings
+                  updated:
+                    type: string
+                    description: Last update timestamp
+                  created:
+                    type: string
+                    description: Create date
+                  activated:
+                    type: boolean
+                    description: User activated flag
+                  ui_version:
+                    type: string
+                    description: 1 - old ui. 2 - new ui
+                  company_id:
+                    type: integer
+                    description: Company id
+                  telegram_id:
+                    type: integer
+                    description: Telegram id
+                  telegram_settings:
+                    type: object
+                    description: Telegram settings
+                  user_id:
+                    type: integer
+                    description: User id
+                  default_space_id:
+                    type: integer
+                    nullable: true
+                    description: Default space
+                  permissions:
+                    type: integer
+                    description: User company permissions
+                  role:
+                    type: string
+                    description: User role in company:\n 1 - owner,\n 2 - user,\n 3 - deactivated
+                  email_frequency:
+                    type: string
+                    description: 1 - never, 2 – instantly
+                  email_settings:
+                    type: object
+                    description: Email settings
+                  slack_id:
+                    type: string
+                    nullable: true
+                    description: User slack id
+                  slack_settings:
+                    type: string
+                    nullable: true
+                    description: Slack settings
+                  notification_settings:
+                    type: string
+                    nullable: true
+                    description: Notification settings
+                  notification_enabled_channels:
+                    type: array
+                    items:
+                      type: object
+                    description: List of enabled channels for notifications
+                  slack_private_channel_id:
+                    type: integer
+                    nullable: true
+                    description: User slack private channel id
+                  telegram_sd_bot_enabled:
+                    type: boolean
+                    description: Telegram bot enable flag
+                  invite_last_sent_at:
+                    type: string
+                    description: Last invite date
+                  apps_permissions:
+                    type: string
+                    description: 0 - no access,\n 1 - full access to {{projectName}}, access to service desk denied.\n 2 -
+                      guest access to {{projectName}}, access to service desk denied.\n 4 - access only to service desk.\n
+                      5 - full access to {{projectName}} and service desk.\n 6 - guest access to {{projectName}}, access to
+                      service desk
+                  external:
+                    type: boolean
+                    description: Is user external
+                  last_request_date:
+                    type: string
+                    nullable: true
+                    description: Date of last request
+                  last_request_method:
+                    type: string
+                    nullable: true
+                    description: Type of last request
+                  has_password:
+                    type: boolean
+                    description: Has user password flag
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbiden
+        '404':
+          description: Not found
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card ID
+        uid:
+          type: string
+          description: Card UID
+        title:
+          type: string
+          description: Card title
+        description:
+          type: string
+          nullable: true
+          description: Card description (markdown)
+        state:
+          type: integer
+          description: Card state
+        archived:
+          type: boolean
+          description: Archived flag
+        board_id:
+          type: integer
+          description: Board ID
+        column_id:
+          type: integer
+          description: Column ID
+        lane_id:
+          type: integer
+          nullable: true
+          description: Lane ID
+        sort_order:
+          type: number
+          description: Sort order in column
+        type_id:
+          type: integer
+          nullable: true
+          description: Card type ID
+        size_text:
+          type: string
+          nullable: true
+          description: Size text
+        created:
+          type: string
+          description: Created timestamp
+        updated:
+          type: string
+          description: Updated timestamp
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardMember'
+          description: Card members
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          description: Card tags
+        checklists:
+          type: array
+          items:
+            type: object
+          description: Card checklists
+        properties:
+          type: object
+          description: Custom properties values
+          additionalProperties: true
+        blocked_by_card_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of cards blocking this card
+        blocks_card_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of cards blocked by this card
+        relates_card_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of related cards
+        condition:
+          type: object
+          nullable: true
+          description: Card condition/deadline info
+    CardMember:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Member record ID
+        user_id:
+          type: integer
+          description: User ID
+        card_id:
+          type: integer
+          description: Card ID
+        full_name:
+          type: string
+          description: User full name
+        email:
+          type: string
+          description: User email
+        username:
+          type: string
+          description: Username
+        type:
+          type: integer
+          description: 1 - member, 2 - responsible
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: integer
+          nullable: true
