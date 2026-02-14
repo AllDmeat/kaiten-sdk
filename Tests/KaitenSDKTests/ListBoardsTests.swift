@@ -7,10 +7,6 @@ import Testing
 @Suite("ListBoards")
 struct ListBoardsTests {
 
-    init() {
-        setenv("KAITEN_URL", "https://test.kaiten.ru/api/latest", 1)
-        setenv("KAITEN_TOKEN", "test-token", 1)
-    }
 
     @Test("200 returns boards")
     func success() async throws {
@@ -18,7 +14,7 @@ struct ListBoardsTests {
             [{"id": 1, "title": "Sprint Board"}, {"id": 2, "title": "Kanban"}]
             """
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let boards = try await client.listBoards(spaceId: 5)
         #expect(boards.count == 2)
@@ -29,7 +25,7 @@ struct ListBoardsTests {
     @Test("200 empty array returns empty")
     func emptyArray() async throws {
         let transport = MockClientTransport.returning(statusCode: 200, body: "[]")
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let boards = try await client.listBoards(spaceId: 5)
         #expect(boards.isEmpty)

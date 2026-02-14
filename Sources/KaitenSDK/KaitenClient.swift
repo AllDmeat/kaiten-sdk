@@ -37,15 +37,16 @@ public struct KaitenClient: Sendable {
     // MARK: - Initialization
 
     /// Internal initializer for testing with a custom transport.
-    init(transport: any ClientTransport) throws {
-        self.config = try KaitenConfiguration.resolve()
-        let url = try URL(string: config.baseURL)
-            .orThrow(KaitenError.invalidURL(config.baseURL))
+    /// Internal initializer for testing with a custom transport and explicit config.
+    init(baseURL: String, token: String, transport: any ClientTransport) throws {
+        self.config = KaitenConfiguration(baseURL: baseURL, token: token)
+        let url = try URL(string: baseURL)
+            .orThrow(KaitenError.invalidURL(baseURL))
         self.client = Client(
             serverURL: url,
             transport: transport,
             middlewares: [
-                AuthenticationMiddleware(token: config.token),
+                AuthenticationMiddleware(token: token),
                 RetryMiddleware(),
             ]
         )

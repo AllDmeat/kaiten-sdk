@@ -7,10 +7,6 @@ import Testing
 @Suite("ListSpaces")
 struct ListSpacesTests {
 
-    init() {
-        setenv("KAITEN_URL", "https://test.kaiten.ru/api/latest", 1)
-        setenv("KAITEN_TOKEN", "test-token", 1)
-    }
 
     @Test("200 returns spaces")
     func success() async throws {
@@ -18,7 +14,7 @@ struct ListSpacesTests {
             [{"id": 1, "title": "Engineering"}, {"id": 2, "title": "Design"}]
             """
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let spaces = try await client.listSpaces()
         #expect(spaces.count == 2)
@@ -29,7 +25,7 @@ struct ListSpacesTests {
     @Test("200 empty array returns empty")
     func emptyArray() async throws {
         let transport = MockClientTransport.returning(statusCode: 200, body: "[]")
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let spaces = try await client.listSpaces()
         #expect(spaces.isEmpty)
@@ -38,7 +34,7 @@ struct ListSpacesTests {
     @Test("401 throws unauthorized")
     func unauthorized() async throws {
         let transport = MockClientTransport.returning(statusCode: 401)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         await #expect(throws: KaitenError.self) {
             _ = try await client.listSpaces()

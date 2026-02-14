@@ -7,10 +7,6 @@ import Testing
 @Suite("CustomProperties")
 struct CustomPropertiesTests {
 
-    init() {
-        setenv("KAITEN_URL", "https://test.kaiten.ru/api/latest", 1)
-        setenv("KAITEN_TOKEN", "test-token", 1)
-    }
 
     @Test("listCustomProperties 200 returns array")
     func listSuccess() async throws {
@@ -18,7 +14,7 @@ struct CustomPropertiesTests {
             [{"id": 1, "name": "Priority", "type": "select"}, {"id": 2, "name": "Effort", "type": "number"}]
             """
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let props = try await client.listCustomProperties()
         #expect(props.count == 2)
@@ -31,7 +27,7 @@ struct CustomPropertiesTests {
             {"id": 1, "name": "Priority", "type": "select"}
             """
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         let prop = try await client.getCustomProperty(id: 1)
         #expect(prop.name == "Priority")
@@ -40,7 +36,7 @@ struct CustomPropertiesTests {
     @Test("getCustomProperty 404 throws notFound")
     func notFound() async throws {
         let transport = MockClientTransport.returning(statusCode: 404)
-        let client = try KaitenClient(transport: transport)
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
         await #expect(throws: KaitenError.self) {
             _ = try await client.getCustomProperty(id: 999)
