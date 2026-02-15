@@ -14,6 +14,10 @@ let package = Package(
     ],
     dependencies: [
         .package(
+            url: "https://github.com/apple/swift-argument-parser",
+            from: "1.5.0"
+        ),
+        .package(
             url: "https://github.com/apple/swift-openapi-generator",
             from: "1.7.0"
         ),
@@ -63,6 +67,19 @@ let package = Package(
                     name: "OpenAPIGenerator",
                     package: "swift-openapi-generator"
                 ),
+            ]
+        ),
+        .executableTarget(
+            name: "kaiten",
+            dependencies: [
+                "KaitenSDK",
+                .product(
+                    name: "ArgumentParser",
+                    package: "swift-argument-parser"
+                ),
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
         .testTarget(
