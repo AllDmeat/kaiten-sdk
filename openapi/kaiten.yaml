@@ -1068,12 +1068,12 @@ components:
           type: integer
           description: Company id
         allowed_card_type_ids:
-          type: array
+          type:
+          - array
+          - 'null'
           items:
-            type:
-            - object
-            - 'null'
-          description: Allowed card types for this space
+            type: integer
+          description: Allowed card type IDs for this space
         external_id:
           type:
           - string
