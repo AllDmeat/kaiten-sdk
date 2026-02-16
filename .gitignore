@@ -4,3 +4,4 @@
 *.xcodeproj/
 *.xcworkspace/
 .claude/
+Sources/KaitenSDK/GeneratedSources/

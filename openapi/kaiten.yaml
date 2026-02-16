@@ -836,12 +836,9 @@ components:
           type: string
           description: Board title
         cell_wip_limits:
-          type: array
-          items:
-            type:
-            - object
-            - 'null'
-          description: JSON containing wip limits rules for cells
+          description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
+          type: object
+          additionalProperties: true
         external_id:
           type:
           - string
@@ -1151,12 +1148,9 @@ components:
           type: string
           description: Board title
         cell_wip_limits:
-          type: array
-          items:
-            type:
-            - object
-            - 'null'
-          description: JSON containing wip limits rules for cells
+          description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
+          type: object
+          additionalProperties: true
         external_id:
           type:
           - string
