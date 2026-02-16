@@ -1,12 +1,10 @@
-import Configuration
 import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
 
 /// Main entry point for the Kaiten SDK.
 ///
-/// Reads `KAITEN_URL` and `KAITEN_TOKEN` from environment variables.
-/// Fails fast if either is missing.
+/// Accepts explicit `baseURL` and `token` parameters.
 public struct KaitenClient: Sendable {
     private let client: Client
     private let config: KaitenConfiguration
@@ -52,17 +50,17 @@ public struct KaitenClient: Sendable {
         )
     }
 
-    public init() throws {
-        self.config = try KaitenConfiguration.resolve()
+    public init(baseURL: String, token: String) throws {
+        self.config = KaitenConfiguration(baseURL: baseURL, token: token)
 
-        let url = try URL(string: config.baseURL)
-            .orThrow(KaitenError.invalidURL(config.baseURL))
+        let url = try URL(string: baseURL)
+            .orThrow(KaitenError.invalidURL(baseURL))
 
         self.client = Client(
             serverURL: url,
             transport: URLSessionTransport(),
             middlewares: [
-                AuthenticationMiddleware(token: config.token),
+                AuthenticationMiddleware(token: token),
                 RetryMiddleware(),
             ]
         )
@@ -116,21 +114,6 @@ public struct KaitenClient: Sendable {
 struct KaitenConfiguration: Sendable {
     let baseURL: String
     let token: String
-
-    static func resolve() throws -> KaitenConfiguration {
-        let config = ConfigReader(providers: [
-            EnvironmentVariablesProvider(),
-        ])
-
-        guard let url: String = config.string(forKey: "KAITEN_URL") else {
-            throw KaitenError.missingConfiguration("KAITEN_URL")
-        }
-        guard let token: String = config.string(forKey: "KAITEN_TOKEN") else {
-            throw KaitenError.missingConfiguration("KAITEN_TOKEN")
-        }
-
-        return KaitenConfiguration(baseURL: url, token: token)
-    }
 }
 
 // MARK: - Custom Properties

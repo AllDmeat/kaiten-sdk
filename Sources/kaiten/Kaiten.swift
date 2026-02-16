@@ -32,13 +32,13 @@ struct GlobalOptions: ParsableArguments {
     var token: String?
 
     func makeClient() throws -> KaitenClient {
-        if let url {
-            setenv("KAITEN_URL", url, 1)
+        guard let baseURL = url ?? ProcessInfo.processInfo.environment["KAITEN_URL"] else {
+            throw ValidationError("Missing Kaiten API URL. Pass --url or set KAITEN_URL env var.")
         }
-        if let token {
-            setenv("KAITEN_TOKEN", token, 1)
+        guard let apiToken = token ?? ProcessInfo.processInfo.environment["KAITEN_TOKEN"] else {
+            throw ValidationError("Missing Kaiten API token. Pass --token or set KAITEN_TOKEN env var.")
         }
-        return try KaitenClient()
+        return try KaitenClient(baseURL: baseURL, token: apiToken)
     }
 }
 

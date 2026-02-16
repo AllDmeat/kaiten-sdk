@@ -33,10 +33,6 @@ let package = Package(
             url: "https://github.com/apple/swift-http-types",
             from: "1.3.0"
         ),
-        .package(
-            url: "https://github.com/apple/swift-configuration",
-            from: "0.0.1"
-        ),
     ],
     targets: [
         .target(
@@ -53,10 +49,6 @@ let package = Package(
                 .product(
                     name: "HTTPTypes",
                     package: "swift-http-types"
-                ),
-                .product(
-                    name: "Configuration",
-                    package: "swift-configuration"
                 ),
             ],
             swiftSettings: [
