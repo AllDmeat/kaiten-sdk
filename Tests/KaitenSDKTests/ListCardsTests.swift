@@ -16,10 +16,13 @@ struct ListCardsTests {
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
         let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-        let cards = try await client.listCards(boardId: 10)
-        #expect(cards.count == 2)
-        #expect(cards[0].id == 1)
-        #expect(cards[1].title == "Card B")
+        let page = try await client.listCards(boardId: 10)
+        #expect(page.items.count == 2)
+        #expect(page.items[0].id == 1)
+        #expect(page.items[1].title == "Card B")
+        #expect(page.offset == 0)
+        #expect(page.limit == 100)
+        #expect(page.hasMore == false)
     }
 
     @Test("200 empty array returns empty")
@@ -27,8 +30,8 @@ struct ListCardsTests {
         let transport = MockClientTransport.returning(statusCode: 200, body: "[]")
         let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-        let cards = try await client.listCards(boardId: 10)
-        #expect(cards.isEmpty)
+        let page = try await client.listCards(boardId: 10)
+        #expect(page.items.isEmpty)
     }
 
     @Test("200 with empty body returns empty array (#84)")
@@ -36,8 +39,8 @@ struct ListCardsTests {
         let transport = MockClientTransport.returning(statusCode: 200, body: nil)
         let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-        let cards = try await client.listCards(boardId: 10)
-        #expect(cards.isEmpty)
+        let page = try await client.listCards(boardId: 10)
+        #expect(page.items.isEmpty)
     }
 
     @Test("200 with empty string body returns empty array (#84)")
@@ -45,8 +48,8 @@ struct ListCardsTests {
         let transport = MockClientTransport.returning(statusCode: 200, body: "")
         let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-        let cards = try await client.listCards(boardId: 10)
-        #expect(cards.isEmpty)
+        let page = try await client.listCards(boardId: 10)
+        #expect(page.items.isEmpty)
     }
 
     @Test("401 throws unauthorized")

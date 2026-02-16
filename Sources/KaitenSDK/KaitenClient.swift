@@ -62,19 +62,22 @@ public struct KaitenClient: Sendable {
 
     // MARK: - Cards
 
-    /// Returns all cards for the given board.
+    /// Returns a page of cards for the given board.
     ///
-    /// - Parameter boardId: The board to fetch cards from.
-    /// - Returns: An array of ``Components/Schemas/Card``.
-    /// - Throws: ``KaitenError/unauthorized`` or ``KaitenError/unexpectedResponse(statusCode:)``.
-    public func listCards(boardId: Int) async throws(KaitenError) -> [Components.Schemas.Card] {
+    /// - Parameters:
+    ///   - boardId: The board to fetch cards from.
+    ///   - offset: Number of cards to skip (default: 0).
+    ///   - limit: Maximum number of cards to return (default/max: 100).
+    /// - Returns: A ``Page`` of ``Components/Schemas/Card``.
+    /// - Throws: ``KaitenError`` on failure.
+    public func listCards(boardId: Int, offset: Int = 0, limit: Int = 100) async throws(KaitenError) -> Page<Components.Schemas.Card> {
         let response: Operations.get_cards.Output
         do {
-            response = try await client.get_cards(query: .init(board_id: boardId))
+            response = try await client.get_cards(query: .init(board_id: boardId, offset: offset, limit: limit))
         } catch let error as ClientError where error.response?.status == .ok {
             // Kaiten returns HTTP 200 with empty body when a board has no cards (#84).
             // OpenAPI runtime throws ClientError for missing/empty response body.
-            return []
+            return Page(items: [], offset: offset, limit: limit)
         } catch let error as KaitenError {
             throw error
         } catch {
@@ -82,7 +85,8 @@ public struct KaitenClient: Sendable {
         }
         switch response {
         case .ok(let ok):
-            return try decode { try ok.body.json }
+            let items = try decode { try ok.body.json }
+            return Page(items: items, offset: offset, limit: limit)
         case .unauthorized:
             throw .unauthorized
         case .undocumented(statusCode: let code, _):

@@ -6,7 +6,7 @@ import KaitenSDK
 struct ListCards: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "list-cards",
-        abstract: "List all cards on a board"
+        abstract: "List cards on a board (paginated)"
     )
 
     @OptionGroup var global: GlobalOptions
@@ -14,10 +14,16 @@ struct ListCards: AsyncParsableCommand {
     @Option(name: .long, help: "Board ID")
     var boardId: Int
 
+    @Option(name: .long, help: "Offset for pagination (default: 0)")
+    var offset: Int = 0
+
+    @Option(name: .long, help: "Limit for pagination (default/max: 100)")
+    var limit: Int = 100
+
     func run() async throws {
         let client = try await global.makeClient()
-        let cards = try await client.listCards(boardId: boardId)
-        try printJSON(cards)
+        let page = try await client.listCards(boardId: boardId, offset: offset, limit: limit)
+        try printJSON(page)
     }
 }
 
