@@ -698,6 +698,17 @@ components:
         archived:
           type: boolean
           description: Archived flag
+        asap:
+          type: boolean
+          description: ASAP flag
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Due date
+        due_date_time_present:
+          type: boolean
+          description: Whether due date includes time
         board_id:
           type: integer
           description: Board ID
@@ -712,11 +723,30 @@ components:
         sort_order:
           type: number
           description: Sort order in column
+        owner_id:
+          type: integer
+          description: Owner user ID
         type_id:
           type:
           - integer
           - 'null'
           description: Card type ID
+        version:
+          type: integer
+          description: Card version
+        updater_id:
+          type: integer
+          description: Last updater user ID
+        size:
+          type:
+          - integer
+          - 'null'
+          description: Card size
+        size_unit:
+          type:
+          - string
+          - 'null'
+          description: Size unit
         size_text:
           type:
           - string
@@ -728,6 +758,241 @@ components:
         updated:
           type: string
           description: Updated timestamp
+        expires_later:
+          type: boolean
+          description: Whether card expires later
+        blocked:
+          type: boolean
+          description: Whether card is blocked
+        blocking_card:
+          type: boolean
+          description: Whether card is blocking another card
+        completed_on_time:
+          type:
+          - boolean
+          - 'null'
+          description: Whether card was completed on time
+        completed_at:
+          type:
+          - string
+          - 'null'
+          description: Completion timestamp
+        milestone_id:
+          type:
+          - integer
+          - 'null'
+          description: Milestone ID
+        sprint_id:
+          type:
+          - integer
+          - 'null'
+          description: Sprint ID
+        condition:
+          type: integer
+          description: Card condition
+        last_moved_at:
+          type: string
+          description: Last moved timestamp
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External ID
+        lane_changed_at:
+          type: string
+          description: Lane change timestamp
+        column_changed_at:
+          type: string
+          description: Column change timestamp
+        first_moved_to_in_progress_at:
+          type:
+          - string
+          - 'null'
+          description: First moved to in-progress timestamp
+        last_moved_to_done_at:
+          type:
+          - string
+          - 'null'
+          description: Last moved to done timestamp
+        service_id:
+          type:
+          - integer
+          - 'null'
+          description: Service ID
+        properties:
+          type: object
+          description: Custom properties values
+          additionalProperties: true
+        planned_start:
+          type:
+          - string
+          - 'null'
+          description: Planned start date
+        planned_end:
+          type:
+          - string
+          - 'null'
+          description: Planned end date
+        public:
+          type: boolean
+          description: Public flag
+        share_id:
+          type:
+          - string
+          - 'null'
+          description: Share ID
+        share_settings:
+          type:
+          - object
+          - 'null'
+          description: Share settings
+        sd_external_recipients:
+          type:
+          - string
+          - 'null'
+          description: Service desk external recipients
+        external_user_emails:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: External user emails
+        tag_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+          description: Tag IDs
+        estimate_workload:
+          type: integer
+          description: Estimated workload
+        parents_count:
+          type: integer
+          description: Number of parent cards
+        children_count:
+          type: integer
+          description: Number of child cards
+        children_done:
+          type: integer
+          description: Number of completed child cards
+        goals_total:
+          type: integer
+          description: Total goals
+        goals_done:
+          type: integer
+          description: Completed goals
+        parent_checklist_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+          description: Parent checklist IDs
+        parent_link_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+          description: Parent link IDs
+        fifo_order:
+          type:
+          - integer
+          - 'null'
+          description: FIFO order
+        has_blocked_children:
+          type: boolean
+          description: Whether card has blocked children
+        comments_total:
+          type: integer
+          description: Total comments count
+        comment_last_added_at:
+          type:
+          - string
+          - 'null'
+          description: Last comment timestamp
+        children_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+          description: Child card IDs
+        parents_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+          description: Parent card IDs
+        counters_recalculated_at:
+          type: string
+          description: Counters recalculation timestamp
+        sd_new_comment:
+          type: boolean
+          description: Service desk new comment flag
+        time_spent_sum:
+          type: integer
+          description: Total time spent
+        calculated_planned_start:
+          type:
+          - string
+          - 'null'
+          description: Calculated planned start
+        calculated_planned_end:
+          type:
+          - string
+          - 'null'
+          description: Calculated planned end
+        time_blocked_sum:
+          type: integer
+          description: Total time blocked
+        children_number_properties_sum:
+          type:
+          - object
+          - 'null'
+          description: Sum of children number properties
+        description_filled:
+          type: boolean
+          description: Whether description is filled
+        import_id:
+          type:
+          - integer
+          - 'null'
+          description: Import ID
+        fts_version:
+          type: string
+          description: Full-text search version
+        locked:
+          type:
+          - string
+          - 'null'
+          description: Lock status
+        source:
+          type: string
+          description: Card source
+        lane:
+          type: object
+          description: Inline lane summary
+        column:
+          type: object
+          description: Inline column summary
+        board:
+          type: object
+          description: Inline board summary
+        type:
+          type: object
+          description: Inline card type summary
+        owner:
+          type: object
+          description: Inline owner summary
+        key:
+          type:
+          - string
+          - 'null'
+          description: Card key
         members:
           type: array
           items:
@@ -743,10 +1008,26 @@ components:
           items:
             type: object
           description: Card checklists
-        properties:
-          type: object
-          description: Custom properties values
-          additionalProperties: true
+        children:
+          type: array
+          items:
+            type: object
+          description: Child cards
+        parents:
+          type: array
+          items:
+            type: object
+          description: Parent cards
+        files:
+          type: array
+          items:
+            type: object
+          description: Card files
+        external_links:
+          type: array
+          items:
+            type: object
+          description: External links
         blocked_by_card_ids:
           type: array
           items:
@@ -762,11 +1043,6 @@ components:
           items:
             type: integer
           description: IDs of related cards
-        condition:
-          type:
-          - object
-          - 'null'
-          description: Card condition/deadline info
     CardMember:
       type: object
       properties:
@@ -824,10 +1100,12 @@ components:
           type: integer
           description: Width
         wip_limit:
-          type: integer
+          type:
+          - integer
+          - 'null'
           description: Recommended limit for column
         type:
-          type: string
+          type: integer
           description: 1 - queue, 2 – in progress, 3 – done
         rules:
           type: integer
@@ -836,14 +1114,16 @@ components:
           type: integer
           description: Board id
         column_id:
-          type: string
+          type:
+          - integer
+          - 'null'
           description: Parent column id
         archive_after_days:
           type: integer
           description: Specify amont of days after which cards will be automatically archived. Works only for columns with
             type **done**
         wip_limit_type:
-          type: string
+          type: integer
           description: 1 – card's count, 2 – card's size
         external_id:
           type:
@@ -851,7 +1131,9 @@ components:
           - 'null'
           description: External id
         default_tags:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Default tags
         last_moved_warning_after_days:
           type: integer
@@ -875,11 +1157,14 @@ components:
         pause_sla:
           type: boolean
           description: Indicates whether the SLA timer should be paused in this column
-        subcolumns:
-          type: array
-          items:
-            type: object
-          description: Column subcolumns
+        uid:
+          type: string
+          description: Column UID
+        locked:
+          type:
+          - string
+          - 'null'
+          description: Lock status
     Lane:
       type: object
       properties:
@@ -890,7 +1175,7 @@ components:
           type: string
           description: Create date
         id:
-          type: string
+          type: integer
           description: Lane id
         title:
           type: string
@@ -902,8 +1187,10 @@ components:
           type: integer
           description: Height
         wip_limit:
-          type: integer
-          description: Recommended limit for column
+          type:
+          - integer
+          - 'null'
+          description: Recommended limit for lane
         board_id:
           type: integer
           description: Board id
@@ -913,7 +1200,7 @@ components:
           - 'null'
           description: Default card type for new cards in lane
         wip_limit_type:
-          type: string
+          type: integer
           description: 1 – card's count, 2 – card's size
         external_id:
           type:
@@ -921,7 +1208,9 @@ components:
           - 'null'
           description: External id
         default_tags:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Default tags
         last_moved_warning_after_days:
           type: integer
@@ -933,8 +1222,16 @@ components:
           type: integer
           description: Warning appears on stale cards
         condition:
-          type: string
+          type: integer
           description: 1 - live, 2 - archived, 3 - deleted
+        uid:
+          type: string
+          description: Lane UID
+        locked:
+          type:
+          - string
+          - 'null'
+          description: Lock status
     Board:
       type: object
       properties:
@@ -1297,10 +1594,10 @@ components:
           type: string
           description: Custom property type
         show_on_facade:
-          type: string
+          type: boolean
           description: Should show property on card's facade
         multiline:
-          type: string
+          type: boolean
           description: Should render multiline text field
         fields_settings:
           type:
@@ -1363,6 +1660,22 @@ components:
           - string
           - 'null'
           description: External id
+        uid:
+          type: string
+          description: Custom property UID
+        import_uid:
+          type:
+          - string
+          - 'null'
+          description: Import UID
+        is_used_as_progress:
+          type: boolean
+          description: Whether property is used as progress indicator
+        calculation_method:
+          type:
+          - string
+          - 'null'
+          description: Calculation method
     Checklist:
       type: object
       properties:
