@@ -2,6 +2,7 @@ import ArgumentParser
 import Configuration
 import Foundation
 import KaitenSDK
+import System
 
 @main
 struct Kaiten: AsyncParsableCommand {
@@ -36,7 +37,7 @@ struct GlobalOptions: ParsableArguments {
         let configPath = Self.configPath
 
         let config = ConfigReader(providers: [
-            (try? await FileProvider<JSONSnapshot>(filePath: configPath)) as ConfigProvider?,
+            (try? await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))) as ConfigProvider?,
         ].compactMap { $0 })
 
         guard let baseURL = url ?? config.string(forKey: "url") else {
