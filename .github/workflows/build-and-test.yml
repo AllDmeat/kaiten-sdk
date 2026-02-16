@@ -11,30 +11,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test-macos:
-    runs-on: macos-26
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Cache SPM
-        uses: actions/cache@v5
-        with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
-          restore-keys: ${{ runner.os }}-spm-
-
-      - name: Build
-        run: swift build
-
-      - name: Test
-        run: swift test
-
-  build-and-test-linux:
-    runs-on: ubuntu-latest
+  build-and-test:
+    strategy:
+      matrix:
+        include:
+          - os: macos-26
+            install-swift: false
+          - os: ubuntu-latest
+            install-swift: true
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
 
       - name: Install mise
+        if: matrix.install-swift
         uses: jdx/mise-action@v3
 
       - name: Cache SPM
