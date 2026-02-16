@@ -33,6 +33,15 @@ let package = Package(
             url: "https://github.com/apple/swift-http-types",
             from: "1.3.0"
         ),
+        .package(
+            url: "https://github.com/apple/swift-configuration",
+            from: "1.0.2",
+            traits: ["JSON"]
+        ),
+        .package(
+            url: "https://github.com/apple/swift-system",
+            from: "1.4.0"
+        ),
     ],
     targets: [
         .target(
@@ -68,6 +77,14 @@ let package = Package(
                 .product(
                     name: "ArgumentParser",
                     package: "swift-argument-parser"
+                ),
+                .product(
+                    name: "Configuration",
+                    package: "swift-configuration"
+                ),
+                .product(
+                    name: "SystemPackage",
+                    package: "swift-system"
                 ),
             ],
             swiftSettings: [

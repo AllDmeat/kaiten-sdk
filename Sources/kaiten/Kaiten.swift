@@ -1,6 +1,8 @@
 import ArgumentParser
+import Configuration
 import Foundation
 import KaitenSDK
+import SystemPackage
 
 @main
 struct Kaiten: AsyncParsableCommand {
@@ -25,20 +27,35 @@ struct Kaiten: AsyncParsableCommand {
 // MARK: - Global Options
 
 struct GlobalOptions: ParsableArguments {
-    @Option(name: .long, help: "Kaiten API base URL (overrides KAITEN_URL env/config)")
+    @Option(name: .long, help: "Kaiten API base URL (overrides config file)")
     var url: String?
 
-    @Option(name: .long, help: "Kaiten API token (overrides KAITEN_TOKEN env/config)")
+    @Option(name: .long, help: "Kaiten API token (overrides config file)")
     var token: String?
 
-    func makeClient() throws -> KaitenClient {
-        guard let baseURL = url ?? ProcessInfo.processInfo.environment["KAITEN_URL"] else {
-            throw ValidationError("Missing Kaiten API URL. Pass --url or set KAITEN_URL env var.")
+    func makeClient() async throws -> KaitenClient {
+        let configPath = Self.configPath
+
+        let config = ConfigReader(providers: [
+            (try? await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))) as ConfigProvider?,
+        ].compactMap { $0 })
+
+        guard let baseURL = url ?? config.string(forKey: "url") else {
+            throw ValidationError(
+                "Missing Kaiten API URL. Pass --url or set \"url\" in \(configPath)"
+            )
         }
-        guard let apiToken = token ?? ProcessInfo.processInfo.environment["KAITEN_TOKEN"] else {
-            throw ValidationError("Missing Kaiten API token. Pass --token or set KAITEN_TOKEN env var.")
+        guard let apiToken = token ?? config.string(forKey: "token") else {
+            throw ValidationError(
+                "Missing Kaiten API token. Pass --token or set \"token\" in \(configPath)"
+            )
         }
         return try KaitenClient(baseURL: baseURL, token: apiToken)
+    }
+
+    private static var configPath: String {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return home.appendingPathComponent(".config/kaiten-mcp/config.json").path
     }
 }
 
@@ -62,7 +79,7 @@ struct ListSpaces: AsyncParsableCommand {
     @OptionGroup var global: GlobalOptions
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let spaces = try await client.listSpaces()
         try printJSON(spaces)
     }
@@ -80,7 +97,7 @@ struct ListBoards: AsyncParsableCommand {
     var spaceId: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let boards = try await client.listBoards(spaceId: spaceId)
         try printJSON(boards)
     }
@@ -98,7 +115,7 @@ struct GetBoard: AsyncParsableCommand {
     var id: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let board = try await client.getBoard(id: id)
         try printJSON(board)
     }
@@ -116,7 +133,7 @@ struct GetBoardColumns: AsyncParsableCommand {
     var boardId: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let columns = try await client.getBoardColumns(boardId: boardId)
         try printJSON(columns)
     }
@@ -134,7 +151,7 @@ struct GetBoardLanes: AsyncParsableCommand {
     var boardId: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let lanes = try await client.getBoardLanes(boardId: boardId)
         try printJSON(lanes)
     }
@@ -154,7 +171,7 @@ struct ListCards: AsyncParsableCommand {
     var boardId: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let cards = try await client.listCards(boardId: boardId)
         try printJSON(cards)
     }
@@ -172,7 +189,7 @@ struct GetCard: AsyncParsableCommand {
     var id: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let card = try await client.getCard(id: id)
         try printJSON(card)
     }
@@ -190,7 +207,7 @@ struct GetCardMembers: AsyncParsableCommand {
     var cardId: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let members = try await client.getCardMembers(cardId: cardId)
         try printJSON(members)
     }
@@ -207,7 +224,7 @@ struct ListCustomProperties: AsyncParsableCommand {
     @OptionGroup var global: GlobalOptions
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let props = try await client.listCustomProperties()
         try printJSON(props)
     }
@@ -225,7 +242,7 @@ struct GetCustomProperty: AsyncParsableCommand {
     var id: Int
 
     func run() async throws {
-        let client = try global.makeClient()
+        let client = try await global.makeClient()
         let prop = try await client.getCustomProperty(id: id)
         try printJSON(prop)
     }

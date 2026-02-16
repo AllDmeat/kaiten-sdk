@@ -12,12 +12,16 @@ concurrency:
 
 jobs:
   build-and-test:
+    name: ${{ matrix.name }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: macos-26
+          - name: macOS
+            os: macos-26
             install-swift: false
-          - os: ubuntu-latest
+          - name: Linux
+            os: ubuntu-latest
             install-swift: true
     runs-on: ${{ matrix.os }}
     steps:
@@ -32,7 +36,6 @@ jobs:
         with:
           path: .build
           key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
-          restore-keys: ${{ runner.os }}-spm-
 
       - name: Build
         run: swift build
