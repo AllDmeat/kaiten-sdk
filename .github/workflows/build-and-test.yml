@@ -35,6 +35,11 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
 
+      - name: Resolve dependencies
+        run: |
+          rm -rf .build/checkouts/swift-configuration
+          swift package resolve
+
       - name: Build
         run: swift build
 
