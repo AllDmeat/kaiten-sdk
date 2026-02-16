@@ -7,7 +7,7 @@ Swift SDK for the [Kaiten](https://kaiten.ru) project management API. OpenAPI-ge
 ## Requirements
 
 - Swift 6.2+
-- macOS 15+ / Linux
+- macOS 15+ (ARM) / Linux (x86-64, ARM)
 
 ## Installation
 
@@ -29,26 +29,71 @@ targets: [
 
 ## Quick Start
 
-Set the required environment variables:
-
-```bash
-export KAITEN_URL="https://your-company.kaiten.ru/api/latest"
-export KAITEN_TOKEN="your-api-token"
-```
-
-Then use the client:
+### As a library
 
 ```swift
 import KaitenSDK
 
-let client = try KaitenClient()
+let client = try KaitenClient(
+    baseURL: "https://your-company.kaiten.ru/api/latest",
+    token: "your-api-token"
+)
 
 let spaces = try await client.listSpaces()
 let cards = try await client.listCards(boardId: 42)
 let card = try await client.getCard(id: 123)
 ```
 
-## API Methods
+### As a CLI
+
+The CLI resolves credentials in order: flags → config file.
+
+**Option 1 — Config file** (recommended):
+
+Create `~/.config/kaiten-mcp/config.json`:
+
+```json
+{
+  "url": "https://your-company.kaiten.ru/api/latest",
+  "token": "your-api-token"
+}
+```
+
+Then run commands without flags:
+
+```bash
+kaiten list-spaces
+kaiten get-card --id 123
+```
+
+**Option 2 — Flags** (override config file):
+
+```bash
+kaiten list-spaces \
+  --url "https://your-company.kaiten.ru/api/latest" \
+  --token "your-api-token"
+```
+
+## CLI Commands
+
+Every command accepts `--url` and `--token` flags to override the config file.
+
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list-spaces` | — | List all spaces |
+| `list-boards` | `--space-id` | List boards in a space |
+| `get-board` | `--id` | Get a board by ID |
+| `get-board-columns` | `--board-id` | Get columns of a board |
+| `get-board-lanes` | `--board-id` | Get lanes of a board |
+| `list-cards` | `--board-id` | List all cards on a board |
+| `get-card` | `--id` | Get a card by ID |
+| `get-card-members` | `--card-id` | Get members of a card |
+| `list-custom-properties` | — | List all custom property definitions |
+| `get-custom-property` | `--id` | Get a custom property by ID |
+
+All output is pretty-printed JSON.
+
+## SDK API Methods
 
 | Method | Description |
 |--------|-------------|
@@ -62,6 +107,16 @@ let card = try await client.getCard(id: 123)
 | `getBoardLanes(boardId:)` | Get lanes for a board |
 | `listSpaces()` | List all spaces |
 | `listBoards(spaceId:)` | List boards in a space |
+
+## Configuration
+
+The `KaitenClient` initializer takes explicit parameters:
+
+```swift
+public init(baseURL: String, token: String) throws
+```
+
+The CLI uses [swift-configuration](https://github.com/apple/swift-configuration) with `FileProvider<JSONSnapshot>` to read `~/.config/kaiten-mcp/config.json`. The `--url` and `--token` flags take priority over the config file.
 
 ## Error Handling
 
@@ -91,15 +146,6 @@ do {
     }
 }
 ```
-
-## Configuration
-
-Environment variables are resolved via [swift-configuration](https://github.com/apple/swift-configuration):
-
-| Variable | Description |
-|----------|-------------|
-| `KAITEN_URL` | Base URL of the Kaiten API (e.g. `https://your-company.kaiten.ru/api/latest`) |
-| `KAITEN_TOKEN` | Bearer token for authentication |
 
 ## License
 

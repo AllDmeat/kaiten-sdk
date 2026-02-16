@@ -33,3 +33,6 @@
   уточнить у пользователя, что является правильным.
 - При добавлении нового функционала — сначала обновить спеку,
   получить подтверждение, затем реализовать.
+- Always update READMEs when public APIs change. Any PR that
+  modifies public API surface must include corresponding README
+  updates.
