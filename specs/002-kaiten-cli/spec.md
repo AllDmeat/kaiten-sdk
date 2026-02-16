@@ -27,7 +27,7 @@ CLI-доступ к SDK.
    пользователь запускает подкоманду (например `list-spaces`),
    **Then** CLI выводит структурированные данные в stdout.
 2. **Given** существует валидный конфиг-файл
-   `~/.config/kaiten-mcp/config.json`, **When** пользователь
+   `~/.config/kaiten-mcp/preferences.json`, **When** пользователь
    запускает подкоманду без флагов, **Then** CLI читает
    параметры из конфиг-файла.
 3. **Given** присутствуют и флаги и конфиг-файл с разными
@@ -53,7 +53,7 @@ CLI-доступ к SDK.
   CLI MUST вывести ошибку с описанием проблемы конфигурации.
 - Что если конфиг-файл не существует и флаги не переданы?
   CLI MUST вывести ошибку с инструкцией: передать флаги или
-  создать `~/.config/kaiten-mcp/config.json`.
+  создать `~/.config/kaiten-mcp/preferences.json`.
 
 ## Requirements *(mandatory)*
 
@@ -73,14 +73,19 @@ CLI-доступ к SDK.
   ненулевым при ошибке.
 - **FR-006**: CLI MUST компилироваться и работать на macOS (ARM)
   и Linux (x86-64 и ARM).
-- **FR-007**: CLI MUST читать конфиг из
-  `~/.config/kaiten-mcp/config.json` в формате JSON:
+- **FR-007**: CLI MUST читать конфиг из единого файла
+  `~/.config/kaiten-mcp/preferences.json` (Linux) или
+  `~/Library/Application Support/kaiten-mcp/preferences.json`
+  (macOS). Формат — тот же что использует KaitenMCP:
   ```json
   {
     "url": "https://company.kaiten.ru/api/latest",
-    "token": "your-api-token"
+    "token": "your-api-token",
+    "my_boards": [{"id": 123, "alias": "Sprint"}],
+    "my_spaces": [{"id": 456}]
   }
   ```
+  CLI читает только `url` и `token`, остальные поля игнорирует.
 - **FR-008**: CLI MUST использовать `swift-configuration`
   (`ConfigReader` + `FileProvider<JSONSnapshot>`) для чтения
   конфиг-файла. `swift-configuration` — зависимость только
