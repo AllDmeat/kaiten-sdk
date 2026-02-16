@@ -44,6 +44,27 @@ let cards = try await client.listCards(boardId: 42)
 let card = try await client.getCard(id: 123)
 ```
 
+### CLI Installation
+
+#### mise (recommended)
+
+[mise](https://mise.jdx.dev) — менеджер инструментов. Установит нужную версию автоматически:
+
+```bash
+mise use -g ubi:AllDmeat/KaitenSDK --rename kaiten
+```
+
+#### GitHub Release
+
+Скачайте бинарь для вашей платформы со [страницы релизов](https://github.com/AllDmeat/KaitenSDK/releases).
+
+#### Из исходников
+
+```bash
+swift build -c release
+# Бинарь: .build/release/kaiten
+```
+
 ### As a CLI
 
 The CLI resolves credentials in order: flags → config file.
