@@ -22,6 +22,26 @@ struct Kaiten: AsyncParsableCommand {
     )
 }
 
+// MARK: - Global Options
+
+struct GlobalOptions: ParsableArguments {
+    @Option(name: .long, help: "Kaiten API base URL (overrides KAITEN_URL env/config)")
+    var url: String?
+
+    @Option(name: .long, help: "Kaiten API token (overrides KAITEN_TOKEN env/config)")
+    var token: String?
+
+    func makeClient() throws -> KaitenClient {
+        if let url {
+            setenv("KAITEN_URL", url, 1)
+        }
+        if let token {
+            setenv("KAITEN_TOKEN", token, 1)
+        }
+        return try KaitenClient()
+    }
+}
+
 // MARK: - Helpers
 
 func printJSON(_ value: some Encodable) throws {
@@ -39,8 +59,10 @@ struct ListSpaces: AsyncParsableCommand {
         abstract: "List all spaces"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let spaces = try await client.listSpaces()
         try printJSON(spaces)
     }
@@ -52,11 +74,13 @@ struct ListBoards: AsyncParsableCommand {
         abstract: "List boards in a space"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Space ID")
     var spaceId: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let boards = try await client.listBoards(spaceId: spaceId)
         try printJSON(boards)
     }
@@ -68,11 +92,13 @@ struct GetBoard: AsyncParsableCommand {
         abstract: "Get a board by ID"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Board ID")
     var id: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let board = try await client.getBoard(id: id)
         try printJSON(board)
     }
@@ -84,11 +110,13 @@ struct GetBoardColumns: AsyncParsableCommand {
         abstract: "Get columns of a board"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Board ID")
     var boardId: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let columns = try await client.getBoardColumns(boardId: boardId)
         try printJSON(columns)
     }
@@ -100,11 +128,13 @@ struct GetBoardLanes: AsyncParsableCommand {
         abstract: "Get lanes of a board"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Board ID")
     var boardId: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let lanes = try await client.getBoardLanes(boardId: boardId)
         try printJSON(lanes)
     }
@@ -118,11 +148,13 @@ struct ListCards: AsyncParsableCommand {
         abstract: "List all cards on a board"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Board ID")
     var boardId: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let cards = try await client.listCards(boardId: boardId)
         try printJSON(cards)
     }
@@ -134,11 +166,13 @@ struct GetCard: AsyncParsableCommand {
         abstract: "Get a card by ID"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Card ID")
     var id: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let card = try await client.getCard(id: id)
         try printJSON(card)
     }
@@ -150,11 +184,13 @@ struct GetCardMembers: AsyncParsableCommand {
         abstract: "Get members of a card"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Card ID")
     var cardId: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let members = try await client.getCardMembers(cardId: cardId)
         try printJSON(members)
     }
@@ -168,8 +204,10 @@ struct ListCustomProperties: AsyncParsableCommand {
         abstract: "List all custom property definitions"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let props = try await client.listCustomProperties()
         try printJSON(props)
     }
@@ -181,11 +219,13 @@ struct GetCustomProperty: AsyncParsableCommand {
         abstract: "Get a custom property by ID"
     )
 
+    @OptionGroup var global: GlobalOptions
+
     @Option(name: .long, help: "Custom property ID")
     var id: Int
 
     func run() async throws {
-        let client = try KaitenClient()
+        let client = try global.makeClient()
         let prop = try await client.getCustomProperty(id: id)
         try printJSON(prop)
     }
