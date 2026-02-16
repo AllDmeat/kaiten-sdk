@@ -3,31 +3,13 @@ import Testing
 
 @testable import KaitenSDK
 
-@Suite("KaitenClient Configuration", .serialized)
+@Suite("KaitenClient Configuration")
 struct KaitenClientConfigurationTests {
 
-    @Test("Fails fast when KAITEN_URL is missing")
-    func missingURL() {
-        // Clear any env vars set by other tests
-        unsetenv("KAITEN_URL")
-        unsetenv("KAITEN_TOKEN")
-
+    @Test("Fails with invalid URL")
+    func invalidURL() {
         #expect(throws: KaitenError.self) {
-            _ = try KaitenClient()
-        }
-    }
-
-    @Test("Fails fast when KAITEN_TOKEN is missing")
-    func missingToken() {
-        setenv("KAITEN_URL", "https://test.kaiten.ru/api/latest", 1)
-        unsetenv("KAITEN_TOKEN")
-
-        defer {
-            unsetenv("KAITEN_URL")
-        }
-
-        #expect(throws: KaitenError.self) {
-            _ = try KaitenClient()
+            _ = try KaitenClient(baseURL: "", token: "test-token")
         }
     }
 }
