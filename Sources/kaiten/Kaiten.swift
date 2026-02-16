@@ -22,21 +22,42 @@ struct Kaiten: AsyncParsableCommand {
     )
 }
 
+// MARK: - Config File
+
+private struct ConfigFile: Codable, Sendable {
+    let url: String?
+    let token: String?
+}
+
+private func loadConfigFile() -> ConfigFile? {
+    let homeDir = FileManager.default.homeDirectoryForCurrentUser
+    let configPath = homeDir
+        .appendingPathComponent(".config/kaiten/config.json")
+    guard let data = try? Data(contentsOf: configPath) else { return nil }
+    return try? JSONDecoder().decode(ConfigFile.self, from: data)
+}
+
 // MARK: - Global Options
 
 struct GlobalOptions: ParsableArguments {
-    @Option(name: .long, help: "Kaiten API base URL (overrides KAITEN_URL env/config)")
+    @Option(name: .long, help: "Kaiten API base URL (overrides config file)")
     var url: String?
 
-    @Option(name: .long, help: "Kaiten API token (overrides KAITEN_TOKEN env/config)")
+    @Option(name: .long, help: "Kaiten API token (overrides config file)")
     var token: String?
 
     func makeClient() throws -> KaitenClient {
-        guard let baseURL = url ?? ProcessInfo.processInfo.environment["KAITEN_URL"] else {
-            throw ValidationError("Missing Kaiten API URL. Pass --url or set KAITEN_URL env var.")
+        let config = loadConfigFile()
+
+        guard let baseURL = url ?? config?.url else {
+            throw ValidationError(
+                "Missing Kaiten API URL. Pass --url or set \"url\" in ~/.config/kaiten/config.json"
+            )
         }
-        guard let apiToken = token ?? ProcessInfo.processInfo.environment["KAITEN_TOKEN"] else {
-            throw ValidationError("Missing Kaiten API token. Pass --token or set KAITEN_TOKEN env var.")
+        guard let apiToken = token ?? config?.token else {
+            throw ValidationError(
+                "Missing Kaiten API token. Pass --token or set \"token\" in ~/.config/kaiten/config.json"
+            )
         }
         return try KaitenClient(baseURL: baseURL, token: apiToken)
     }
