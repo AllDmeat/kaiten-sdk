@@ -1,0 +1,63 @@
+name: Release
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+env:
+  PRODUCT_NAME: kaiten
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-26
+            install-swift: false
+            archive-suffix: darwin_arm64
+          - os: ubuntu-latest
+            install-swift: true
+            archive-suffix: linux_x86_64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install mise
+        if: matrix.install-swift
+        uses: jdx/mise-action@v3
+
+      - name: Build release binary
+        id: build
+        run: |
+          swift build -c release --product "$PRODUCT_NAME"
+          echo "bin-path=$(swift build -c release --product "$PRODUCT_NAME" --show-bin-path)" >> $GITHUB_OUTPUT
+
+      - name: Package binary
+        id: package
+        run: |
+          ARCHIVE_NAME="${PRODUCT_NAME}_${GITHUB_REF_NAME}_${{ matrix.archive-suffix }}.tar.gz"
+          tar -czf "${ARCHIVE_NAME}" -C "${{ steps.build.outputs.bin-path }}" "$PRODUCT_NAME"
+          echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive-suffix }}
+          path: ${{ steps.package.outputs.archive-name }}
+
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            **/*.tar.gz
