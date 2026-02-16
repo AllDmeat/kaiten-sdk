@@ -34,7 +34,7 @@ struct GlobalOptions: ParsableArguments {
 
     func makeClient() async throws -> KaitenClient {
         let configPath = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".config/kaiten/config.json").path
+            .appendingPathComponent(".config/kaiten-mcp/config.json").path
 
         let config = ConfigReader(providers: [
             (try? await FileProvider<JSONSnapshot>(filePath: configPath)) as ConfigProvider?,
@@ -42,12 +42,12 @@ struct GlobalOptions: ParsableArguments {
 
         guard let baseURL = url ?? config.string(forKey: "url") else {
             throw ValidationError(
-                "Missing Kaiten API URL. Pass --url or create ~/.config/kaiten/config.json with \"url\" key."
+                "Missing Kaiten API URL. Pass --url or create ~/.config/kaiten-mcp/config.json with \"url\" key."
             )
         }
         guard let apiToken = token ?? config.string(forKey: "token") else {
             throw ValidationError(
-                "Missing Kaiten API token. Pass --token or create ~/.config/kaiten/config.json with \"token\" key."
+                "Missing Kaiten API token. Pass --token or create ~/.config/kaiten-mcp/config.json with \"token\" key."
             )
         }
         return try KaitenClient(baseURL: baseURL, token: apiToken)
