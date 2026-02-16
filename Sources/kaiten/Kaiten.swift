@@ -35,17 +35,17 @@ struct GlobalOptions: ParsableArguments {
 
     func makeClient() async throws -> KaitenClient {
         let configPath = Self.configPath
+        let fileProvider = try? await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))
 
-        let config = ConfigReader(providers: [
-            (try? await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))) as ConfigProvider?,
-        ].compactMap { $0 })
+        let configURL: String? = url ?? fileProvider?.string(forKey: "url")
+        let configToken: String? = token ?? fileProvider?.string(forKey: "token")
 
-        guard let baseURL = url ?? config.string(forKey: "url") else {
+        guard let baseURL = configURL else {
             throw ValidationError(
                 "Missing Kaiten API URL. Pass --url or set \"url\" in \(configPath)"
             )
         }
-        guard let apiToken = token ?? config.string(forKey: "token") else {
+        guard let apiToken = configToken else {
             throw ValidationError(
                 "Missing Kaiten API token. Pass --token or set \"token\" in \(configPath)"
             )
