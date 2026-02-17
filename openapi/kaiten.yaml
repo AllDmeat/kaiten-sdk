@@ -613,7 +613,9 @@ components:
           type: object
           description: Inline column summary
         board:
-          $ref: '#/components/schemas/Board'
+          # NOTE: Kaiten docs show full Board schema here, but API actually
+          # returns only 6 fields: id, uid, title, external_id, card_properties, settings.
+          $ref: '#/components/schemas/CardBoardSummary'
         type:
           $ref: '#/components/schemas/CardType'
         owner:
@@ -1719,3 +1721,37 @@ components:
         updated:
           type: string
           description: SLA last update date
+    CardBoardSummary:
+      type: object
+      # Kaiten docs (Schema button on GET /cards) show full Board here,
+      # but the API actually returns only 6 fields. This schema reflects
+      # the real API response, not the docs.
+      required:
+      - id
+      - uid
+      - title
+      properties:
+        id:
+          type: integer
+          description: Board id
+        uid:
+          type: string
+          description: Board uid
+        title:
+          type: string
+          description: Board title
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External id
+        card_properties:
+          type:
+          - object
+          - 'null'
+          description: Board card properties
+        settings:
+          type:
+          - object
+          - 'null'
+          description: Board settings
