@@ -1,5 +1,16 @@
 # KaitenSDK — Development Guidelines
 
+## Language Policy
+
+**English only.** All content in this repository MUST be in English:
+- Code, comments, documentation
+- Commit messages, PR titles and descriptions
+- Issue titles and descriptions
+- Specs, READMEs, and any other markdown files
+- YAML descriptions in OpenAPI spec
+
+No exceptions. Existing Russian content will be translated (see #163).
+
 ## Spec-First Development
 
 Спецификации в `specs/` — единственный источник правды о том,
