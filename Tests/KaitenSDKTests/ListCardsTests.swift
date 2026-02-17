@@ -52,6 +52,17 @@ struct ListCardsTests {
         #expect(page.items.isEmpty)
     }
 
+    @Test("200 with invalid JSON throws decodingError (#183)")
+    func invalidJsonThrowsDecodingError() async throws {
+        // Simulate a schema mismatch: body is present but not a valid card array.
+        let transport = MockClientTransport.returning(statusCode: 200, body: "{\"not\": \"an array\"}")
+        let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
+
+        await #expect(throws: KaitenError.self) {
+            _ = try await client.listCards(boardId: 10)
+        }
+    }
+
     @Test("401 throws unauthorized")
     func unauthorized() async throws {
         let transport = MockClientTransport.returning(statusCode: 401)

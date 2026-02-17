@@ -66,10 +66,26 @@ public struct KaitenClient: Sendable {
     /// Executes an API call for list endpoints.
     /// Returns `nil` when Kaiten returns HTTP 200 with an empty body (no JSON),
     /// allowing callers to fall back to an empty array.
+    /// Propagates decoding errors instead of silently returning nil.
     private func callList<T>(_ operation: () async throws -> T) async throws(KaitenError) -> T? {
         do {
             return try await operation()
         } catch let error as ClientError where error.response?.status == .ok {
+            // If the underlying error is a schema mismatch (typeMismatch or
+            // keyNotFound), the body was valid JSON but didn't match the
+            // expected schema — propagate instead of hiding.
+            // Other DecodingErrors (dataCorrupted from empty/invalid body)
+            // are treated as "no data" and return nil.
+            if let decodingError = error.underlyingError as? DecodingError {
+                switch decodingError {
+                case .typeMismatch, .keyNotFound, .valueNotFound:
+                    throw .decodingError(underlying: error)
+                case .dataCorrupted:
+                    break  // treat as empty body
+                @unknown default:
+                    throw .decodingError(underlying: error)
+                }
+            }
             return nil
         } catch let error as KaitenError {
             throw error
