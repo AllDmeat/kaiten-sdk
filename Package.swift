@@ -96,6 +96,7 @@ let package = Package(
             name: "KaitenSDKTests",
             dependencies: [
                 "KaitenSDK",
+                "kaiten",
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
