@@ -931,7 +931,9 @@ components:
           description: Automatically assign a user to the card when he/she moves the card if the user is not a member of the
             card
         card_properties:
-          type: array
+          type:
+          - array
+          - 'null'
           items:
             type:
             - object
@@ -1295,7 +1297,9 @@ components:
           description: Automatically assign a user to the card when he/she moves the card if the user is not a member of the
             card
         card_properties:
-          type: array
+          type:
+          - array
+          - 'null'
           items:
             type:
             - object
