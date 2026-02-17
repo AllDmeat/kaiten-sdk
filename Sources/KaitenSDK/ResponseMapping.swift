@@ -25,6 +25,20 @@ extension Operations.get_card.Output {
     }
 }
 
+extension Operations.update_card.Output {
+    func toCase() -> KaitenClient.ResponseCase<Operations.update_card.Output.Ok.Body> {
+        switch self {
+        case .ok(let ok): .ok(ok.body)
+        case .badRequest: .undocumented(statusCode: 400)
+        case .unauthorized: .unauthorized
+        case .paymentRequired: .undocumented(statusCode: 402)
+        case .forbidden: .forbidden
+        case .notFound: .notFound
+        case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+        }
+    }
+}
+
 // MARK: - Card Members & Comments
 
 extension Operations.retrieve_list_of_card_members.Output {

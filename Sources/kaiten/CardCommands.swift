@@ -229,6 +229,110 @@ struct GetCard: AsyncParsableCommand {
     }
 }
 
+struct UpdateCard: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "update-card",
+        abstract: "Update a card by ID"
+    )
+
+    @OptionGroup var global: GlobalOptions
+
+    @Option(name: .long, help: "Card ID")
+    var id: Int
+
+    @Option(name: .long, help: "New title")
+    var title: String?
+
+    @Option(name: .long, help: "New description")
+    var description: String?
+
+    @Option(name: .long, help: "ASAP marker")
+    var asap: Bool?
+
+    @Option(name: .long, help: "Deadline (ISO 8601)")
+    var dueDate: String?
+
+    @Option(name: .long, help: "Deadline includes hours and minutes")
+    var dueDateTimePresent: Bool?
+
+    @Option(name: .long, help: "Position in the cell")
+    var sortOrder: Double?
+
+    @Option(name: .long, help: "Fixed deadline flag")
+    var expiresLater: Bool?
+
+    @Option(name: .long, help: "Size text (e.g. '1', 'S', 'XL')")
+    var sizeText: String?
+
+    @Option(name: .long, help: "Board ID")
+    var boardId: Int?
+
+    @Option(name: .long, help: "Column ID")
+    var columnId: Int?
+
+    @Option(name: .long, help: "Lane ID")
+    var laneId: Int?
+
+    @Option(name: .long, help: "Owner user ID")
+    var ownerId: Int?
+
+    @Option(name: .long, help: "Card type ID")
+    var typeId: Int?
+
+    @Option(name: .long, help: "Service ID")
+    var serviceId: Int?
+
+    @Option(name: .long, help: "Release all blocks (pass false)")
+    var blocked: Bool?
+
+    @Option(name: .long, help: "Condition: 1 = live, 2 = archived")
+    var condition: Int?
+
+    @Option(name: .long, help: "External ID")
+    var externalId: String?
+
+    @Option(name: .long, help: "Text format: 1 = markdown, 2 = html, 3 = jira wiki")
+    var textFormatTypeId: Int?
+
+    @Option(name: .long, help: "Owner email address")
+    var ownerEmail: String?
+
+    @Option(name: .long, help: "Previous card ID for repositioning")
+    var prevCardId: Int?
+
+    @Option(name: .long, help: "Estimate workload")
+    var estimateWorkload: Double?
+
+    func run() async throws {
+        let client = try await global.makeClient()
+        let card = try await client.updateCard(
+            id: id,
+            title: title,
+            description: description,
+            asap: asap,
+            dueDate: dueDate,
+            dueDateTimePresent: dueDateTimePresent,
+            sortOrder: sortOrder,
+            expiresLater: expiresLater,
+            sizeText: sizeText,
+            boardId: boardId,
+            columnId: columnId,
+            laneId: laneId,
+            ownerId: ownerId,
+            typeId: typeId,
+            serviceId: serviceId,
+            blocked: blocked,
+            condition: condition,
+            externalId: externalId,
+            textFormatTypeId: textFormatTypeId,
+            ownerEmail: ownerEmail,
+            prevCardId: prevCardId,
+            estimateWorkload: estimateWorkload
+        )
+        try printJSON(card)
+    }
+}
+
 struct GetCardComments: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "get-card-comments",

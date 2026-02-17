@@ -363,6 +363,39 @@ paths:
         '401':
           description: Unauthorized
   /cards/{card_id}:
+    patch:
+      summary: Update card
+      operationId: update_card
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardRequest'
+      responses:
+        '200':
+          description: Card updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '402':
+          description: Payment required
+        '403':
+          description: Forbidden
+        '404':
+          description: Card not found
     get:
       summary: Get card
       operationId: get_card
@@ -2033,6 +2066,93 @@ components:
         updated:
           type: string
           description: SLA last update date
+    UpdateCardRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Card title
+        description:
+          type:
+          - string
+          - 'null'
+          description: Card description (null to clear)
+        asap:
+          type: boolean
+          description: ASAP marker
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Deadline in ISO 8601 format (null to clear)
+        due_date_time_present:
+          type: boolean
+          description: Flag indicating that deadline is specified up to hours and minutes
+        sort_order:
+          type: number
+          description: Position in the cell
+          exclusiveMinimum: 0
+        expires_later:
+          type: boolean
+          description: Fixed deadline or not
+        size_text:
+          type:
+          - string
+          - 'null'
+          description: "Size text (e.g. '1', 'S', 'XL', null to clear)"
+        board_id:
+          type: integer
+          description: Board ID
+        column_id:
+          type: integer
+          description: Column ID
+        lane_id:
+          type: integer
+          description: Lane ID
+        owner_id:
+          type: integer
+          description: Owner user ID
+        type_id:
+          type: integer
+          description: Card type ID
+        service_id:
+          type:
+          - integer
+          - 'null'
+          description: Service ID (null to clear)
+        blocked:
+          type: boolean
+          description: Send false to release all blocks related to this card
+        condition:
+          type: integer
+          enum: [1, 2]
+          description: "1 - live, 2 - archived"
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: Any external id to assign to the card
+        text_format_type_id:
+          type: integer
+          enum: [1, 2, 3]
+          description: "1 - markdown (default), 2 - html, 3 - jira wiki format"
+        sd_new_comment:
+          type: boolean
+          description: Has unseen Service Desk request author comments
+        owner_email:
+          type: string
+          description: Owner email address
+        prev_card_id:
+          type: integer
+          description: ID of the card that was previous one for repositioning
+        estimate_workload:
+          type: number
+          minimum: 0
+          description: Card estimate workload
+        properties:
+          type: object
+          additionalProperties: true
+          description: "Custom properties. Format: 'id_{custom_property_id}: value'. Pass null to remove."
     CardBoardSummary:
       type: object
       # Kaiten docs (Schema button on GET /cards) show full Board here,

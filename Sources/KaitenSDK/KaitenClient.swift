@@ -429,6 +429,97 @@ public struct KaitenClient: Sendable {
         return try decodeResponse(response.toCase(), notFoundResource: ("card", id)) { try $0.json }
     }
 
+    /// Updates a card by its identifier.
+    ///
+    /// All fields in the request body are optional — only provided values are changed.
+    ///
+    /// - Parameters:
+    ///   - id: The card identifier.
+    ///   - title: New card title.
+    ///   - description: New description (pass `nil` wrapped in `.some(nil)` to clear).
+    ///   - asap: ASAP marker.
+    ///   - dueDate: Deadline in ISO 8601 format (pass `nil` wrapped in `.some(nil)` to clear).
+    ///   - dueDateTimePresent: Whether deadline includes hours and minutes.
+    ///   - sortOrder: Position in the cell.
+    ///   - expiresLater: Fixed deadline flag.
+    ///   - sizeText: Size text (e.g. "1", "S", "XL").
+    ///   - boardId: Target board ID.
+    ///   - columnId: Target column ID.
+    ///   - laneId: Target lane ID.
+    ///   - ownerId: Owner user ID.
+    ///   - typeId: Card type ID.
+    ///   - serviceId: Service ID.
+    ///   - blocked: Send `false` to release all blocks.
+    ///   - condition: 1 = live, 2 = archived.
+    ///   - externalId: External identifier.
+    ///   - textFormatTypeId: 1 = markdown, 2 = html, 3 = jira wiki.
+    ///   - sdNewComment: Service Desk new comment flag.
+    ///   - ownerEmail: Owner email address.
+    ///   - prevCardId: Previous card ID for repositioning.
+    ///   - estimateWorkload: Estimated workload.
+    ///   - properties: Custom properties object.
+    /// - Returns: The updated card.
+    /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+    public func updateCard(
+        id: Int,
+        title: String? = nil,
+        description: String? = nil,
+        asap: Bool? = nil,
+        dueDate: String? = nil,
+        dueDateTimePresent: Bool? = nil,
+        sortOrder: Double? = nil,
+        expiresLater: Bool? = nil,
+        sizeText: String? = nil,
+        boardId: Int? = nil,
+        columnId: Int? = nil,
+        laneId: Int? = nil,
+        ownerId: Int? = nil,
+        typeId: Int? = nil,
+        serviceId: Int? = nil,
+        blocked: Bool? = nil,
+        condition: Int? = nil,
+        externalId: String? = nil,
+        textFormatTypeId: Int? = nil,
+        sdNewComment: Bool? = nil,
+        ownerEmail: String? = nil,
+        prevCardId: Int? = nil,
+        estimateWorkload: Double? = nil,
+        properties: Components.Schemas.UpdateCardRequest.propertiesPayload? = nil
+    ) async throws(KaitenError) -> Components.Schemas.Card {
+        let body = Components.Schemas.UpdateCardRequest(
+            title: title,
+            description: description,
+            asap: asap,
+            due_date: dueDate,
+            due_date_time_present: dueDateTimePresent,
+            sort_order: sortOrder,
+            expires_later: expiresLater,
+            size_text: sizeText,
+            board_id: boardId,
+            column_id: columnId,
+            lane_id: laneId,
+            owner_id: ownerId,
+            type_id: typeId,
+            service_id: serviceId,
+            blocked: blocked,
+            condition: condition,
+            external_id: externalId,
+            text_format_type_id: textFormatTypeId,
+            sd_new_comment: sdNewComment,
+            owner_email: ownerEmail,
+            prev_card_id: prevCardId,
+            estimate_workload: estimateWorkload,
+            properties: properties
+        )
+        let response = try await call {
+            try await client.update_card(
+                path: .init(card_id: id),
+                body: .json(body)
+            )
+        }
+        return try decodeResponse(response.toCase(), notFoundResource: ("card", id)) { try $0.json }
+    }
+
     // MARK: - Card Members
 
     /// Fetches the list of members assigned to a card.
