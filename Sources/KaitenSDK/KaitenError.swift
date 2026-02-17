@@ -53,35 +53,3 @@ extension KaitenError: LocalizedError {
     }
 }
 
-// MARK: - HTTP Status Code Mapping
-
-extension KaitenError {
-    /// Maps an HTTP status code (and optional response body) to a ``KaitenError``.
-    ///
-    /// Returns `nil` for 2xx success codes.
-    public static func fromHTTPStatus(
-        _ statusCode: Int,
-        body: String? = nil,
-        resource: String? = nil,
-        resourceId: Int? = nil,
-        retryAfter: TimeInterval? = nil
-    ) -> KaitenError? {
-        switch statusCode {
-        case 200..<300:
-            return nil
-        case 401:
-            return .unauthorized
-        case 404:
-            if let resource, let resourceId {
-                return .notFound(resource: resource, id: resourceId)
-            }
-            return .unexpectedResponse(statusCode: 404)
-        case 429:
-            return .rateLimited(retryAfter: retryAfter)
-        case 500...599:
-            return .serverError(statusCode: statusCode, body: body)
-        default:
-            return .unexpectedResponse(statusCode: statusCode)
-        }
-    }
-}
