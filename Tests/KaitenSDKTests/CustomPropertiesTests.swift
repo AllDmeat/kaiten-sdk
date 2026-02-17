@@ -8,7 +8,7 @@ import Testing
 struct CustomPropertiesTests {
 
 
-    @Test("listCustomProperties 200 returns array")
+    @Test("listCustomProperties 200 returns page")
     func listSuccess() async throws {
         let json = """
             [{"id": 1, "name": "Priority", "type": "select"}, {"id": 2, "name": "Effort", "type": "number"}]
@@ -16,9 +16,11 @@ struct CustomPropertiesTests {
         let transport = MockClientTransport.returning(statusCode: 200, body: json)
         let client = try KaitenClient(baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-        let props = try await client.listCustomProperties()
-        #expect(props.count == 2)
-        #expect(props[0].name == "Priority")
+        let page = try await client.listCustomProperties()
+        #expect(page.items.count == 2)
+        #expect(page.items[0].name == "Priority")
+        #expect(page.offset == 0)
+        #expect(page.limit == 100)
     }
 
     @Test("getCustomProperty 200 returns single")
