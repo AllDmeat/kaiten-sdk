@@ -619,8 +619,7 @@ components:
           type: object
           description: Inline card type summary
         owner:
-          type: object
-          description: Inline owner summary
+          $ref: '#/components/schemas/User'
         key:
           type:
           - string
@@ -677,29 +676,20 @@ components:
             type: integer
           description: IDs of related cards
     CardMember:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Member record ID
-        user_id:
-          type: integer
-          description: User ID
-        card_id:
-          type: integer
-          description: Card ID
-        full_name:
-          type: string
-          description: User full name
-        email:
-          type: string
-          description: User email
-        username:
-          type: string
-          description: Username
-        type:
-          type: integer
-          description: 1 - member, 2 - responsible
+      description: User with card membership info (card_id, user_id, type)
+      allOf:
+      - $ref: '#/components/schemas/User'
+      - type: object
+        properties:
+          user_id:
+            type: integer
+            description: User ID
+          card_id:
+            type: integer
+            description: Card ID
+          type:
+            type: integer
+            description: 1 - member, 2 - responsible
     Tag:
       type: object
       properties:
@@ -1327,3 +1317,74 @@ components:
         type:
           type: integer
           description: 1 - place on space with coordinates (top, left), 5 - attach to space as sidebar
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User id
+        uid:
+          type: string
+          description: User uid
+        full_name:
+          type: string
+          description: User full name
+        username:
+          type: string
+          description: Username for mentions and login
+        email:
+          type: string
+          description: User email
+        activated:
+          type: boolean
+          description: User activated flag
+        avatar_initials_url:
+          type: string
+          description: Default user avatar url
+        avatar_uploaded_url:
+          type:
+          - string
+          - 'null'
+          description: User uploaded avatar url
+        initials:
+          type: string
+          description: User initials
+        avatar_type:
+          type: integer
+          description: 1 - gravatar, 2 - initials, 3 - uploaded
+        lng:
+          type: string
+          description: Language
+        timezone:
+          type: string
+          description: Time zone
+        theme:
+          type: string
+          description: light - light color theme, dark - dark color theme, auto - based on OS settings
+        ui_version:
+          type: integer
+          description: 1 - old ui, 2 - new
+        virtual:
+          type: boolean
+          description: Virtual user flag
+        email_blocked:
+          type:
+          - string
+          - 'null'
+          description: Email blocked status
+        email_blocked_reason:
+          type:
+          - string
+          - 'null'
+          description: Email blocked reason
+        delete_requested_at:
+          type:
+          - string
+          - 'null'
+          description: Delete request timestamp
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
