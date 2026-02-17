@@ -932,17 +932,17 @@ components:
         columns:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Column'
           description: Board columns
         lanes:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Lane'
           description: Board lanes
         cards:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Card'
           description: Board cards
     Space:
       type: object
@@ -1298,12 +1298,12 @@ components:
         columns:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Column'
           description: Board columns
         lanes:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Lane'
           description: Board lanes
         top:
           type: integer
