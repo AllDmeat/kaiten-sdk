@@ -37,7 +37,11 @@ final class MockClientTransport: ClientTransport, @unchecked Sendable {
     /// - Returns: A configured `MockClientTransport`.
     static func returning(statusCode: Int, body: String? = nil) -> MockClientTransport {
         MockClientTransport { _, _, _, _ in
-            let response = HTTPResponse(status: .init(code: statusCode))
+            var headerFields = HTTPFields()
+            if body != nil {
+                headerFields[.contentType] = "application/json"
+            }
+            let response = HTTPResponse(status: .init(code: statusCode), headerFields: headerFields)
             let responseBody: HTTPBody? = body.map { .init($0) }
             return (response, responseBody)
         }
