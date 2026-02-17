@@ -36,3 +36,16 @@
 - Always update READMEs when public APIs change. Any PR that
   modifies public API surface must include corresponding README
   updates.
+
+## Kaiten API Documentation
+
+Подробный гайд по парсингу документации Kaiten API: [docs/kaiten-docs-parsing.md](docs/kaiten-docs-parsing.md)
+
+### Обязательное правило
+
+**Перед любым изменением OpenAPI спеки** (`openapi/kaiten.yaml`) — обязательно проверить по документации Kaiten API (https://developers.kaiten.ru), как эндпоинт выглядит на самом деле:
+- Какие query/path параметры принимает
+- Какие поля в ответе обязательные (`integer`, `string`), а какие nullable (`null | string`)
+- Есть ли пагинация (`offset`/`limit`)
+
+Не менять спеку по догадкам или на основе эмпирических данных. Только по документации.
