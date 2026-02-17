@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "KaitenSDK",
     platforms: [
-        .macOS(.v15),
+        .iOS(.v13),
+        .macOS(.v10_15),
     ],
     products: [
         .library(
