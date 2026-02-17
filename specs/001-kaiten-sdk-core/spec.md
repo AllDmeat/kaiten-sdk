@@ -117,6 +117,7 @@ A developer requests all spaces and boards — for navigation.
   - **Different responses = different schemas** — if two endpoints return similar but not identical data, the spec MUST have separate schemas (Board vs BoardInSpace vs CardBoardSummary).
   - **Nullable and required strictly per the real API** — verify through requests, not just docs.
   - **Cross-checking is mandatory** — for any spec change, compare with documentation + verify against the real API. Documentation parsing guide: [docs/kaiten-docs-parsing.md](../../docs/kaiten-docs-parsing.md).
+- **FR-017**: All public types (structs, enums, protocols) and methods MUST have Swift doc comments (`///`) following DocC conventions. Doc comments MUST include `- Parameter`, `- Returns`, and `- Throws` tags where applicable.
 
 ### Key Entities
 
