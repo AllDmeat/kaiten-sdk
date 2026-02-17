@@ -463,41 +463,6 @@ paths:
           description: Forbidden
         '404':
           description: Not found
-    post:
-      summary: Create a card comment
-      operationId: create_card_comment
-      parameters:
-      - name: card_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Card ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - text
-              properties:
-                text:
-                  type: string
-                  description: Comment text (markdown)
-      responses:
-        '200':
-          description: Created comment
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Card not found
   /company/custom-properties:
     get:
       summary: Get list of properties
