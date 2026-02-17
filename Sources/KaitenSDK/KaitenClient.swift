@@ -133,6 +133,24 @@ public struct KaitenClient: Sendable {
             throw .unexpectedResponse(statusCode: code)
         }
     }
+
+
+    /// Fetches comments for a card.
+    public func getCardComments(cardId: Int) async throws(KaitenError) -> [Components.Schemas.Comment] {
+        let response = try await call { try await client.retrieve_card_comments(path: .init(card_id: cardId)) }
+        switch response {
+        case .ok(let ok):
+            return try decode { try ok.body.json }
+        case .unauthorized(_):
+            throw .unauthorized
+        case .forbidden(_):
+            throw .unexpectedResponse(statusCode: 403)
+        case .notFound(_):
+            throw .notFound(resource: "card", id: cardId)
+        case .undocumented(statusCode: let code, _):
+            throw .unexpectedResponse(statusCode: code)
+        }
+    }
 }
 
 // MARK: - Custom Properties

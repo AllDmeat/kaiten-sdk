@@ -45,6 +45,24 @@ struct GetCard: AsyncParsableCommand {
     }
 }
 
+struct GetCardComments: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "get-card-comments",
+        abstract: "Get comments on a card"
+    )
+
+    @OptionGroup var global: GlobalOptions
+
+    @Option(name: .long, help: "Card ID")
+    var cardId: Int
+
+    func run() async throws {
+        let client = try await global.makeClient()
+        let comments = try await client.getCardComments(cardId: cardId)
+        try printJSON(comments)
+    }
+}
+
 struct GetCardMembers: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "get-card-members",

@@ -175,6 +175,32 @@ paths:
           description: Invalid token
         '403':
           description: Forbidden
+  /cards/{card_id}/comments:
+    get:
+      summary: Retrieve card comments
+      operationId: retrieve_card_comments
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -390,7 +416,9 @@ components:
           type: integer
           description: Card condition
         last_moved_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Last moved timestamp
         external_id:
           type:
@@ -398,10 +426,14 @@ components:
           - 'null'
           description: External ID
         lane_changed_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Lane change timestamp
         column_changed_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Column change timestamp
         first_moved_to_in_progress_at:
           type:
@@ -419,7 +451,9 @@ components:
           - 'null'
           description: Service ID
         properties:
-          type: object
+          type:
+          - object
+          - 'null'
           description: Custom properties values
           additionalProperties: true
         planned_start:
@@ -848,7 +882,9 @@ components:
           description: Board title
         cell_wip_limits:
           description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
-          type: object
+          type:
+          - object
+          - 'null'
           additionalProperties: true
         external_id:
           type:
@@ -1081,6 +1117,56 @@ components:
           - string
           - 'null'
           description: Calculation method
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Comment ID
+        uid:
+          type: integer
+          description: Comment UID
+        text:
+          type: string
+          description: Comment text
+        type:
+          type: integer
+          description: "Comment type: 1-markdown, 2-html"
+        edited:
+          type: boolean
+          description: Whether comment was edited
+        card_id:
+          type: integer
+          description: Card ID
+        author_id:
+          type: integer
+          description: Author ID
+        email_addresses_to:
+          type: string
+          description: Mail addresses to send comment
+        internal:
+          type: boolean
+          description: Internal flag
+        deleted:
+          type: boolean
+          description: Deleted flag
+        sd_external_recipients_cc:
+          type: string
+          nullable: true
+          description: Service desk external recipients
+        sd_description:
+          type: boolean
+          description: Flag indicating comment is used as request description
+        notification_sent:
+          type: string
+          nullable: true
+          description: Notification sent date
+        updated:
+          type: string
+          description: Last update timestamp
+        created:
+          type: string
+          description: Create date
     MemberDetailed:
       type: object
       properties:
@@ -1160,7 +1246,9 @@ components:
           description: Board title
         cell_wip_limits:
           description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
-          type: object
+          type:
+          - object
+          - 'null'
           additionalProperties: true
         external_id:
           type:
