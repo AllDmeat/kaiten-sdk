@@ -651,7 +651,7 @@ components:
         files:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/File'
           description: Card files
         external_links:
           type: array
@@ -1574,6 +1574,59 @@ components:
         total_items:
           type: integer
           description: Total items count (present in list-cards)
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    File:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: File id
+        name:
+          type: string
+          description: File name
+        size:
+          type: integer
+          description: File size
+        type:
+          type: integer
+          description: 1-attachment, 2-googleDrive, 3-dropBox, 4-box, 5-oneDrive, 6-yandex disc, 7-comment email, 8-commentAttachment
+        url:
+          type: string
+          description: Uploaded url
+        card_cover:
+          type: boolean
+          description: Flag indicating that image used as card cover
+        author_id:
+          type: integer
+          description: Author id
+        card_id:
+          type: integer
+          description: Card id
+        comment_id:
+          type: integer
+          description: Comment id
+        deleted:
+          type: boolean
+          description: Deleted flag
+        external:
+          type: boolean
+          description: External flag
+        mh_markup_id:
+          type: string
+          description: Markup id
+        mh_secret:
+          type: string
+          description: Markup secret
+        sort_order:
+          type: number
+          description: Position
+        author:
+          $ref: '#/components/schemas/User'
         created:
           type: string
           description: Create date
