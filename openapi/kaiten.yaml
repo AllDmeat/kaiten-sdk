@@ -613,8 +613,7 @@ components:
           type: object
           description: Inline column summary
         board:
-          type: object
-          description: Inline board summary
+          $ref: '#/components/schemas/Board'
         type:
           $ref: '#/components/schemas/CardType'
         owner:
