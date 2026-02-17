@@ -694,12 +694,25 @@ components:
       properties:
         id:
           type: integer
+          description: Card tag id
         name:
           type: string
+          description: Card tag name
+        company_id:
+          type: integer
+          description: Company id
         color:
-          type:
-          - integer
-          - 'null'
+          type: integer
+          description: Card tag color number
+        archived:
+          type: boolean
+          description: Archived flag
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
     Column:
       type: object
       properties:
