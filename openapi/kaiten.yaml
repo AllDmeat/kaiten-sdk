@@ -2197,8 +2197,12 @@ components:
           description: External id
         card_properties:
           type:
-          - object
+          - array
           - 'null'
+          items:
+            type:
+            - object
+            - 'null'
           description: Board card properties
         settings:
           type:
