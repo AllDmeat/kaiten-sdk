@@ -616,8 +616,7 @@ components:
           type: object
           description: Inline board summary
         type:
-          type: object
-          description: Inline card type summary
+          $ref: '#/components/schemas/CardType'
         owner:
           $ref: '#/components/schemas/User'
         key:
@@ -1382,6 +1381,54 @@ components:
           - string
           - 'null'
           description: Delete request timestamp
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    CardType:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card type id
+        name:
+          type: string
+          description: Card type name
+        color:
+          type: integer
+          description: Color number
+        letter:
+          type: string
+          description: Card type letter
+        description_template:
+          type:
+          - string
+          - 'null'
+          description: Card type description template
+        company_id:
+          type: integer
+          description: Company id
+        properties:
+          type:
+          - object
+          - 'null'
+          description: Card type properties (preset and custom)
+        archived:
+          type: boolean
+          description: Archived flag
+        suggest_fields:
+          type: boolean
+          description: Suggest fields flag
+        uid:
+          type: string
+          description: Card type uid
+        author_uid:
+          type:
+          - string
+          - 'null'
+          description: Author uid
         created:
           type: string
           description: Create date
