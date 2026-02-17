@@ -19,16 +19,13 @@ jobs:
         include:
           - name: macOS ARM64
             os: macos-26
-            install-swift: false
           - name: Linux x86_64
             os: ubuntu-latest
-            install-swift: true
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
 
       - name: Install mise
-        if: matrix.install-swift
         uses: jdx/mise-action@v3
 
       - name: Install system dependencies (Linux)
