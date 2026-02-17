@@ -658,6 +658,11 @@ components:
           items:
             $ref: '#/components/schemas/ExternalLink'
           description: External links
+        slas:
+          type: array
+          items:
+            $ref: '#/components/schemas/SLA'
+          description: SLAs attached to the card
         blocked_by_card_ids:
           type: array
           items:
@@ -1633,3 +1638,84 @@ components:
         updated:
           type: string
           description: Last update timestamp
+    SLARule:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Rule identifier
+        sla_id:
+          type: string
+          description: Parent SLA identifier
+        type:
+          type: string
+          description: Rule type
+        estimated_time:
+          type: integer
+          description: Estimated rule time in minutes
+        calendar_id:
+          type:
+          - string
+          - 'null'
+          description: Calendar identifier
+        start_column_uid:
+          type:
+          - string
+          - 'null'
+          description: Start column identifier for rules with type onPathTime
+        finish_column_uid:
+          type:
+          - string
+          - 'null'
+          description: Finish column identifier for rules with type onPathTime
+        notification_settings:
+          type:
+          - object
+          - 'null'
+          description: Notification settings
+        deleted:
+          type: boolean
+          description: Deleted rule indicator
+        created:
+          type: string
+          description: Rule creation date
+    SLA:
+      type: object
+      properties:
+        id:
+          type: string
+          description: SLA identifier
+        name:
+          type: string
+          description: SLA name
+        status:
+          type: string
+          description: SLA status
+        company_id:
+          type: integer
+          description: Company identifier
+        updater_id:
+          type: integer
+          description: User ID who last updated the SLA
+        notification_settings:
+          type:
+          - object
+          - 'null'
+          description: Notification settings
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/SLARule'
+          description: SLA rules
+        card_id:
+          type: integer
+          description: Card identifier
+        sla_id:
+          type: string
+          description: SLA identifier
+        created:
+          type: string
+          description: SLA creation date
+        updated:
+          type: string
+          description: SLA last update date
