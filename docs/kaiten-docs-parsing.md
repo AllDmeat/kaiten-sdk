@@ -123,6 +123,38 @@ with sync_playwright() as p:
 - Вложенные схемы могут содержать свои кнопки Schema (рекурсивные типы, например `children` → Card)
 - Формат текста в диалоге: `FieldNameType: typeNameTypeDescriptionfield1type1desc1field2type2desc2...`
 
+#### Вложенные схемы внутри диалога (MuiLink)
+
+Внутри раскрытого диалога поля с типом `array` или `object` могут быть **кликабельными ссылками** (не кнопками Schema, а сам текст типа). Это `button` с классом `MuiLink-root` — клик по ней заменяет содержимое диалога на вложенную схему.
+
+Пример: `checklists` → Schema → внутри поле `items` с типом `array` → клик по `array` → раскрывается схема ChecklistItem.
+
+```python
+# После открытия основного диалога Schema:
+dialog = page.query_selector('.MuiDialog-root')
+if dialog:
+    # Найти кликабельные типы внутри диалога
+    link_buttons = dialog.query_selector_all('button.MuiLink-root')
+    for lb in link_buttons:
+        text = lb.text_content().strip()
+        # text будет "array", "object" и т.п.
+        lb.click(timeout=3000)
+        page.wait_for_timeout(1000)
+
+        # Диалог обновился — читаем новое содержимое
+        dialog = page.query_selector('.MuiDialog-root')
+        nested_text = dialog.text_content()
+        print(nested_text)
+
+        # В диалоге есть кнопка "Back" для возврата к родительской схеме
+        page.keyboard.press('Escape')
+        page.wait_for_timeout(500)
+```
+
+**Как отличить:**
+- Кнопки **Schema** на странице (вне диалога): `button.MuiButton-root` с текстом `Schema`
+- Ссылки на вложенные схемы **внутри диалога**: `button.MuiLink-root` с текстом типа (`array`, `object`)
+
 ### 8. Batch-парсинг нескольких эндпоинтов
 ```python
 urls = {
