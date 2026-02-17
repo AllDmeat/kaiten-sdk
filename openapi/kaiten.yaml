@@ -390,7 +390,9 @@ components:
           type: integer
           description: Card condition
         last_moved_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Last moved timestamp
         external_id:
           type:
@@ -398,10 +400,14 @@ components:
           - 'null'
           description: External ID
         lane_changed_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Lane change timestamp
         column_changed_at:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Column change timestamp
         first_moved_to_in_progress_at:
           type:
@@ -419,7 +425,9 @@ components:
           - 'null'
           description: Service ID
         properties:
-          type: object
+          type:
+          - object
+          - 'null'
           description: Custom properties values
           additionalProperties: true
         planned_start:
@@ -848,7 +856,9 @@ components:
           description: Board title
         cell_wip_limits:
           description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
-          type: object
+          type:
+          - object
+          - 'null'
           additionalProperties: true
         external_id:
           type:
@@ -895,7 +905,9 @@ components:
           description: Automatically assign a user to the card when he/she moves the card if the user is not a member of the
             card
         card_properties:
-          type: array
+          type:
+          - array
+          - 'null'
           items:
             type:
             - object
@@ -1160,7 +1172,9 @@ components:
           description: Board title
         cell_wip_limits:
           description: JSON containing wip limits rules for cells. Object with "limits" array, not an array itself.
-          type: object
+          type:
+          - object
+          - 'null'
           additionalProperties: true
         external_id:
           type:
@@ -1207,7 +1221,9 @@ components:
           description: Automatically assign a user to the card when he/she moves the card if the user is not a member of the
             card
         card_properties:
-          type: array
+          type:
+          - array
+          - 'null'
           items:
             type:
             - object
