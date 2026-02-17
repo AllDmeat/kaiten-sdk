@@ -637,7 +637,7 @@ components:
         checklists:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/Checklist'
           description: Card checklists
         children:
           type: array
@@ -1466,6 +1466,115 @@ components:
         external_link_id:
           type: integer
           description: External link id
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    ChecklistItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card checklist item id
+        text:
+          type: string
+          description: Checklist item text
+        sort_order:
+          type: number
+          description: Position
+        checked:
+          type: boolean
+          description: Flag indicating that checklist item checked
+        checklist_id:
+          type: integer
+          description: Parent checklist id
+        checker_id:
+          type:
+          - integer
+          - 'null'
+          description: User id who checked checklist item
+        user_id:
+          type: integer
+          description: Creator user id
+        checked_at:
+          type:
+          - string
+          - 'null'
+          description: Date of check
+        responsible_id:
+          type:
+          - integer
+          - 'null'
+          description: User id who is responsible for checklist item
+        deleted:
+          type: boolean
+          description: Flag indicating that checklist item deleted
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Checklist item deadline
+        uid:
+          type: string
+          description: Checklist item uid
+        fts_version:
+          type: string
+          description: Full-text search version
+        checked_by:
+          oneOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: User who checked checklist item
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    Checklist:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card checklist id
+        name:
+          type: string
+          description: Checklist name
+        policy_id:
+          type:
+          - integer
+          - 'null'
+          description: Template checklist id
+        items:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ChecklistItem'
+          description: Checklist items (present in get-card, absent in list-cards)
+        uid:
+          type: string
+          description: Checklist uid
+        card_id:
+          type: integer
+          description: Card id
+        checklist_id:
+          type: integer
+          description: Checklist id
+        sort_order:
+          type: number
+          description: Position
+        fts_version:
+          type: string
+          description: Full-text search version
+        checked_items:
+          type: integer
+          description: Count of checked items (present in list-cards)
+        total_items:
+          type: integer
+          description: Total items count (present in list-cards)
         created:
           type: string
           description: Create date
