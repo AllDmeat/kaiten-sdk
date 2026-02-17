@@ -657,7 +657,7 @@ components:
         external_links:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/ExternalLink'
           description: External links
         blocked_by_card_ids:
           type: array
@@ -1442,6 +1442,30 @@ components:
           - string
           - 'null'
           description: Author uid
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    ExternalLink:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: External link id
+        url:
+          type: string
+          description: External link url
+        description:
+          type: string
+          description: External link description
+        card_id:
+          type: integer
+          description: Card id
+        external_link_id:
+          type: integer
+          description: External link id
         created:
           type: string
           description: Create date
