@@ -27,7 +27,7 @@ stdout confirms it works.
    user runs a subcommand (e.g. `list-spaces`), **Then** the
    CLI outputs structured data to stdout.
 2. **Given** a valid config file exists at
-   `~/.config/kaiten-mcp/config.json`, **When** the user runs
+   `~/.config/kaiten/config.json`, **When** the user runs
    a subcommand without flags, **Then** the CLI reads parameters
    from the config file.
 3. **Given** both flags and a config file with different values
@@ -51,7 +51,7 @@ stdout confirms it works.
   MUST output an error describing the configuration problem.
 - What if the config file does not exist and no flags are passed?
   The CLI MUST output an error with instructions: pass flags or
-  create `~/.config/kaiten-mcp/config.json`.
+  create `~/.config/kaiten/config.json`.
 
 ## Requirements *(mandatory)*
 
@@ -72,7 +72,7 @@ stdout confirms it works.
 - **FR-006**: The CLI MUST compile and run on macOS (ARM) and
   Linux (x86-64 and ARM).
 - **FR-007**: Configuration is stored in two files in a shared
-  directory `~/.config/kaiten-mcp/` (all platforms):
+  directory `~/.config/kaiten/` (all platforms):
   - **`config.json`** — connection settings (url, token):
     ```json
     {

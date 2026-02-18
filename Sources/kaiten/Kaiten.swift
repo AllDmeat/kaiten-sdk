@@ -113,7 +113,7 @@ struct GlobalOptions: ParsableArguments {
 
   private static var configPath: String {
     let home = FileManager.default.homeDirectoryForCurrentUser
-    return home.appendingPathComponent(".config/kaiten-mcp/config.json").path
+    return home.appendingPathComponent(".config/kaiten/config.json").path
   }
 }
 

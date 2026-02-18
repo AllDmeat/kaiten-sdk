@@ -76,7 +76,7 @@ Get your API token at `https://<your-company>.kaiten.ru/profile/api-key`.
 
 **Option 1 — Config file** (recommended):
 
-Create `~/.config/kaiten-mcp/config.json`:
+Create `~/.config/kaiten/config.json`:
 
 ```json
 {
@@ -219,7 +219,7 @@ kaiten list-spaces \
 
 ## Configuration
 
-The CLI and MCP server share the same config file at `~/.config/kaiten-mcp/config.json` (see [Configure Credentials](#2-configure-credentials) above).
+The CLI and MCP server share the same config file at `~/.config/kaiten/config.json` (see [Configure Credentials](#2-configure-credentials) above).
 
 The `--url` and `--token` CLI flags take priority over the config file.
 

@@ -212,8 +212,8 @@ if (dialog) {
 After parsing docs, **always verify with a real API request**:
 
 ```bash
-URL=$(jq -r .url ~/.config/kaiten-mcp/config.json)
-TOKEN=$(jq -r .token ~/.config/kaiten-mcp/config.json)
+URL=$(jq -r .url ~/.config/kaiten/config.json)
+TOKEN=$(jq -r .token ~/.config/kaiten/config.json)
 
 curl -s -H "Authorization: Bearer $TOKEN" \
     "$URL/cards/47271507/checklists/12345" | python3 -m json.tool
