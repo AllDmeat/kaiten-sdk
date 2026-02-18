@@ -23,7 +23,12 @@ struct CreateLane: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let lane = try await client.createLane(boardId: boardId, title: title, sortOrder: sortOrder, rowCount: rowCount)
+    let lane = try await client.createLane(
+      boardId: boardId,
+      title: title,
+      sortOrder: sortOrder,
+      rowCount: rowCount
+    )
     try printJSON(lane)
   }
 }
@@ -56,7 +61,13 @@ struct UpdateLane: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let lane = try await client.updateLane(boardId: boardId, id: id, title: title, sortOrder: sortOrder, condition: condition)
+    let lane = try await client.updateLane(
+      boardId: boardId,
+      id: id,
+      title: title,
+      sortOrder: sortOrder,
+      condition: condition
+    )
     try printJSON(lane)
   }
 }
@@ -77,7 +88,10 @@ struct DeleteLane: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let deletedId = try await client.deleteLane(boardId: boardId, id: id)
+    let deletedId = try await client.deleteLane(
+      boardId: boardId,
+      id: id
+    )
     print("{\"id\": \(deletedId)}")
   }
 }

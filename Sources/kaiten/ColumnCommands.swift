@@ -23,7 +23,12 @@ struct CreateColumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let column = try await client.createColumn(boardId: boardId, title: title, sortOrder: sortOrder, type: columnType)
+    let column = try await client.createColumn(
+      boardId: boardId,
+      title: title,
+      sortOrder: sortOrder,
+      type: columnType
+    )
     try printJSON(column)
   }
 }
@@ -53,7 +58,13 @@ struct UpdateColumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let column = try await client.updateColumn(boardId: boardId, id: id, title: title, sortOrder: sortOrder, type: columnType)
+    let column = try await client.updateColumn(
+      boardId: boardId,
+      id: id,
+      title: title,
+      sortOrder: sortOrder,
+      type: columnType
+    )
     try printJSON(column)
   }
 }
@@ -74,7 +85,10 @@ struct DeleteColumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let deletedId = try await client.deleteColumn(boardId: boardId, id: id)
+    let deletedId = try await client.deleteColumn(
+      boardId: boardId,
+      id: id
+    )
     print("{\"id\": \(deletedId)}")
   }
 }
@@ -94,7 +108,9 @@ struct ListSubcolumns: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let subcolumns = try await client.listSubcolumns(columnId: columnId)
+    let subcolumns = try await client.listSubcolumns(
+      columnId: columnId
+    )
     try printJSON(subcolumns)
   }
 }
@@ -118,7 +134,11 @@ struct CreateSubcolumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let subcolumn = try await client.createSubcolumn(columnId: columnId, title: title, sortOrder: sortOrder)
+    let subcolumn = try await client.createSubcolumn(
+      columnId: columnId,
+      title: title,
+      sortOrder: sortOrder
+    )
     try printJSON(subcolumn)
   }
 }
@@ -145,7 +165,12 @@ struct UpdateSubcolumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let subcolumn = try await client.updateSubcolumn(columnId: columnId, id: id, title: title, sortOrder: sortOrder)
+    let subcolumn = try await client.updateSubcolumn(
+      columnId: columnId,
+      id: id,
+      title: title,
+      sortOrder: sortOrder
+    )
     try printJSON(subcolumn)
   }
 }
@@ -166,7 +191,10 @@ struct DeleteSubcolumn: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let deletedId = try await client.deleteSubcolumn(columnId: columnId, id: id)
+    let deletedId = try await client.deleteSubcolumn(
+      columnId: columnId,
+      id: id
+    )
     print("{\"id\": \(deletedId)}")
   }
 }

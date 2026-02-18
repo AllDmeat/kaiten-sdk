@@ -20,7 +20,11 @@ struct CreateSpace: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let space = try await client.createSpace(title: title, externalId: externalId, sortOrder: sortOrder)
+    let space = try await client.createSpace(
+      title: title,
+      externalId: externalId,
+      sortOrder: sortOrder
+    )
     try printJSON(space)
   }
 }
@@ -65,7 +69,12 @@ struct UpdateSpace: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let space = try await client.updateSpace(id: id, title: title, externalId: externalId, sortOrder: sortOrder)
+    let space = try await client.updateSpace(
+      id: id,
+      title: title,
+      externalId: externalId,
+      sortOrder: sortOrder
+    )
     try printJSON(space)
   }
 }

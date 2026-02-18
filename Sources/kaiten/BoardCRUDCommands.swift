@@ -23,7 +23,12 @@ struct CreateBoard: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let board = try await client.createBoard(spaceId: spaceId, title: title, description: boardDescription, sortOrder: sortOrder)
+    let board = try await client.createBoard(
+      spaceId: spaceId,
+      title: title,
+      description: boardDescription,
+      sortOrder: sortOrder
+    )
     try printJSON(board)
   }
 }
@@ -53,7 +58,13 @@ struct UpdateBoard: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let board = try await client.updateBoard(spaceId: spaceId, id: id, title: title, description: boardDescription, sortOrder: sortOrder)
+    let board = try await client.updateBoard(
+      spaceId: spaceId,
+      id: id,
+      title: title,
+      description: boardDescription,
+      sortOrder: sortOrder
+    )
     try printJSON(board)
   }
 }
@@ -74,7 +85,10 @@ struct DeleteBoard: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let deletedId = try await client.deleteBoard(spaceId: spaceId, id: id)
+    let deletedId = try await client.deleteBoard(
+      spaceId: spaceId,
+      id: id
+    )
     print("{\"id\": \(deletedId)}")
   }
 }
