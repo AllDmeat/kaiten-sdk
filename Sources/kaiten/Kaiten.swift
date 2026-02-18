@@ -45,6 +45,10 @@ struct Kaiten: AsyncParsableCommand {
       ListCardChildren.self,
       AddCardChild.self,
       RemoveCardChild.self,
+      ListExternalLinks.self,
+      CreateExternalLink.self,
+      UpdateExternalLink.self,
+      RemoveExternalLink.self,
     ]
   )
 }
