@@ -104,38 +104,13 @@ public struct KaitenClient: Sendable {
   }
 
   /// Standard response case from an OpenAPI-generated Output enum.
-  /// Used by `handleResponse` to eliminate switch boilerplate.
+  /// Standard response case from an OpenAPI-generated Output enum.
   enum ResponseCase<OKBody> {
     case ok(OKBody)
     case unauthorized
     case forbidden
     case notFound
     case undocumented(statusCode: Int)
-  }
-
-  /// Handles a standard response by extracting the ok body or throwing the appropriate error.
-  /// The `ok` closure receives the body and should extract the JSON value.
-  private func handleResponse<OKBody, JSONBody, T>(
-    _ responseCase: ResponseCase<OKBody>,
-    notFoundResource: (name: String, id: Int)? = nil,
-    extract: (OKBody) -> JSONBody,
-    transform: (JSONBody) throws(KaitenError) -> T
-  ) throws(KaitenError) -> T {
-    switch responseCase {
-    case .ok(let body):
-      return try transform(extract(body))
-    case .unauthorized:
-      throw .unauthorized
-    case .forbidden:
-      throw .unexpectedResponse(statusCode: 403)
-    case .notFound:
-      if let res = notFoundResource {
-        throw .notFound(resource: res.name, id: res.id)
-      }
-      throw .unexpectedResponse(statusCode: 404)
-    case .undocumented(let code):
-      throw .unexpectedResponse(statusCode: code)
-    }
   }
 
   /// Convenience: handle response, decode JSON body.
