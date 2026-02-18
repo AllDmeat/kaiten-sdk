@@ -16,7 +16,7 @@ struct UpdateCardMemberRoleTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    let role = try await client.updateCardMemberRole(cardId: 42, userId: 10, type: 2)
+    let role = try await client.updateCardMemberRole(cardId: 42, userId: 10, type: .responsible)
     #expect(role.card_id == 42)
     #expect(role.user_id == 10)
     #expect(role._type == 2)
@@ -29,7 +29,7 @@ struct UpdateCardMemberRoleTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.updateCardMemberRole(cardId: 999, userId: 10, type: 2)
+      _ = try await client.updateCardMemberRole(cardId: 999, userId: 10, type: .responsible)
     }
   }
 
@@ -40,7 +40,7 @@ struct UpdateCardMemberRoleTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.updateCardMemberRole(cardId: 42, userId: 10, type: 2)
+      _ = try await client.updateCardMemberRole(cardId: 42, userId: 10, type: .responsible)
     }
   }
 }

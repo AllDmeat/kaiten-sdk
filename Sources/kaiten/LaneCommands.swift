@@ -66,7 +66,7 @@ struct UpdateLane: AsyncParsableCommand {
       id: id,
       title: title,
       sortOrder: sortOrder,
-      condition: condition
+      condition: condition.flatMap(LaneCondition.init(rawValue:))
     )
     try printJSON(lane)
   }

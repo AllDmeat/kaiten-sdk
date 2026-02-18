@@ -73,7 +73,8 @@ struct GetBoardLanes: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let lanes = try await client.getBoardLanes(boardId: boardId, condition: condition)
+    let lanes = try await client.getBoardLanes(
+      boardId: boardId, condition: condition.flatMap(LaneCondition.init(rawValue:)))
     try printJSON(lanes)
   }
 }

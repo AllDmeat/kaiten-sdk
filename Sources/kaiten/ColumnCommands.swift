@@ -27,7 +27,7 @@ struct CreateColumn: AsyncParsableCommand {
       boardId: boardId,
       title: title,
       sortOrder: sortOrder,
-      type: columnType
+      type: columnType.flatMap(ColumnType.init(rawValue:))
     )
     try printJSON(column)
   }
@@ -63,7 +63,7 @@ struct UpdateColumn: AsyncParsableCommand {
       id: id,
       title: title,
       sortOrder: sortOrder,
-      type: columnType
+      type: columnType.flatMap(ColumnType.init(rawValue:))
     )
     try printJSON(column)
   }

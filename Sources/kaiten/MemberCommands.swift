@@ -41,7 +41,10 @@ struct UpdateCardMemberRole: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let role = try await client.updateCardMemberRole(cardId: cardId, userId: userId, type: type)
+    guard let roleType = CardMemberRoleType(rawValue: type) else {
+      throw KaitenError.unexpectedResponse(statusCode: 0)
+    }
+    let role = try await client.updateCardMemberRole(cardId: cardId, userId: userId, type: roleType)
     try printJSON(role)
   }
 }

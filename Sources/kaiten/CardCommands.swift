@@ -193,8 +193,10 @@ struct ListCards: AsyncParsableCommand {
       excludeColumnIds: excludeColumnIds,
       excludeOwnerIds: excludeOwnerIds,
       excludeCardIds: excludeCardIds,
-      condition: condition,
-      states: states,
+      condition: condition.flatMap(CardCondition.init(rawValue:)),
+      states: states?.split(separator: ",").compactMap {
+        Int($0).flatMap(CardState.init(rawValue:))
+      },
       archived: archived,
       asap: asap,
       overdue: overdue,
@@ -292,10 +294,10 @@ struct CreateCard: AsyncParsableCommand {
       ownerId: ownerId,
       responsibleId: responsibleId,
       ownerEmail: ownerEmail,
-      position: position,
+      position: position.flatMap(CardPosition.init(rawValue:)),
       typeId: typeId,
       externalId: externalId,
-      textFormatTypeId: textFormatTypeId
+      textFormatTypeId: textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
     )
     try printJSON(card)
   }
@@ -412,9 +414,9 @@ struct UpdateCard: AsyncParsableCommand {
       typeId: typeId,
       serviceId: serviceId,
       blocked: blocked,
-      condition: condition,
+      condition: condition.flatMap(CardCondition.init(rawValue:)),
       externalId: externalId,
-      textFormatTypeId: textFormatTypeId,
+      textFormatTypeId: textFormatTypeId.flatMap(TextFormatType.init(rawValue:)),
       ownerEmail: ownerEmail,
       prevCardId: prevCardId,
       estimateWorkload: estimateWorkload
