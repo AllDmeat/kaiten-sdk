@@ -1401,41 +1401,6 @@ extension KaitenClient {
   }
 }
 
-// MARK: - Time Logs
-
-extension KaitenClient {
-  /// Creates a time log on a card.
-  public func createTimeLog(
-    cardId: Int, roleId: Int, timeSpent: Int, forDate: String, comment: String? = nil
-  ) async throws(KaitenError) -> Components.Schemas.TimeLog {
-    let response = try await call {
-      try await client.create_time_log(
-        path: .init(card_id: cardId),
-        body: .json(
-          .init(role_id: roleId, time_spent: timeSpent, for_date: forDate, comment: comment))
-      )
-    }
-    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) { try $0.json }
-  }
-
-  /// Lists time logs for a card.
-  public func listTimeLogs(
-    cardId: Int, forDate: String? = nil, personal: Bool? = nil
-  ) async throws(KaitenError) -> [Components.Schemas.TimeLog] {
-    guard
-      let response = try await callList({
-        try await client.list_time_logs(
-          path: .init(card_id: cardId),
-          query: .init(for_date: forDate, personal: personal)
-        )
-      })
-    else {
-      return []
-    }
-    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) { try $0.json }
-  }
-}
-
 // MARK: - Card Types
 
 extension KaitenClient {

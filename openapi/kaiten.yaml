@@ -1534,71 +1534,6 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           description: Invalid token
-  /cards/{card_id}/time-logs:
-    get:
-      summary: List time logs for a card
-      operationId: list_time_logs
-      parameters:
-      - name: card_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Card ID
-      - name: for_date
-        in: query
-        schema:
-          type: string
-        description: Filter by date (YYYY-MM-DD)
-      - name: personal
-        in: query
-        schema:
-          type: boolean
-        description: Filter time logs by current user
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimeLog'
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Not found
-    post:
-      summary: Create a time log on a card
-      operationId: create_time_log
-      parameters:
-      - name: card_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Card ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateTimeLogRequest'
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TimeLog'
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Not found
   /cards/{card_id}/location-history:
     get:
       summary: Get card location history
@@ -4260,65 +4195,6 @@ components:
         blocker_card_id:
           type: integer
           description: Blocker card ID
-    TimeLog:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Time log ID
-        card_id:
-          type: integer
-          description: Card ID
-        user_id:
-          type: integer
-          description: User ID
-        role_id:
-          type: integer
-          description: Role ID (-1 = Employee)
-        author_id:
-          type: integer
-          description: Author ID
-        updater_id:
-          type: integer
-          description: Last updater ID
-        time_spent:
-          type: integer
-          description: Minutes logged
-        for_date:
-          type: string
-          description: Log date (YYYY-MM-DD)
-        comment:
-          type:
-          - string
-          - 'null'
-          description: Time log comment
-        created:
-          type: string
-          description: Create date
-        updated:
-          type: string
-          description: Last update timestamp
-    CreateTimeLogRequest:
-      type: object
-      required:
-      - role_id
-      - time_spent
-      - for_date
-      properties:
-        role_id:
-          type: integer
-          description: Role ID (-1 = Employee)
-        time_spent:
-          type: integer
-          minimum: 1
-          description: Minutes to log
-        for_date:
-          type: string
-          description: Log date (YYYY-MM-DD)
-        comment:
-          type: string
-          maxLength: 4096
-          description: Comment for time log
     CardLocationHistory:
       type: object
       properties:

@@ -482,32 +482,6 @@ extension Operations.delete_card_blocker.Output {
   }
 }
 
-// MARK: - Time Logs
-
-extension Operations.create_time_log.Output {
-  func toCase() -> KaitenClient.ResponseCase<Operations.create_time_log.Output.Ok.Body> {
-    switch self {
-    case .ok(let ok): .ok(ok.body)
-    case .unauthorized: .unauthorized
-    case .forbidden: .forbidden
-    case .notFound: .notFound
-    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
-    }
-  }
-}
-
-extension Operations.list_time_logs.Output {
-  func toCase() -> KaitenClient.ResponseCase<Operations.list_time_logs.Output.Ok.Body> {
-    switch self {
-    case .ok(let ok): .ok(ok.body)
-    case .unauthorized: .unauthorized
-    case .forbidden: .forbidden
-    case .notFound: .notFound
-    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
-    }
-  }
-}
-
 // MARK: - Card Types
 
 extension Operations.list_card_types.Output {
