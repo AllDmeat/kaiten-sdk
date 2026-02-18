@@ -534,6 +534,64 @@ extension Operations.list_sprints.Output {
   }
 }
 
+// MARK: - External Links
+
+extension Operations.list_card_external_links.Output {
+  func toCase()
+    -> KaitenClient.ResponseCase<Operations.list_card_external_links.Output.Ok.Body>
+  {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.create_card_external_link.Output {
+  func toCase()
+    -> KaitenClient.ResponseCase<Operations.create_card_external_link.Output.Ok.Body>
+  {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.update_card_external_link.Output {
+  func toCase()
+    -> KaitenClient.ResponseCase<Operations.update_card_external_link.Output.Ok.Body>
+  {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.remove_card_external_link.Output {
+  func toCase()
+    -> KaitenClient.ResponseCase<Operations.remove_card_external_link.Output.Ok.Body>
+  {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
 // MARK: - Card Location History
 
 extension Operations.get_card_location_history.Output {

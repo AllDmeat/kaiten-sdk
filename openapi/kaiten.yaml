@@ -1510,6 +1510,126 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/external-links:
+    get:
+      summary: Retrieve card external links
+      operationId: list_card_external_links
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalLink'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    post:
+      summary: Add external link to card
+      operationId: create_card_external_link
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExternalLinkRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalLink'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/external-links/{id}:
+    patch:
+      summary: Update external link
+      operationId: update_card_external_link
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: External link ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExternalLinkRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalLink'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove external link from card
+      operationId: remove_card_external_link
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: External link ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedExternalLinkResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /card-types:
     get:
       summary: List card types
@@ -3458,6 +3578,42 @@ components:
         id:
           type: integer
           description: Deleted card child ID
+    CreateExternalLinkRequest:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: URL
+          minLength: 1
+          maxLength: 16384
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description
+          maxLength: 512
+    UpdateExternalLinkRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: URL
+          minLength: 1
+          maxLength: 16384
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description
+          maxLength: 512
+    DeletedExternalLinkResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Deleted external link ID
     CardBlocker:
       type: object
       properties:

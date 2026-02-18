@@ -1490,6 +1490,65 @@ extension KaitenClient {
   }
 }
 
+// MARK: - External Links
+
+extension KaitenClient {
+  /// Lists all external links on a card.
+  public func listExternalLinks(cardId: Int) async throws(KaitenError) -> [Components.Schemas
+    .ExternalLink]
+  {
+    guard
+      let response = try await callList({
+        try await client.list_card_external_links(path: .init(card_id: cardId))
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) { try $0.json }
+  }
+
+  /// Creates an external link on a card.
+  public func createExternalLink(cardId: Int, url: String, description: String? = nil)
+    async throws(KaitenError) -> Components.Schemas.ExternalLink
+  {
+    let response = try await call {
+      try await client.create_card_external_link(
+        path: .init(card_id: cardId),
+        body: .json(.init(url: url, description: description))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) { try $0.json }
+  }
+
+  /// Updates an external link on a card.
+  public func updateExternalLink(
+    cardId: Int, linkId: Int, url: String? = nil, description: String? = nil
+  )
+    async throws(KaitenError) -> Components.Schemas.ExternalLink
+  {
+    let response = try await call {
+      try await client.update_card_external_link(
+        path: .init(card_id: cardId, id: linkId),
+        body: .json(.init(url: url, description: description))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("externalLink", linkId)) {
+      try $0.json
+    }
+  }
+
+  /// Removes an external link from a card.
+  public func removeExternalLink(cardId: Int, linkId: Int) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_card_external_link(path: .init(card_id: cardId, id: linkId))
+    }
+    let result: Components.Schemas.DeletedExternalLinkResponse = try decodeResponse(
+      response.toCase(), notFoundResource: ("externalLink", linkId)
+    ) { try $0.json }
+    return result.id!
+  }
+}
+
 // MARK: - Helpers
 
 extension Optional {
