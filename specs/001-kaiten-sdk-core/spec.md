@@ -130,6 +130,22 @@ A developer requests all spaces and boards — for navigation.
 - **Space**: id, title (boards fetched separately via `listBoards(spaceId:)`)
 - **Member**: id, userId, fullName, role
 - **CustomProperty**: id, name, type, value (typed: string, number, select, multiselect, date, user)
+- **CustomPropertySelectValue**: id, customPropertyId, value, color, condition, sortOrder, externalId, updated, created, authorId, companyId
+
+### User Story 7a — List and Get Custom Property Select Values (Priority: P2)
+
+A developer retrieves the available select options for a select-type custom property, to populate dropdowns or validate user input.
+
+**Why this priority**: Select values are needed for setting custom properties on cards — a key automation scenario.
+
+**Independent Test**: Call `client.listCustomPropertySelectValues(propertyId: 299126)`, receive an array of select values.
+
+**Acceptance Scenarios**:
+
+1. **Given** a valid property ID of a select-type custom property, **When** I call `listCustomPropertySelectValues(propertyId:)`, **Then** I receive an array of `CustomPropertySelectValue` objects
+2. **Given** a valid property ID and value ID, **When** I call `getCustomPropertySelectValue(propertyId:id:)`, **Then** I receive a single `CustomPropertySelectValue`
+3. **Given** an invalid property ID, **When** I call `listCustomPropertySelectValues(propertyId:)`, **Then** I receive a `notFound` error
+4. **Given** an invalid value ID, **When** I call `getCustomPropertySelectValue(propertyId:id:)`, **Then** I receive a `notFound` error
 
 ### User Story 7 — Create a Comment on a Card (Priority: P2)
 

@@ -201,6 +201,8 @@ kaiten list-spaces \
 |--------|-------------|
 | `listCustomProperties()` | List all custom property definitions |
 | `getCustomProperty(id:)` | Get a single custom property definition |
+| `listCustomPropertySelectValues(propertyId:)` | List select values for a custom property |
+| `getCustomPropertySelectValue(propertyId:id:)` | Get a single select value |
 
 ### Users
 

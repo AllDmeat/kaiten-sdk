@@ -34,6 +34,8 @@ struct Kaiten: AsyncParsableCommand {
       UpdateChecklist.self,
       ListCustomProperties.self,
       GetCustomProperty.self,
+      ListCustomPropertySelectValues.self,
+      GetCustomPropertySelectValue.self,
       GetChecklist.self,
       DeleteCard.self,
       DeleteComment.self,

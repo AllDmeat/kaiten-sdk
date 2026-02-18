@@ -1068,6 +1068,64 @@ extension KaitenClient {
       try $0.json
     }
   }
+
+  /// Lists select values for a select-type custom property.
+  ///
+  /// - Parameters:
+  ///   - propertyId: The custom property identifier.
+  ///   - v2SelectSearch: Enable additional filtering capabilities.
+  ///   - query: Filter by select value (requires `v2SelectSearch`).
+  ///   - orderBy: Field to sort by (requires `v2SelectSearch`).
+  ///   - ids: Array of value IDs to filter by (requires `v2SelectSearch`).
+  ///   - conditions: Array of conditions to filter by (requires `v2SelectSearch`).
+  ///   - offset: Number of records to skip (requires `v2SelectSearch`).
+  ///   - limit: Maximum number of values to return (requires `v2SelectSearch`, default `100`).
+  /// - Returns: An array of select values.
+  /// - Throws: ``KaitenError``
+  public func listCustomPropertySelectValues(
+    propertyId: Int,
+    v2SelectSearch: Bool? = nil,
+    query: String? = nil,
+    orderBy: String? = nil,
+    ids: [Int]? = nil,
+    conditions: [String]? = nil,
+    offset: Int? = nil,
+    limit: Int? = nil
+  ) async throws(KaitenError) -> [Components.Schemas.CustomPropertySelectValue] {
+    guard
+      let response = try await callList({
+        try await client.get_list_of_select_values(
+          path: .init(property_id: propertyId),
+          query: .init(
+            v2_select_search: v2SelectSearch, query: query, order_by: orderBy,
+            ids: ids, conditions: conditions, offset: offset, limit: limit))
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(response.toCase()) { try $0.json }
+  }
+
+  /// Fetches a single select value by its identifier.
+  ///
+  /// - Parameters:
+  ///   - propertyId: The custom property identifier.
+  ///   - id: The select value identifier.
+  /// - Returns: The select value.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the value does not exist.
+  public func getCustomPropertySelectValue(
+    propertyId: Int,
+    id: Int
+  ) async throws(KaitenError) -> Components.Schemas.CustomPropertySelectValue {
+    let response = try await call {
+      try await client.get_select_value(path: .init(property_id: propertyId, id: id))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("customPropertySelectValue", id)
+    ) {
+      try $0.json
+    }
+  }
 }
 
 // MARK: - Boards
