@@ -641,6 +641,48 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/checklists/{checklist_id}/items/{id}:
+    patch:
+      summary: Update checklist item
+      operationId: update_checklist_item
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: checklist_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist item ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChecklistItemRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChecklistItem'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -2437,3 +2479,32 @@ components:
         id:
           type: integer
           description: Deleted checklist ID
+    UpdateChecklistItemRequest:
+      type: object
+      properties:
+        text:
+          type:
+          - string
+          - 'null'
+          maxLength: 4096
+          description: Item content
+        sort_order:
+          type: number
+          exclusiveMinimum: 0
+          description: Position
+        checklist_id:
+          type: integer
+          description: Move item to another checklist
+        checked:
+          type: boolean
+          description: Checked state
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Due date (YYYY-MM-DD)
+        responsible_id:
+          type:
+          - integer
+          - 'null'
+          description: Responsible user ID (null to clear)

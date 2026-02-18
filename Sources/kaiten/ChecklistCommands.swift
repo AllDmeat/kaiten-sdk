@@ -69,3 +69,57 @@ struct RemoveChecklist: AsyncParsableCommand {
     try printJSON(["id": deletedId])
   }
 }
+
+// MARK: - Checklist Items
+
+struct UpdateChecklistItem: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "update-checklist-item",
+    abstract: "Update a checklist item on a card"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Card ID")
+  var cardId: Int
+
+  @Option(name: .long, help: "Checklist ID")
+  var checklistId: Int
+
+  @Option(name: .long, help: "Checklist item ID")
+  var itemId: Int
+
+  @Option(name: .long, help: "Item text (max 4096 characters)")
+  var text: String?
+
+  @Option(name: .long, help: "Sort order (must be > 0)")
+  var sortOrder: Double?
+
+  @Option(name: .long, help: "Move to another checklist ID")
+  var moveToChecklistId: Int?
+
+  @Option(name: .long, help: "Checked state")
+  var checked: Bool?
+
+  @Option(name: .long, help: "Due date (YYYY-MM-DD)")
+  var dueDate: String?
+
+  @Option(name: .long, help: "Responsible user ID")
+  var responsibleId: Int?
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let item = try await client.updateChecklistItem(
+      cardId: cardId,
+      checklistId: checklistId,
+      itemId: itemId,
+      text: text,
+      sortOrder: sortOrder,
+      moveToChecklistId: moveToChecklistId,
+      checked: checked,
+      dueDate: dueDate,
+      responsibleId: responsibleId
+    )
+    try printJSON(item)
+  }
+}

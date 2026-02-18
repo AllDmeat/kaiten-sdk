@@ -757,6 +757,56 @@ extension KaitenClient {
   }
 }
 
+// MARK: - Checklist Items
+
+extension KaitenClient {
+  /// Updates a checklist item on a card.
+  ///
+  /// All body parameters are optional — only provided values are changed.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - checklistId: The checklist identifier.
+  ///   - itemId: The checklist item identifier.
+  ///   - text: Item content (max 4096 characters, pass `nil` to clear).
+  ///   - sortOrder: Position (must be > 0).
+  ///   - moveToChecklistId: Move item to another checklist.
+  ///   - checked: Checked state.
+  ///   - dueDate: Due date in YYYY-MM-DD format (pass `nil` to clear).
+  ///   - responsibleId: Responsible user ID (pass `nil` to clear).
+  /// - Returns: The updated checklist item.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card, checklist, or item does not exist.
+  public func updateChecklistItem(
+    cardId: Int,
+    checklistId: Int,
+    itemId: Int,
+    text: String? = nil,
+    sortOrder: Double? = nil,
+    moveToChecklistId: Int? = nil,
+    checked: Bool? = nil,
+    dueDate: String? = nil,
+    responsibleId: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.ChecklistItem {
+    let body = Components.Schemas.UpdateChecklistItemRequest(
+      text: text,
+      sort_order: sortOrder,
+      checklist_id: moveToChecklistId,
+      checked: checked,
+      due_date: dueDate,
+      responsible_id: responsibleId
+    )
+    let response = try await call {
+      try await client.update_checklist_item(
+        path: .init(card_id: cardId, checklist_id: checklistId, id: itemId),
+        body: .json(body)
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("checklistItem", itemId)) {
+      try $0.json
+    }
+  }
+}
+
 // MARK: - Custom Properties
 
 extension KaitenClient {
