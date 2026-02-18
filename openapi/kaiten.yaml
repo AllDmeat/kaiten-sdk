@@ -4029,12 +4029,16 @@ components:
           description: "Custom properties. Format: 'id_{custom_property_id}: value'"
     DeletedCommentResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
           description: Deleted comment ID
     DeletedChecklistResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4092,6 +4096,8 @@ components:
           description: Responsible user ID
     DeletedChecklistItemResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4132,6 +4138,8 @@ components:
           description: 2 - responsible
     DeletedMemberResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4166,6 +4174,8 @@ components:
           description: Tag name
     DeletedTagResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4224,6 +4234,8 @@ components:
           description: ID of child card
     DeletedChildResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4260,6 +4272,8 @@ components:
           maxLength: 512
     DeletedExternalLinkResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
@@ -4552,6 +4566,8 @@ components:
           description: Parent tree entity uid
     DeletedIdResponse:
       type: object
+      required:
+      - id
       properties:
         id:
           type: integer
