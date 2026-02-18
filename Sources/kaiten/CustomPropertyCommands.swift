@@ -79,3 +79,81 @@ struct GetCustomProperty: AsyncParsableCommand {
     try printJSON(prop)
   }
 }
+
+// MARK: - Custom Property Select Values
+
+struct ListCustomPropertySelectValues: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "list-custom-property-select-values",
+    abstract: "List select values for a custom property"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Custom property ID")
+  var propertyId: Int
+
+  @Option(name: .long, help: "Enable v2 search filtering")
+  var v2SelectSearch: Bool?
+
+  @Option(name: .long, help: "Filter by select value (requires v2-select-search)")
+  var query: String?
+
+  @Option(name: .long, help: "Field to sort by (requires v2-select-search)")
+  var orderBy: String?
+
+  @Option(name: .long, help: "Comma-separated value IDs to filter by")
+  var ids: String?
+
+  @Option(name: .long, help: "Comma-separated conditions to filter by")
+  var conditions: String?
+
+  @Option(name: .long, help: "Offset for pagination (requires v2-select-search)")
+  var offset: Int?
+
+  @Option(name: .long, help: "Limit for pagination (requires v2-select-search, default: 100)")
+  var limit: Int?
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let parsedIds = ids?.split(separator: ",").compactMap {
+      Int($0.trimmingCharacters(in: .whitespaces))
+    }
+    let parsedConditions = conditions?.split(separator: ",").map {
+      String($0.trimmingCharacters(in: .whitespaces))
+    }
+    let values = try await client.listCustomPropertySelectValues(
+      propertyId: propertyId,
+      v2SelectSearch: v2SelectSearch,
+      query: query,
+      orderBy: orderBy,
+      ids: parsedIds,
+      conditions: parsedConditions,
+      offset: offset,
+      limit: limit
+    )
+    try printJSON(values)
+  }
+}
+
+struct GetCustomPropertySelectValue: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "get-custom-property-select-value",
+    abstract: "Get a specific select value for a custom property"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Custom property ID")
+  var propertyId: Int
+
+  @Option(name: .long, help: "Select value ID")
+  var id: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let value = try await client.getCustomPropertySelectValue(
+      propertyId: propertyId, id: id)
+    try printJSON(value)
+  }
+}
