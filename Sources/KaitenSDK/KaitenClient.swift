@@ -1206,6 +1206,68 @@ extension KaitenClient {
     }
   }
 
+  // MARK: - Card Children
+
+  /// Lists children of a card.
+  ///
+  /// - Parameter cardId: The card identifier.
+  /// - Returns: An array of card children.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  public func listCardChildren(cardId: Int) async throws(KaitenError) -> [Components.Schemas
+    .CardChild]
+  {
+    guard
+      let response = try await callList({
+        try await client.list_card_children(path: .init(card_id: cardId))
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
+
+  /// Adds a child card to a parent card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The parent card identifier.
+  ///   - childCardId: The child card identifier.
+  /// - Returns: The created card child.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  public func addCardChild(cardId: Int, childCardId: Int) async throws(KaitenError)
+    -> Components.Schemas.CardChild
+  {
+    let response = try await call {
+      try await client.add_card_child(
+        path: .init(card_id: cardId),
+        body: .json(.init(card_id: childCardId))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
+
+  /// Removes a child card from a parent card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The parent card identifier.
+  ///   - childId: The child card identifier.
+  /// - Returns: The deleted child ID.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or child does not exist.
+  public func removeCardChild(cardId: Int, childId: Int) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_card_child(
+        path: .init(card_id: cardId, id: childId)
+      )
+    }
+    let body = try decodeResponse(response.toCase(), notFoundResource: ("child", childId)) {
+      try $0.json
+    }
+    return body.id!
+  }
+
   /// Removes a tag from a card.
   ///
   /// - Parameters:

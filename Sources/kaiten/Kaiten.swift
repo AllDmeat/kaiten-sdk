@@ -42,6 +42,9 @@ struct Kaiten: AsyncParsableCommand {
       RemoveCardTag.self,
       ListUsers.self,
       GetCurrentUser.self,
+      ListCardChildren.self,
+      AddCardChild.self,
+      RemoveCardChild.self,
     ]
   )
 }
