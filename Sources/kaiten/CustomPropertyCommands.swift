@@ -129,8 +129,8 @@ struct ListCustomPropertySelectValues: AsyncParsableCommand {
       orderBy: orderBy,
       ids: parsedIds,
       conditions: parsedConditions,
-      offset: offset,
-      limit: limit
+      offset: offset ?? 0,
+      limit: limit ?? 100
     )
     try printJSON(values)
   }

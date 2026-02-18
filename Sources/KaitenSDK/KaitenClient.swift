@@ -1056,7 +1056,7 @@ extension KaitenClient {
   ///   - conditions: Array of conditions to filter by (requires `v2SelectSearch`).
   ///   - offset: Number of records to skip (requires `v2SelectSearch`).
   ///   - limit: Maximum number of values to return (requires `v2SelectSearch`, default `100`).
-  /// - Returns: An array of select values.
+  /// - Returns: A ``Page`` of select values.
   /// - Throws: ``KaitenError``
   public func listCustomPropertySelectValues(
     propertyId: Int,
@@ -1065,9 +1065,9 @@ extension KaitenClient {
     orderBy: String? = nil,
     ids: [Int]? = nil,
     conditions: [String]? = nil,
-    offset: Int? = nil,
-    limit: Int? = nil
-  ) async throws(KaitenError) -> [Components.Schemas.CustomPropertySelectValue] {
+    offset: Int = 0,
+    limit: Int = 100
+  ) async throws(KaitenError) -> Page<Components.Schemas.CustomPropertySelectValue> {
     guard
       let response = try await callList({
         try await client.get_list_of_select_values(
@@ -1077,9 +1077,12 @@ extension KaitenClient {
             ids: ids, conditions: conditions, offset: offset, limit: limit))
       })
     else {
-      return []
+      return Page(items: [], offset: offset, limit: limit)
     }
-    return try decodeResponse(response.toCase()) { try $0.json }
+    let items: [Components.Schemas.CustomPropertySelectValue] = try decodeResponse(
+      response.toCase()
+    ) { try $0.json }
+    return Page(items: items, offset: offset, limit: limit)
   }
 
   /// Fetches a single select value by its identifier.
