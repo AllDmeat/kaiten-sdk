@@ -19,10 +19,12 @@ struct CustomPropertySelectValuesTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    let values = try await client.listCustomPropertySelectValues(propertyId: 100)
-    #expect(values.count == 2)
-    #expect(values[0].value == "iOS")
-    #expect(values[1].value == "Android")
+    let page = try await client.listCustomPropertySelectValues(propertyId: 100)
+    #expect(page.items.count == 2)
+    #expect(page.items[0].value == "iOS")
+    #expect(page.items[1].value == "Android")
+    #expect(page.offset == 0)
+    #expect(page.limit == 100)
   }
 
   @Test("listCustomPropertySelectValues 404 throws notFound")
