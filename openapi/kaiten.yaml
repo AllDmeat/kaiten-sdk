@@ -1020,6 +1020,91 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/children:
+    get:
+      summary: List card children
+      operationId: list_card_children
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardChild'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    post:
+      summary: Add card child
+      operationId: add_card_child
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Parent Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardChildRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardChild'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/children/{id}:
+    delete:
+      summary: Remove card child
+      operationId: remove_card_child
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Parent Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Child Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedChildResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -3044,3 +3129,60 @@ components:
         id:
           type: integer
           description: Deleted card tag ID
+    CardChild:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Children card id
+        title:
+          type: string
+          description: Card title
+        description:
+          type: string
+          nullable: true
+          description: Card description
+        state:
+          type: integer
+          description: "Card state: 1-queued, 2-inProgress, 3-done"
+        condition:
+          type: integer
+          description: "Card condition: 1-live, 2-archived"
+        board_id:
+          type: integer
+          description: Board id
+        column_id:
+          type: integer
+          description: Column id
+        lane_id:
+          type: integer
+          description: Lane id
+        owner_id:
+          type: integer
+          description: Card owner id
+        type_id:
+          type: integer
+          description: Card type id
+        card_id:
+          type: integer
+          description: Parent card id
+        depends_on_card_id:
+          type: integer
+          description: Children card id
+        space_id:
+          type: integer
+          description: Space id
+    AddCardChildRequest:
+      type: object
+      required:
+      - card_id
+      properties:
+        card_id:
+          type: integer
+          description: ID of child card
+    DeletedChildResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Deleted card child ID

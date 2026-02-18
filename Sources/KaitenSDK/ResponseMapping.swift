@@ -338,6 +338,42 @@ extension Operations.get_list_of_boards.Output {
 
 // MARK: - Card Tags
 
+extension Operations.list_card_children.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.list_card_children.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.add_card_child.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.add_card_child.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.remove_card_child.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.remove_card_child.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
 extension Operations.list_card_tags.Output {
   func toCase() -> KaitenClient.ResponseCase<Operations.list_card_tags.Output.Ok.Body> {
     switch self {
