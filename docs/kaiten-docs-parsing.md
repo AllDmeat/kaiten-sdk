@@ -5,55 +5,133 @@ The Kaiten documentation (https://developers.kaiten.ru) is a JavaScript SPA. `we
 
 ## How to Parse
 
-### 1. Use Playwright (Python)
-```python
-from playwright.sync_api import sync_playwright
+### 1. Use Playwright (Node.js — preferred)
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True, args=['--no-sandbox'])
-    page = browser.new_page()
-    page.goto(url, wait_until='networkidle', timeout=30000)
-    page.wait_for_timeout(3000)  # SPA needs time to render
-    content = page.text_content('body')
-    browser.close()
+The key insight: **do NOT use `document.body.innerText`** — it mixes the sidebar navigation with the API content. Instead, find the specific `MuiBox-root` div that contains just the endpoint documentation.
+
+```javascript
+const { chromium } = require('playwright');
+
+(async () => {
+    const browser = await chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(3000); // SPA needs time to render
+
+    // Extract ONLY the endpoint content (not sidebar nav)
+    const content = await page.evaluate(() => {
+        const divs = [...document.querySelectorAll('div.MuiBox-root')];
+        // Find the smallest div that contains the endpoint content
+        const endpointDiv = divs.find(el => {
+            const t = el.innerText.trim();
+            return t.includes('Path parameters') && t.length < 5000
+                && !t.includes('Create new space'); // exclude sidebar
+        });
+        return endpointDiv ? endpointDiv.innerText : document.body.innerText;
+    });
+
+    console.log(content);
+    await browser.close();
+})();
 ```
 
 ### 2. URL Structure
 ```
 https://developers.kaiten.ru/{section}/{action}
 ```
-Examples:
-- `https://developers.kaiten.ru/columns/get-list-of-columns`
-- `https://developers.kaiten.ru/lanes/get-list-of-lanes`
-- `https://developers.kaiten.ru/space-boards/get-list-of-boards`
-- `https://developers.kaiten.ru/custom-properties/get-list-of-properties`
+
+#### Finding Available Endpoints
+
+To discover all endpoints for a section, extract sidebar links:
+
+```javascript
+const links = await page.evaluate(() => {
+    return [...document.querySelectorAll('a')]
+        .map(a => ({ text: a.textContent.trim(), href: a.href }))
+        .filter(l => l.href.includes('developers.kaiten.ru')
+            && l.text.match(/comment|checklist|card/i)); // adjust filter
+});
+```
+
+#### Known URL Examples
 - `https://developers.kaiten.ru/cards/retrieve-card-list`
 - `https://developers.kaiten.ru/cards/retrieve-card`
+- `https://developers.kaiten.ru/card-comments/add-comment`
+- `https://developers.kaiten.ru/card-comments/update-comment`
+- `https://developers.kaiten.ru/card-checklists/add-checklist-to-card`
+- `https://developers.kaiten.ru/card-checklist-items/add-item-to-checklist`
+- `https://developers.kaiten.ru/columns/get-list-of-columns`
+- `https://developers.kaiten.ru/lanes/get-list-of-lanes`
 - `https://developers.kaiten.ru/spaces/retrieve-list-of-spaces`
+- `https://developers.kaiten.ru/custom-properties/get-list-of-properties`
 
-### 3. Page Content Structure (text_content)
-The page returns **continuous text** without delimiters. Structure:
+### 3. Page Content Structure
+
+The extracted content has this structure (tab-separated table rows):
+
 ```
-[Navigation (sidebar)]...[Endpoint name]GET|POST|...[URL template]
-Path parameters → Name | Type | Reference | Description
-Query → Name | Type | Constraints | Description
-Responses → 200 | 401 | 403 | 404
-Response Attributes → Name | Type | Description
-[Examples curl/node/php]
-[Footer]
+[Endpoint name]
+[METHOD]
+[URL template]
+Path parameters
+Name    Type    Reference
+field_name    type    Description
+...
+Headers
+...
+Attributes (body params)
+Name    Type    Constraints    Description
+field_name    type    minLength: N, maxLength: M    Description
+...
+Responses
+200  400  401  403  404
+Response Attributes
+Name    Type    Description
+field_name    type    Description
+...
+Examples
+[curl/node/php examples]
 ```
 
-### 4. How to Find the Needed Section
-```python
-# Find the start of endpoint description
-idx = content.find('Path parameters')
-# or
-idx = content.find('Query')  # for query params
-# or
-idx = content.find('Response Attributes')  # for response fields
+### 4. Batch Parsing Multiple Endpoints
 
-# Extract a chunk around it
-section = content[max(0, idx-100) : idx+2000]
+Reuse one browser instance:
+
+```javascript
+const { chromium } = require('playwright');
+
+const urls = [
+    ['update-comment', 'https://developers.kaiten.ru/card-comments/update-comment'],
+    ['add-checklist', 'https://developers.kaiten.ru/card-checklists/add-checklist-to-card'],
+    // ...
+];
+
+(async () => {
+    const browser = await chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+
+    for (const [name, url] of urls) {
+        await page.goto(url, { waitUntil: 'networkidle' });
+        await page.waitForTimeout(2000);
+
+        const content = await page.evaluate(() => {
+            const divs = [...document.querySelectorAll('div.MuiBox-root')];
+            const endpointDiv = divs.find(el => {
+                const t = el.innerText.trim();
+                return t.includes('Path parameters') && t.length < 5000
+                    && !t.includes('Create new space');
+            });
+            return endpointDiv ? endpointDiv.innerText : 'NOT FOUND';
+        });
+
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`ENDPOINT: ${name}`);
+        console.log('='.repeat(60));
+        console.log(content);
+    }
+
+    await browser.close();
+})();
 ```
 
 ### 5. How to Determine Pagination Support
@@ -67,116 +145,87 @@ In Response Attributes, the field type indicates nullability:
 - `null | string`, `null | integer`, `null | array`, `null | object` — **optional** (nullable)
 - `enum` — required, values are described in Description (e.g. `1-queued, 2-inProgress, 3-done`)
 
-Examples from GET /cards:
-- `id` → `integer` → required
-- `title` → `string` → required
-- `description` → `null | string` → optional
-- `due_date` → `null | string` → optional
-- `archived` → `boolean` → required
-- `properties` → `null | object` → optional
-- `parents_ids` → `null | array` → optional
-
-In Path parameters, a field is marked `required` explicitly (e.g. `board_id required integer`).
-In Query parameters, `required` is indicated as a constraint; if not indicated — the parameter is optional.
+In Path parameters, a field is marked `required` explicitly.
+In Query/Body parameters, `required` is indicated as a constraint; if not indicated — optional.
 
 ### 7. Expanding Nested Schemas (Schema Buttons)
 
-Fields with type `object Schema` or `array Schema` have a **Schema** button (MUI Button) that opens a **modal dialog** (MUI Dialog) with nested field descriptions. `text_content('body')` does **NOT** show the contents of these schemas — you need to click the button and read the dialog.
+Fields with type `object Schema` or `array Schema` have a **Schema** button (MUI Button) that opens a **modal dialog** with nested field descriptions. The content extractor above does **NOT** include schema dialog contents — you need to click the button.
 
-```python
-from playwright.sync_api import sync_playwright
+```javascript
+// Find all Schema buttons
+const buttons = await page.$$('button.MuiButton-root');
+const schemaButtons = [];
+for (const btn of buttons) {
+    const text = await btn.textContent();
+    if (text.trim() === 'Schema') schemaButtons.push(btn);
+}
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True, args=['--no-sandbox'])
-    page = browser.new_page()
-    page.goto(url, wait_until='networkidle', timeout=30000)
-    page.wait_for_timeout(3000)
+for (const btn of schemaButtons) {
+    // Get field name from the table row
+    const fieldInfo = await btn.evaluate(
+        el => el.closest('tr')?.textContent || 'unknown'
+    );
 
-    # Find all Schema buttons
-    buttons = page.query_selector_all('button.MuiButton-root')
-    schema_buttons = [b for b in buttons if b.text_content().strip() == 'Schema']
+    await btn.click({ timeout: 3000 });
+    await page.waitForTimeout(1000);
 
-    for btn in schema_buttons:
-        # Field name from the table row
-        field_info = btn.evaluate(
-            'el => el.closest("tr")?.textContent || "unknown"'
-        )
+    // Read the dialog contents
+    const dialog = await page.$('.MuiDialog-root');
+    if (dialog) {
+        const schemaText = await dialog.textContent();
+        console.log(`${fieldInfo}: ${schemaText}`);
 
-        btn.click(timeout=3000)
-        page.wait_for_timeout(1000)
-
-        # Read the dialog contents
-        dialog = page.query_selector('.MuiDialog-root')
-        if dialog:
-            schema_text = dialog.text_content()
-            print(f"{field_info}: {schema_text}")
-
-            # Close the dialog before the next click
-            page.keyboard.press('Escape')
-            page.wait_for_timeout(500)
-
-    browser.close()
+        // Close dialog before next click
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(500);
+    }
+}
 ```
-
-**Important:**
-- The dialog blocks clicks on other elements — **must close** via `Escape` before moving to the next button
-- Nested schemas may contain their own Schema buttons (recursive types, e.g. `children` → Card)
-- Text format in the dialog: `FieldNameType: typeNameTypeDescriptionfield1type1desc1field2type2desc2...`
 
 #### Nested Schemas Inside the Dialog (MuiLink)
 
-Inside an opened dialog, fields with type `array` or `object` may be **clickable links** (not Schema buttons, but the type text itself). These are `button` elements with class `MuiLink-root` — clicking them replaces the dialog content with the nested schema.
+Inside an opened dialog, fields with type `array` or `object` may be **clickable links** (`button.MuiLink-root`). Clicking them replaces the dialog content with the nested schema.
 
-Example: `checklists` → Schema → inside, field `items` with type `array` → click `array` → the ChecklistItem schema is revealed.
+```javascript
+// After opening the main Schema dialog:
+const dialog = await page.$('.MuiDialog-root');
+if (dialog) {
+    const linkButtons = await dialog.$$('button.MuiLink-root');
+    for (const lb of linkButtons) {
+        const text = await lb.textContent();
+        await lb.click({ timeout: 3000 });
+        await page.waitForTimeout(1000);
 
-```python
-# After opening the main Schema dialog:
-dialog = page.query_selector('.MuiDialog-root')
-if dialog:
-    # Find clickable types inside the dialog
-    link_buttons = dialog.query_selector_all('button.MuiLink-root')
-    for lb in link_buttons:
-        text = lb.text_content().strip()
-        # text will be "array", "object", etc.
-        lb.click(timeout=3000)
-        page.wait_for_timeout(1000)
+        const updatedDialog = await page.$('.MuiDialog-root');
+        const nestedText = await updatedDialog.textContent();
+        console.log(nestedText);
 
-        # Dialog updated — read new content
-        dialog = page.query_selector('.MuiDialog-root')
-        nested_text = dialog.text_content()
-        print(nested_text)
-
-        # The dialog has a "Back" button to return to the parent schema
-        page.keyboard.press('Escape')
-        page.wait_for_timeout(500)
-```
-
-**How to distinguish:**
-- **Schema** buttons on the page (outside the dialog): `button.MuiButton-root` with text `Schema`
-- Links to nested schemas **inside the dialog**: `button.MuiLink-root` with type text (`array`, `object`)
-
-### 8. Batch Parsing Multiple Endpoints
-```python
-urls = {
-    'columns': 'https://developers.kaiten.ru/columns/get-list-of-columns',
-    'lanes': 'https://developers.kaiten.ru/lanes/get-list-of-lanes',
-    # ...
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(500);
+    }
 }
-
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True, args=['--no-sandbox'])
-    page = browser.new_page()
-    for name, url in urls.items():
-        page.goto(url, wait_until='networkidle', timeout=30000)
-        content = page.text_content('body')
-        # parse the needed sections
-    browser.close()
 ```
+
+### 8. Verifying Against Real API
+
+After parsing docs, **always verify with a real API request**:
+
+```bash
+URL=$(jq -r .url ~/.config/kaiten-mcp/config.json)
+TOKEN=$(jq -r .token ~/.config/kaiten-mcp/config.json)
+
+curl -s -H "Authorization: Bearer $TOKEN" \
+    "$URL/cards/47271507/checklists/12345" | python3 -m json.tool
+```
+
+The real API response is the source of truth. Docs may be incomplete or outdated — the API response shows the actual field names, types, and nullability.
 
 ### 9. Important Notes
-- **One browser, many page.goto()** — don't create a new browser for each URL
-- **wait_for_timeout(3000)** — sometimes needed after networkidle for full rendering
-- **text_content('body')** — returns all text without HTML tags
-- Chromium is installed via `playwright install chromium`
-- Must run with `args=['--no-sandbox']` (we're running as root)
-- Playwright is installed: `pip install --break-system-packages playwright && playwright install chromium`
+- **Node.js preferred** — Playwright JS is already installed (`require('playwright')`)
+- **One browser, many pages** — don't create a new browser for each URL
+- **wait_for_timeout(2000-3000)** — needed after networkidle for SPA rendering
+- **`--no-sandbox`** — required (running as root)
+- **Never use `document.body.innerText`** — it mixes sidebar nav with content
+- **Selector: `div.MuiBox-root`** — filter by content to find the endpoint div
+- **Exclude sidebar**: check that the div does NOT contain `Create new space` (sidebar marker)
