@@ -1,13 +1,12 @@
 # kaiten-sdk
 
 [![Build](https://github.com/AllDmeat/kaiten-sdk/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AllDmeat/kaiten-sdk/actions/workflows/build-and-test.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAllDmeat%2Fkaiten-sdk%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/AllDmeat/kaiten-sdk)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAllDmeat%2Fkaiten-sdk%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/AllDmeat/kaiten-sdk)
 
 Swift SDK for the [Kaiten](https://kaiten.ru) project management API. OpenAPI-generated types with typed errors, automatic retry on `429 Too Many Requests`, and Bearer token authentication.
 
-## Requirements
-
-- Swift 6.2+
-- macOS 15+ (ARM) / Linux (x86-64, ARM)
+Full Kaiten API documentation: [developers.kaiten.ru](https://developers.kaiten.ru)
 
 ## Installation
 
@@ -34,7 +33,7 @@ targets: [
 [mise](https://mise.jdx.dev) — a tool version manager. It will install the required version automatically:
 
 ```bash
-mise use github:AllDmeat/kaiten-sdk
+mise use github:alldmeat/kaiten-sdk
 ```
 
 ### GitHub Release
@@ -69,14 +68,20 @@ let card = try await client.getCard(id: 123)
 
 The CLI resolves credentials in order: flags → config file.
 
+#### 1. Get a Kaiten API Token
+
+Get your API token at `https://<your-company>.kaiten.ru/profile/api-key`.
+
+#### 2. Configure Credentials
+
 **Option 1 — Config file** (recommended):
 
 Create `~/.config/kaiten-mcp/config.json`:
 
 ```json
 {
-  "url": "https://your-company.kaiten.ru/api/latest",
-  "token": "your-api-token"
+  "url": "https://<your-company>.kaiten.ru/api/latest",
+  "token": "<your-api-token>"
 }
 ```
 
@@ -214,18 +219,9 @@ kaiten list-spaces \
 
 ## Configuration
 
-The CLI and MCP server share the same config file at `~/.config/kaiten-mcp/config.json`:
-
-```json
-{
-  "url": "https://your-company.kaiten.ru/api/latest",
-  "token": "your-api-token"
-}
-```
+The CLI and MCP server share the same config file at `~/.config/kaiten-mcp/config.json` (see [Configure Credentials](#2-configure-credentials) above).
 
 The `--url` and `--token` CLI flags take priority over the config file.
-
-Kaiten token: Profile Settings → API Tokens → Create.
 
 ## Error Handling
 
@@ -255,6 +251,11 @@ do {
     }
 }
 ```
+
+## Requirements
+
+- Swift 6.2+
+- macOS 15+ (ARM) / Linux (x86-64, ARM)
 
 ## License
 
