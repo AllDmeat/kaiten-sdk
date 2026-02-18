@@ -19,6 +19,9 @@ struct RetryMiddleware: ClientMiddleware {
     self.baseDelay = baseDelay
   }
 
+  // NOTE: Retrying with the same `body` reference is safe.
+  // JSON request bodies use HTTPBody(data) which has .multiple iteration
+  // behavior (replayable across retries). See #114 for investigation.
   func intercept(
     _ request: HTTPRequest,
     body: HTTPBody?,
