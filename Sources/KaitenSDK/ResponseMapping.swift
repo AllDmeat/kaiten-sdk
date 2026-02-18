@@ -274,6 +274,32 @@ extension Operations.get_property.Output {
   }
 }
 
+extension Operations.get_list_of_select_values.Output {
+  func toCase()
+    -> KaitenClient.ResponseCase<Operations.get_list_of_select_values.Output.Ok.Body>
+  {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.get_select_value.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.get_select_value.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
 // MARK: - Boards
 
 extension Operations.get_board.Output {

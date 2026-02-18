@@ -1092,12 +1092,16 @@ extension KaitenClient {
     offset: Int? = nil,
     limit: Int? = nil
   ) async throws(KaitenError) -> [Components.Schemas.CustomPropertySelectValue] {
-    let response = try await call {
-      try await client.get_list_of_select_values(
-        path: .init(property_id: propertyId),
-        query: .init(
-          v2_select_search: v2SelectSearch, query: query, order_by: orderBy,
-          ids: ids, conditions: conditions, offset: offset, limit: limit))
+    guard
+      let response = try await callList({
+        try await client.get_list_of_select_values(
+          path: .init(property_id: propertyId),
+          query: .init(
+            v2_select_search: v2SelectSearch, query: query, order_by: orderBy,
+            ids: ids, conditions: conditions, offset: offset, limit: limit))
+      })
+    else {
+      return []
     }
     return try decodeResponse(response.toCase()) { try $0.json }
   }
