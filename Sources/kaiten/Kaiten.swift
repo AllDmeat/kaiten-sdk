@@ -26,6 +26,7 @@ struct Kaiten: AsyncParsableCommand {
       CreateChecklist.self,
       ListCustomProperties.self,
       GetCustomProperty.self,
+      GetChecklist.self,
     ]
   )
 }

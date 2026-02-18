@@ -582,6 +582,36 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/checklists/{id}:
+    get:
+      summary: Retrieve card checklist
+      operationId: get_checklist
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checklist'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties

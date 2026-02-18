@@ -714,6 +714,28 @@ public struct KaitenClient: Sendable {
   }
 }
 
+// MARK: - Checklists
+
+extension KaitenClient {
+  /// Fetches a single checklist by its identifier.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - checklistId: The checklist identifier.
+  /// - Returns: The checklist object.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  public func getChecklist(cardId: Int, checklistId: Int) async throws(KaitenError)
+    -> Components.Schemas.Checklist
+  {
+    let response = try await call {
+      try await client.get_checklist(path: .init(card_id: cardId, id: checklistId))
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("checklist", checklistId)) {
+      try $0.json
+    }
+  }
+}
+
 // MARK: - Custom Properties
 
 extension KaitenClient {

@@ -25,3 +25,26 @@ struct CreateChecklist: AsyncParsableCommand {
     try printJSON(checklist)
   }
 }
+
+// MARK: - Checklists
+
+struct GetChecklist: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "get-checklist",
+    abstract: "Retrieve a card checklist"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Card ID")
+  var cardId: Int
+
+  @Option(name: .long, help: "Checklist ID")
+  var checklistId: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let checklist = try await client.getChecklist(cardId: cardId, checklistId: checklistId)
+    try printJSON(checklist)
+  }
+}
