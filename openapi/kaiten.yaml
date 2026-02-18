@@ -4195,6 +4195,7 @@ components:
         blocker_card_id:
           type: integer
           description: Blocker card ID
+    CardLocationHistory:
       type: object
       properties:
         id:
