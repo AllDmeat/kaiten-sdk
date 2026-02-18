@@ -1,13 +1,10 @@
 # kaiten-sdk
 
 [![Build](https://github.com/AllDmeat/kaiten-sdk/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AllDmeat/kaiten-sdk/actions/workflows/build-and-test.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAllDmeat%2Fkaiten-sdk%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/AllDmeat/kaiten-sdk)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAllDmeat%2Fkaiten-sdk%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/AllDmeat/kaiten-sdk)
 
 Swift SDK for the [Kaiten](https://kaiten.ru) project management API. OpenAPI-generated types with typed errors, automatic retry on `429 Too Many Requests`, and Bearer token authentication.
-
-## Requirements
-
-- Swift 6.2+
-- macOS 15+ (ARM) / Linux (x86-64, ARM)
 
 ## Installation
 
@@ -34,7 +31,7 @@ targets: [
 [mise](https://mise.jdx.dev) — a tool version manager. It will install the required version automatically:
 
 ```bash
-mise use github:AllDmeat/kaiten-sdk
+mise use github:alldmeat/kaiten-sdk
 ```
 
 ### GitHub Release
@@ -255,6 +252,11 @@ do {
     }
 }
 ```
+
+## Requirements
+
+- Swift 6.2+
+- macOS 15+ (ARM) / Linux (x86-64, ARM)
 
 ## License
 
