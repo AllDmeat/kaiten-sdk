@@ -46,7 +46,8 @@ over all other project practices.
   get confirmation, then implement.
 - Always update READMEs when public APIs change. Any PR that
   modifies public API surface must include corresponding README
-  updates.
+  updates. Specifically: the "API Reference" tables and "CLI Commands"
+  section in README.md. No exceptions.
 
 ## Kaiten API Documentation
 
