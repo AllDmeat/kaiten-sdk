@@ -1557,3 +1557,426 @@ extension Optional {
     return self
   }
 }
+
+// MARK: - Sprint Summary
+
+extension KaitenClient {
+  /// Gets a sprint summary by ID.
+  public func getSprintSummary(
+    id: Int, excludeDeletedCards: Bool? = nil
+  ) async throws(KaitenError) -> Components.Schemas.SprintSummary {
+    let response = try await call {
+      try await client.get_sprint_summary(
+        path: .init(id: id),
+        query: .init(exclude_deleted_cards: excludeDeletedCards)
+      )
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("sprint", id)
+    ) { try $0.json }
+  }
+}
+
+// MARK: - Spaces CRUD
+
+extension KaitenClient {
+  /// Creates a new space.
+  public func createSpace(
+    title: String,
+    externalId: String? = nil,
+    parentEntityUid: String? = nil,
+    sortOrder: Double? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Space {
+    let response = try await call {
+      try await client.create_space(
+        body: .json(
+          .init(
+            title: title,
+            external_id: externalId,
+            parent_entity_uid: parentEntityUid,
+            sort_order: sortOrder
+          )))
+    }
+    return try decodeResponse(response.toCase()) {
+      try $0.json
+    }
+  }
+
+  /// Gets a space by ID.
+  public func getSpace(
+    id: Int
+  ) async throws(KaitenError) -> Components.Schemas.Space {
+    let response = try await call {
+      try await client.retrieve_space(path: .init(space_id: id))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("space", id)
+    ) { try $0.json }
+  }
+
+  /// Updates a space.
+  public func updateSpace(
+    id: Int,
+    title: String? = nil,
+    externalId: String? = nil,
+    sortOrder: Double? = nil,
+    access: String? = nil,
+    parentEntityUid: String? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Space {
+    let response = try await call {
+      try await client.update_space(
+        path: .init(space_id: id),
+        body: .json(
+          .init(
+            title: title,
+            external_id: externalId,
+            sort_order: sortOrder,
+            access: access,
+            parent_entity_uid: parentEntityUid
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("space", id)
+    ) { try $0.json }
+  }
+
+  /// Deletes a space.
+  public func deleteSpace(
+    id: Int
+  ) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_space(path: .init(space_id: id))
+    }
+    let result: Components.Schemas.DeletedIdResponse =
+      try decodeResponse(
+        response.toCase(), notFoundResource: ("space", id)
+      ) { try $0.json }
+    return result.id!
+  }
+}
+
+// MARK: - Boards CRUD
+
+extension KaitenClient {
+  /// Creates a new board in a space.
+  public func createBoard(
+    spaceId: Int,
+    title: String,
+    description: String? = nil,
+    sortOrder: Double? = nil,
+    externalId: String? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Board {
+    let response = try await call {
+      try await client.create_board(
+        path: .init(space_id: spaceId),
+        body: .json(
+          .init(
+            title: title,
+            description: description,
+            sort_order: sortOrder,
+            external_id: externalId
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("space", spaceId)
+    ) { try $0.json }
+  }
+
+  /// Updates a board.
+  public func updateBoard(
+    spaceId: Int,
+    id: Int,
+    title: String? = nil,
+    description: String? = nil,
+    sortOrder: Double? = nil,
+    externalId: String? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Board {
+    let response = try await call {
+      try await client.update_board(
+        path: .init(space_id: spaceId, id: id),
+        body: .json(
+          .init(
+            title: title,
+            description: description,
+            sort_order: sortOrder,
+            external_id: externalId
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("board", id)
+    ) { try $0.json }
+  }
+
+  /// Deletes a board.
+  public func deleteBoard(
+    spaceId: Int, id: Int
+  ) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_board(
+        path: .init(space_id: spaceId, id: id)
+      )
+    }
+    let result: Components.Schemas.DeletedIdResponse =
+      try decodeResponse(
+        response.toCase(), notFoundResource: ("board", id)
+      ) { try $0.json }
+    return result.id!
+  }
+}
+
+// MARK: - Columns CRUD
+
+extension KaitenClient {
+  /// Creates a new column on a board.
+  public func createColumn(
+    boardId: Int,
+    title: String,
+    sortOrder: Double? = nil,
+    type: Int? = nil,
+    wipLimit: Int? = nil,
+    wipLimitType: Int? = nil,
+    colCount: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Column {
+    let response = try await call {
+      try await client.create_column(
+        path: .init(board_id: boardId),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            _type: type,
+            wip_limit: wipLimit,
+            wip_limit_type: wipLimitType,
+            col_count: colCount
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("board", boardId)
+    ) { try $0.json }
+  }
+
+  /// Updates a column.
+  public func updateColumn(
+    boardId: Int,
+    id: Int,
+    title: String? = nil,
+    sortOrder: Double? = nil,
+    type: Int? = nil,
+    wipLimit: Int? = nil,
+    wipLimitType: Int? = nil,
+    colCount: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Column {
+    let response = try await call {
+      try await client.update_column(
+        path: .init(board_id: boardId, id: id),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            _type: type,
+            wip_limit: wipLimit,
+            wip_limit_type: wipLimitType,
+            col_count: colCount
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("column", id)
+    ) { try $0.json }
+  }
+
+  /// Deletes a column.
+  public func deleteColumn(
+    boardId: Int, id: Int
+  ) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_column(
+        path: .init(board_id: boardId, id: id)
+      )
+    }
+    let result: Components.Schemas.DeletedIdResponse =
+      try decodeResponse(
+        response.toCase(), notFoundResource: ("column", id)
+      ) { try $0.json }
+    return result.id!
+  }
+}
+
+// MARK: - Subcolumns
+
+extension KaitenClient {
+  /// Lists subcolumns of a column.
+  public func listSubcolumns(
+    columnId: Int
+  ) async throws(KaitenError) -> [Components.Schemas.Column] {
+    guard
+      let response = try await callList({
+        try await client.get_list_of_subcolumns(
+          path: .init(column_id: columnId)
+        )
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("column", columnId)
+    ) { try $0.json }
+  }
+
+  /// Creates a subcolumn.
+  public func createSubcolumn(
+    columnId: Int,
+    title: String,
+    sortOrder: Double? = nil,
+    type: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Column {
+    let response = try await call {
+      try await client.create_subcolumn(
+        path: .init(column_id: columnId),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            _type: type
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("column", columnId)
+    ) { try $0.json }
+  }
+
+  /// Updates a subcolumn.
+  public func updateSubcolumn(
+    columnId: Int,
+    id: Int,
+    title: String? = nil,
+    sortOrder: Double? = nil,
+    type: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Column {
+    let response = try await call {
+      try await client.update_subcolumn(
+        path: .init(column_id: columnId, id: id),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            _type: type
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("subcolumn", id)
+    ) { try $0.json }
+  }
+
+  /// Deletes a subcolumn.
+  public func deleteSubcolumn(
+    columnId: Int, id: Int
+  ) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_subcolumn(
+        path: .init(column_id: columnId, id: id)
+      )
+    }
+    let result: Components.Schemas.DeletedIdResponse =
+      try decodeResponse(
+        response.toCase(), notFoundResource: ("subcolumn", id)
+      ) { try $0.json }
+    return result.id!
+  }
+}
+
+// MARK: - Lanes CRUD
+
+extension KaitenClient {
+  /// Creates a new lane on a board.
+  public func createLane(
+    boardId: Int,
+    title: String,
+    sortOrder: Double? = nil,
+    wipLimit: Int? = nil,
+    wipLimitType: Int? = nil,
+    rowCount: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Lane {
+    let response = try await call {
+      try await client.create_lane(
+        path: .init(board_id: boardId),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            wip_limit: wipLimit,
+            wip_limit_type: wipLimitType,
+            row_count: rowCount
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("board", boardId)
+    ) { try $0.json }
+  }
+
+  /// Updates a lane.
+  public func updateLane(
+    boardId: Int,
+    id: Int,
+    title: String? = nil,
+    sortOrder: Double? = nil,
+    wipLimit: Int? = nil,
+    wipLimitType: Int? = nil,
+    rowCount: Int? = nil,
+    condition: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.Lane {
+    let response = try await call {
+      try await client.update_lane(
+        path: .init(board_id: boardId, id: id),
+        body: .json(
+          .init(
+            title: title,
+            sort_order: sortOrder,
+            wip_limit: wipLimit,
+            wip_limit_type: wipLimitType,
+            row_count: rowCount,
+            condition: condition
+          )))
+    }
+    return try decodeResponse(
+      response.toCase(), notFoundResource: ("lane", id)
+    ) { try $0.json }
+  }
+
+  /// Deletes a lane.
+  public func deleteLane(
+    boardId: Int, id: Int
+  ) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_lane(
+        path: .init(board_id: boardId, id: id)
+      )
+    }
+    let result: Components.Schemas.DeletedIdResponse =
+      try decodeResponse(
+        response.toCase(), notFoundResource: ("lane", id)
+      ) { try $0.json }
+    return result.id!
+  }
+}
+
+// MARK: - Card Baselines
+
+extension KaitenClient {
+  /// Gets card baselines.
+  public func getCardBaselines(
+    cardId: Int
+  ) async throws(KaitenError)
+    -> [Components.Schemas.CardBaseline]
+  {
+    guard
+      let response = try await callList({
+        try await client.get_card_baselines(
+          path: .init(card_id: cardId)
+        )
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(response.toCase()) { try $0.json }
+  }
+}

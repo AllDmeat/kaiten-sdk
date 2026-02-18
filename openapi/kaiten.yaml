@@ -13,6 +13,37 @@ security:
 - bearerAuth: []
 paths:
   /boards/{board_id}/columns:
+    post:
+      summary: Create new column
+      operationId: create_column
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateColumnRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
     get:
       summary: Get list of columns
       operationId: get_list_of_columns
@@ -39,6 +70,37 @@ paths:
         '404':
           description: Not found
   /boards/{board_id}/lanes:
+    post:
+      summary: Create new lane
+      operationId: create_lane
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLaneRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lane'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
     get:
       summary: Get list of lanes
       operationId: get_list_of_lanes
@@ -1320,6 +1382,28 @@ paths:
         '404':
           description: Not found
   /spaces:
+    post:
+      summary: Create new space
+      operationId: create_space
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpaceRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
     get:
       summary: Retrieve list of spaces
       operationId: retrieve_list_of_spaces
@@ -1335,6 +1419,37 @@ paths:
         '401':
           description: Invalid token
   /spaces/{space_id}/boards:
+    post:
+      summary: Create new board
+      operationId: create_board
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
     get:
       summary: Get list of boards
       operationId: get_list_of_boards
@@ -1687,6 +1802,470 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Sprint'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+  /sprints/{id}:
+    get:
+      summary: Get sprint summary
+      operationId: get_sprint_summary
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Sprint ID
+      - name: exclude_deleted_cards
+        in: query
+        schema:
+          type: boolean
+        description: Exclude deleted cards from the summary
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SprintSummary'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /spaces/{space_id}:
+    get:
+      summary: Retrieve space
+      operationId: retrieve_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    patch:
+      summary: Update space
+      operationId: update_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpaceRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove space
+      operationId: remove_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedIdResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /spaces/{space_id}/boards/{id}:
+    patch:
+      summary: Update board
+      operationId: update_board
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBoardRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove board
+      operationId: remove_board
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Space ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedIdResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /boards/{board_id}/columns/{id}:
+    patch:
+      summary: Update column
+      operationId: update_column
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateColumnRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove column
+      operationId: remove_column
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedIdResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /columns/{column_id}/subcolumns:
+    get:
+      summary: Get list of subcolumns
+      operationId: get_list_of_subcolumns
+      parameters:
+      - name: column_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Column'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    post:
+      summary: Create new subcolumn
+      operationId: create_subcolumn
+      parameters:
+      - name: column_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateColumnRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /columns/{column_id}/subcolumns/{id}:
+    patch:
+      summary: Update subcolumn
+      operationId: update_subcolumn
+      parameters:
+      - name: column_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Subcolumn ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateColumnRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove subcolumn
+      operationId: remove_subcolumn
+      parameters:
+      - name: column_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Column ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Subcolumn ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedIdResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /boards/{board_id}/lanes/{id}:
+    patch:
+      summary: Update lane
+      operationId: update_lane
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Lane ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLaneRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lane'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove lane
+      operationId: remove_lane
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Lane ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedIdResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/baselines:
+    get:
+      summary: Retrieve card baselines
+      operationId: get_card_baselines
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardBaseline'
         '401':
           description: Invalid token
         '403':
@@ -3829,3 +4408,344 @@ components:
         updated:
           type: string
           description: Last update timestamp
+    SprintSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Sprint ID
+        uid:
+          type: string
+          description: Sprint UID
+        board_id:
+          type: integer
+          description: Board ID
+        title:
+          type: string
+          description: Sprint title
+        goal:
+          type:
+          - string
+          - 'null'
+          description: Sprint goal
+        active:
+          type: boolean
+          description: Sprint active status
+        committed:
+          type: integer
+          description: Number of committed cards
+        children_committed:
+          type: integer
+          description: Number of committed child cards
+        velocity:
+          type: number
+          description: Sprint velocity
+        children_velocity:
+          type: number
+          description: Velocity of child cards
+        creator_id:
+          type: integer
+          description: Creator user ID
+        updater_id:
+          type: integer
+          description: Last updater user ID
+        start_date:
+          type: string
+          description: Sprint start date
+        finish_date:
+          type: string
+          description: Sprint planned finish date
+        actual_finish_date:
+          type:
+          - string
+          - 'null'
+          description: Sprint actual finish date
+        archived:
+          type: boolean
+          description: Archived flag
+        created:
+          type: string
+          description: Creation timestamp
+        updated:
+          type: string
+          description: Last update timestamp
+        cards:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+          description: Cards in the sprint
+        cardUpdates:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+          description: Card versions and states over time
+        customProperties:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+          description: Custom properties used in sprint cards
+    CreateSpaceRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Space title
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External id
+        parent_entity_uid:
+          type:
+          - string
+          - 'null'
+          description: Parent tree entity uid
+        for_everyone_access_role_id:
+          type:
+          - string
+          - 'null'
+          description: Role id for everyone access
+        sort_order:
+          type: number
+          description: Space sort order
+    UpdateSpaceRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Space title
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External id
+        sort_order:
+          type: number
+          description: Space sort order
+        access:
+          type: string
+          description: Space access (for_everyone or by_invite)
+        parent_entity_uid:
+          type:
+          - string
+          - 'null'
+          description: Parent tree entity uid
+    DeletedIdResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Deleted resource id
+    CreateBoardRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Board title
+        description:
+          type:
+          - string
+          - 'null'
+          description: Board description
+        sort_order:
+          type: number
+          description: Position
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External id
+        default_card_type_id:
+          type: integer
+          description: Default card type for new cards
+        first_image_is_cover:
+          type: boolean
+          description: Auto mark first image as cover
+        reset_lane_spent_time:
+          type: boolean
+          description: Reset lane spent time on lane change
+        automove_cards:
+          type: boolean
+          description: Auto move cards by children state
+        backward_moves_enabled:
+          type: boolean
+          description: Allow backward movement
+        auto_assign_enabled:
+          type: boolean
+          description: Auto assign author on move
+    UpdateBoardRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Board title
+        description:
+          type:
+          - string
+          - 'null'
+          description: Board description
+        sort_order:
+          type: number
+          description: Position
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External id
+        default_card_type_id:
+          type: integer
+          description: Default card type
+        default_tags:
+          type:
+          - string
+          - 'null'
+          description: Default tags
+        first_image_is_cover:
+          type: boolean
+          description: Auto mark first image as cover
+        reset_lane_spent_time:
+          type: boolean
+          description: Reset lane spent time
+        automove_cards:
+          type: boolean
+          description: Auto move cards
+        backward_moves_enabled:
+          type: boolean
+          description: Allow backward movement
+        auto_assign_enabled:
+          type: boolean
+          description: Auto assign author
+    CreateColumnRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Column title
+        sort_order:
+          type: number
+          description: Position
+        type:
+          type: integer
+          description: "1 - queue, 2 - in progress, 3 - done"
+        wip_limit:
+          type: integer
+          description: WIP limit
+        wip_limit_type:
+          type: integer
+          description: "1 - card count, 2 - card size"
+        col_count:
+          type: integer
+          description: Width
+    UpdateColumnRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Column title
+        sort_order:
+          type: number
+          description: Position
+        type:
+          type: integer
+          description: "1 - queue, 2 - in progress, 3 - done"
+        wip_limit:
+          type:
+          - integer
+          - 'null'
+          description: WIP limit
+        wip_limit_type:
+          type: integer
+          description: "1 - card count, 2 - card size"
+        col_count:
+          type: integer
+          description: Width
+        default_tags:
+          type:
+          - string
+          - 'null'
+          description: Default tags
+    CreateLaneRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Lane title
+        sort_order:
+          type: number
+          description: Position
+        wip_limit:
+          type: integer
+          description: WIP limit
+        wip_limit_type:
+          type: integer
+          description: "1 - card count, 2 - card size"
+        row_count:
+          type: integer
+          description: Height
+    UpdateLaneRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Lane title
+        sort_order:
+          type: number
+          description: Position
+        wip_limit:
+          type:
+          - integer
+          - 'null'
+          description: WIP limit
+        wip_limit_type:
+          type: integer
+          description: "1 - card count, 2 - card size"
+        row_count:
+          type: integer
+          description: Height
+        default_tags:
+          type:
+          - string
+          - 'null'
+          description: Default tags
+        default_card_type_id:
+          type:
+          - integer
+          - 'null'
+          description: Default card type
+        condition:
+          type: integer
+          description: "1 - live, 2 - archived"
+    CardBaseline:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card id
+        project_id:
+          type: string
+          description: Project uid
+        baseline_id:
+          type: string
+          description: Baseline uid
+        planned_start:
+          type: string
+          description: Baseline start time
+        planned_end:
+          type:
+          - string
+          - 'null'
+          description: Baseline end time

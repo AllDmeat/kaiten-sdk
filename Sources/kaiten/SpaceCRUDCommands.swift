@@ -1,0 +1,98 @@
+import ArgumentParser
+import KaitenSDK
+
+struct CreateSpace: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "create-space",
+    abstract: "Create a new space"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Space title")
+  var title: String
+
+  @Option(name: .long, help: "External ID")
+  var externalId: String?
+
+  @Option(name: .long, help: "Sort order")
+  var sortOrder: Double?
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let space = try await client.createSpace(
+      title: title,
+      externalId: externalId,
+      sortOrder: sortOrder
+    )
+    try printJSON(space)
+  }
+}
+
+struct GetSpace: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "get-space",
+    abstract: "Get a space by ID"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Space ID")
+  var id: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let space = try await client.getSpace(id: id)
+    try printJSON(space)
+  }
+}
+
+struct UpdateSpace: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "update-space",
+    abstract: "Update a space"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Space ID")
+  var id: Int
+
+  @Option(name: .long, help: "Space title")
+  var title: String?
+
+  @Option(name: .long, help: "External ID")
+  var externalId: String?
+
+  @Option(name: .long, help: "Sort order")
+  var sortOrder: Double?
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let space = try await client.updateSpace(
+      id: id,
+      title: title,
+      externalId: externalId,
+      sortOrder: sortOrder
+    )
+    try printJSON(space)
+  }
+}
+
+struct DeleteSpace: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "delete-space",
+    abstract: "Delete a space"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Space ID")
+  var id: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let deletedId = try await client.deleteSpace(id: id)
+    print("{\"id\": \(deletedId)}")
+  }
+}
