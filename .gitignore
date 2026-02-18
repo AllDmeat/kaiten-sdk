@@ -5,3 +5,4 @@
 *.xcworkspace/
 .claude/
 Sources/KaitenSDK/GeneratedSources/
+.worktrees/
