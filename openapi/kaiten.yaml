@@ -1155,6 +1155,65 @@ paths:
           description: Forbiden
         '404':
           description: Not found
+  /users:
+    get:
+      summary: Retrieve list of users
+      operationId: retrieve_list_of_users
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+        description: Type of users to return
+      - name: query
+        in: query
+        schema:
+          type: string
+        description: Search query
+      - name: ids
+        in: query
+        schema:
+          type: string
+        description: Array of user ids separated by commas
+      - name: limit
+        in: query
+        schema:
+          type: integer
+        description: Limit the number of users returned (max 100)
+      - name: offset
+        in: query
+        schema:
+          type: integer
+        description: Offset the number of users returned
+      - name: include_inactive
+        in: query
+        schema:
+          type: boolean
+        description: Include inactive users
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid token
+  /users/current:
+    get:
+      summary: Retrieve current user
+      operationId: retrieve_current_user
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid token
 components:
   securitySchemes:
     bearerAuth:
@@ -2298,6 +2357,23 @@ components:
         updated:
           type: string
           description: Last update timestamp
+        role:
+          type: integer
+          description: 1 - owner, 2 - user, 3 - deactivated
+        company_id:
+          type: integer
+          description: Company id
+        user_id:
+          type: integer
+          description: User id
+        external:
+          type: boolean
+          description: Is user external
+        last_request_date:
+          type:
+          - string
+          - 'null'
+          description: Date of last request
     CardType:
       type: object
       properties:
