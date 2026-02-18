@@ -516,6 +516,36 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/checklists:
+    post:
+      summary: Add checklist to card
+      operationId: create_checklist
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChecklistRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checklist'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -1904,6 +1934,17 @@ components:
         updated:
           type: string
           description: Last update timestamp
+    CreateChecklistRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Checklist name
+        sort_order:
+          type: number
+          description: Position
     Checklist:
       type: object
       properties:
