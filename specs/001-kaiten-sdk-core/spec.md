@@ -102,24 +102,26 @@ A developer requests all spaces and boards — for navigation.
   configuration on its own — that is the caller's responsibility.
 - **FR-006**: SDK MUST throw an error on initialization
   (fail fast) if `baseURL` is invalid.
-- **FR-007**: SDK MUST compile on macOS (ARM) and Linux (x86-64 and ARM)
-- **FR-008**: SDK MUST support async/await
-- **FR-009**: SDK MUST use `swift-tools-version: 6.2` with `.swiftLanguageMode(.v6)` on each target
-- **FR-010**: SDK MUST automatically retry requests on 429 (rate limit) with a delay (configurable max retries and delay). Implementation via `ClientMiddleware`.
-- **FR-012**: GitHub Actions workflows MUST have explicit names describing what they do (e.g. `build-and-test.yml`, not `ci.yml`)
-- **FR-013**: CI MUST cache SPM dependencies between runs to speed up builds
-- **FR-014**: Code MUST NOT use `nonisolated(unsafe)`. For mutable state in a Sendable context, use `Mutex` from `import Synchronization`
-- **FR-015**: The OpenAPI spec MUST contain only endpoints (`paths`) that are actually used in the SDK. The `components/schemas` section MUST contain all data models needed to fully describe responses of these endpoints — including nested objects (User, Checklist, SLA, etc.), even if the SDK has no special business logic for them. Since Kaiten does not yet have an official OpenAPI spec, we maintain a minimal hand-crafted spec — only used endpoints + complete models of their responses. When Kaiten provides an official spec, we can switch to it entirely.
-- **FR-016**: The OpenAPI spec is assembled **manually** — Kaiten does not have a public OpenAPI specification. The spec MUST accurately reflect real API behavior:
+- **FR-007**: SDK MUST support async/await
+- **FR-008**: The OpenAPI spec MUST contain only endpoints (`paths`) that are actually used in the SDK. The `components/schemas` section MUST contain all data models needed to fully describe responses of these endpoints — including nested objects (User, Checklist, SLA, etc.), even if the SDK has no special business logic for them. Since Kaiten does not yet have an official OpenAPI spec, we maintain a minimal hand-crafted spec — only used endpoints + complete models of their responses. When Kaiten provides an official spec, we can switch to it entirely.
+- **FR-009**: The OpenAPI spec is assembled **manually** — Kaiten does not have a public OpenAPI specification. The spec MUST accurately reflect real API behavior:
   - **Kaiten documentation is the starting point**, but not absolute truth. Docs may diverge from the real API.
   - **When docs diverge from API — the real API takes priority.** Verify fields, types, nullable/required through real requests. Example: docs show a full Board for Card.board, but the API returns only 6 fields → the spec uses a separate CardBoardSummary schema.
   - **Divergences MUST be documented** with a YAML comment directly above the field/schema (e.g. `# NOTE: Kaiten docs show X, but API returns Y`).
   - **Different responses = different schemas** — if two endpoints return similar but not identical data, the spec MUST have separate schemas (Board vs BoardInSpace vs CardBoardSummary).
   - **Nullable and required strictly per the real API** — verify through requests, not just docs.
   - **Cross-checking is mandatory** — for any spec change, compare with documentation + verify against the real API. Documentation parsing guide: [docs/kaiten-docs-parsing.md](../../docs/kaiten-docs-parsing.md).
-- **FR-017**: All public types (structs, enums, protocols) and methods MUST have Swift doc comments (`///`) following DocC conventions. Doc comments MUST include `- Parameter`, `- Returns`, and `- Throws` tags where applicable.
+- **FR-010**: SDK MUST support ALL query parameters documented in the Kaiten API for every endpoint in the spec. No subset, no phasing — every filter the API accepts MUST be present in the OpenAPI spec and exposed in the SDK's public API with backward-compatible optional defaults.
 
-- **FR-018**: SDK MUST support ALL query parameters documented in the Kaiten API for every endpoint in the spec. No subset, no phasing — every filter the API accepts MUST be present in the OpenAPI spec and exposed in the SDK's public API with backward-compatible optional defaults.
+### Non-Functional Requirements
+
+- **NFR-001**: SDK MUST compile on macOS (ARM) and Linux (x86-64 and ARM)
+- **NFR-002**: SDK MUST use `swift-tools-version: 6.2` with `.swiftLanguageMode(.v6)` on each target
+- **NFR-003**: SDK MUST automatically retry requests on 429 (rate limit) with a delay (configurable max retries and delay). Implementation via `ClientMiddleware`.
+- **NFR-004**: GitHub Actions workflows MUST have explicit names describing what they do (e.g. `build-and-test.yml`, not `ci.yml`)
+- **NFR-005**: CI MUST cache SPM dependencies between runs to speed up builds
+- **NFR-006**: Code MUST NOT use `nonisolated(unsafe)`. For mutable state in a Sendable context, use `Mutex` from `import Synchronization`
+- **NFR-007**: All public types (structs, enums, protocols) and methods MUST have Swift doc comments (`///`) following DocC conventions. Doc comments MUST include `- Parameter`, `- Returns`, and `- Throws` tags where applicable.
 
 ### Key Entities
 

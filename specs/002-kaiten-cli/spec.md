@@ -69,9 +69,7 @@ stdout confirms it works.
   errors to stderr.
 - **FR-005**: The CLI MUST exit with code 0 on success and
   non-zero on error.
-- **FR-006**: The CLI MUST compile and run on macOS (ARM) and
-  Linux (x86-64 and ARM).
-- **FR-007**: Configuration is stored in two files in a shared
+- **FR-006**: Configuration is stored in two files in a shared
   directory `~/.config/kaiten/` (all platforms):
   - **`config.json`** — connection settings (url, token):
     ```json
@@ -85,10 +83,15 @@ stdout confirms it works.
     this file.
 
   The CLI reads only `config.json`.
-- **FR-008**: The CLI MUST use `swift-configuration`
+- **FR-007**: The CLI MUST use `swift-configuration`
   (`ConfigReader` + `FileProvider<JSONSnapshot>`) to read the
   config file. `swift-configuration` is a dependency of the CLI
   target only, not the SDK.
+
+### Non-Functional Requirements
+
+- **NFR-001**: The CLI MUST compile and run on macOS (ARM) and
+  Linux (x86-64 and ARM).
 
 ## Success Criteria *(mandatory)*
 
