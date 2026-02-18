@@ -632,6 +632,66 @@ public struct KaitenClient: Sendable {
     return try decodeResponse(response.toCase()) { try $0.json }
   }
 
+  /// Adds a member to a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - userId: The user identifier to add.
+  /// - Returns: The added member details.
+  /// - Throws: ``KaitenError``
+  public func addCardMember(cardId: Int, userId: Int) async throws(KaitenError)
+    -> Components.Schemas.MemberDetailed
+  {
+    let response = try await call {
+      try await client.add_card_member(
+        path: .init(card_id: cardId),
+        body: .json(.init(user_id: userId))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
+
+  /// Updates a card member's role.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - userId: The user identifier.
+  ///   - type: The role type (2 = responsible).
+  /// - Returns: The updated card member role.
+  /// - Throws: ``KaitenError``
+  public func updateCardMemberRole(cardId: Int, userId: Int, type: Int) async throws(KaitenError)
+    -> Components.Schemas.CardMemberRole
+  {
+    let response = try await call {
+      try await client.update_card_member_role(
+        path: .init(card_id: cardId, id: userId),
+        body: .json(.init(_type: type))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("member", userId)) {
+      try $0.json
+    }
+  }
+
+  /// Removes a member from a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - userId: The user identifier to remove.
+  /// - Returns: The removed user ID.
+  /// - Throws: ``KaitenError``
+  public func removeCardMember(cardId: Int, userId: Int) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_card_member(path: .init(card_id: cardId, id: userId))
+    }
+    let result: Components.Schemas.DeletedMemberResponse = try decodeResponse(
+      response.toCase(), notFoundResource: ("member", userId)
+    ) { try $0.json }
+    return result.id!
+  }
+
   /// Creates a comment on a card.
   ///
   /// - Parameters:

@@ -65,6 +65,42 @@ extension Operations.retrieve_list_of_card_members.Output {
   }
 }
 
+extension Operations.add_card_member.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.add_card_member.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.update_card_member_role.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.update_card_member_role.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.remove_card_member.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.remove_card_member.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
 extension Operations.retrieve_card_comments.Output {
   func toCase() -> KaitenClient.ResponseCase<Operations.retrieve_card_comments.Output.Ok.Body> {
     switch self {

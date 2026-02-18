@@ -484,6 +484,100 @@ paths:
           description: Invalid token
         '403':
           description: Forbidden
+    post:
+      summary: Add member to card
+      operationId: add_card_member
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardMemberRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetailed'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/members/{id}:
+    patch:
+      summary: Update card member role
+      operationId: update_card_member_role
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardMemberRoleRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardMemberRole'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Remove member from card
+      operationId: remove_card_member
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedMemberResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /cards/{card_id}/comments:
     get:
       summary: Retrieve card comments
@@ -1950,7 +2044,7 @@ components:
           type: integer
           description: User id
         type:
-          type: string
+          type: integer
           description: 1 - member, 2 - responsible
     BoardInSpace:
       type: object
@@ -2715,3 +2809,43 @@ components:
         id:
           type: integer
           description: Deleted checklist item ID
+    AddCardMemberRequest:
+      type: object
+      required:
+      - user_id
+      properties:
+        user_id:
+          type: integer
+          description: User ID to add as card member
+    UpdateCardMemberRoleRequest:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: integer
+          description: Member role type (2 = responsible)
+    CardMemberRole:
+      type: object
+      properties:
+        updated:
+          type: string
+          description: Last update timestamp
+        created:
+          type: string
+          description: Create date
+        card_id:
+          type: integer
+          description: Card ID
+        user_id:
+          type: integer
+          description: User ID
+        type:
+          type: integer
+          description: 2 - responsible
+    DeletedMemberResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Removed user ID
