@@ -431,3 +431,53 @@ extension Operations.retrieve_current_user.Output {
     }
   }
 }
+
+// MARK: - Card Blockers
+
+extension Operations.list_card_blockers.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.list_card_blockers.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.create_card_blocker.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.create_card_blocker.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.update_card_blocker.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.update_card_blocker.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
+extension Operations.delete_card_blocker.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.delete_card_blocker.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
