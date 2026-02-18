@@ -667,6 +667,29 @@ public struct KaitenClient: Sendable {
     }
     return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) { try $0.json }
   }
+  // MARK: - Checklists
+
+  /// Creates a checklist on a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - name: Checklist name (required).
+  ///   - sortOrder: Position (optional).
+  /// - Returns: The created checklist.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  public func createChecklist(cardId: Int, name: String, sortOrder: Double? = nil)
+    async throws(KaitenError) -> Components.Schemas.Checklist
+  {
+    let response = try await call {
+      try await client.create_checklist(
+        path: .init(card_id: cardId),
+        body: .json(.init(name: name, sort_order: sortOrder))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
 }
 
 // MARK: - Custom Properties
