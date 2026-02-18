@@ -203,3 +203,31 @@ struct CreateChecklistItem: AsyncParsableCommand {
     try printJSON(item)
   }
 }
+
+struct RemoveChecklistItem: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "remove-checklist-item",
+    abstract: "Remove an item from a checklist"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Card ID")
+  var cardId: Int
+
+  @Option(name: .long, help: "Checklist ID")
+  var checklistId: Int
+
+  @Option(name: .long, help: "Checklist item ID")
+  var itemId: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let deletedId = try await client.removeChecklistItem(
+      cardId: cardId,
+      checklistId: checklistId,
+      itemId: itemId
+    )
+    print(deletedId)
+  }
+}

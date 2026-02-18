@@ -754,6 +754,41 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+    delete:
+      summary: Remove checklist item
+      operationId: remove_checklist_item
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: checklist_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist item ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedChecklistItemResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -2616,3 +2651,9 @@ components:
         responsible_id:
           type: integer
           description: Responsible user ID
+    DeletedChecklistItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Deleted checklist item ID

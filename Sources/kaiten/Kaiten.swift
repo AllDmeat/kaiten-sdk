@@ -26,6 +26,7 @@ struct Kaiten: AsyncParsableCommand {
       CreateChecklist.self,
       RemoveChecklist.self,
       CreateChecklistItem.self,
+      RemoveChecklistItem.self,
       UpdateChecklistItem.self,
       UpdateChecklist.self,
       ListCustomProperties.self,
