@@ -37,6 +37,9 @@ struct Kaiten: AsyncParsableCommand {
       GetChecklist.self,
       DeleteCard.self,
       DeleteComment.self,
+      ListCardTags.self,
+      AddCardTag.self,
+      RemoveCardTag.self,
     ]
   )
 }

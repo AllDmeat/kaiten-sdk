@@ -935,6 +935,91 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/tags:
+    get:
+      summary: List card tags
+      operationId: list_card_tags
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardTag'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    post:
+      summary: Add card tag
+      operationId: add_card_tag
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardTagRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/tags/{tag_id}:
+    delete:
+      summary: Remove card tag
+      operationId: remove_card_tag
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: tag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Tag ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedTagResponse'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -2849,3 +2934,37 @@ components:
         id:
           type: integer
           description: Removed user ID
+    CardTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Card tag ID
+        name:
+          type: string
+          description: Tag name
+        color:
+          type: integer
+          description: Tag color number
+        card_id:
+          type: integer
+          description: Card ID
+        tag_id:
+          type: integer
+          description: Tag ID
+    AddCardTagRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: Tag name
+    DeletedTagResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Deleted card tag ID
