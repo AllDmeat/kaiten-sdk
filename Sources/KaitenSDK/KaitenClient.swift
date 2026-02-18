@@ -1079,7 +1079,9 @@ extension KaitenClient {
     else {
       return Page(items: [], offset: offset, limit: limit)
     }
-    let items: [Components.Schemas.CustomPropertySelectValue] = try decodeResponse(response.toCase()) { try $0.json }
+    let items: [Components.Schemas.CustomPropertySelectValue] = try decodeResponse(
+      response.toCase()
+    ) { try $0.json }
     return Page(items: items, offset: offset, limit: limit)
   }
 
