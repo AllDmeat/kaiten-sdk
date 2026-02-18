@@ -3103,15 +3103,17 @@ components:
           type: boolean
           description: Deleted flag
         sd_external_recipients_cc:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Service desk external recipients
         sd_description:
           type: boolean
           description: Flag indicating comment is used as request description
         notification_sent:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Notification sent date
         updated:
           type: string
@@ -4045,8 +4047,9 @@ components:
           type: string
           description: Card title
         description:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Card description
         state:
           type: integer
