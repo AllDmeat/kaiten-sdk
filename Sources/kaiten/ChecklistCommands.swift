@@ -48,3 +48,24 @@ struct GetChecklist: AsyncParsableCommand {
     try printJSON(checklist)
   }
 }
+
+struct RemoveChecklist: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "remove-checklist",
+    abstract: "Remove a checklist from a card"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Card ID")
+  var cardId: Int
+
+  @Option(name: .long, help: "Checklist ID")
+  var checklistId: Int
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let deletedId = try await client.removeChecklist(cardId: cardId, checklistId: checklistId)
+    try printJSON(["id": deletedId])
+  }
+}

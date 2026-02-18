@@ -736,6 +736,27 @@ extension KaitenClient {
   }
 }
 
+// MARK: - Remove Checklist
+
+extension KaitenClient {
+  /// Removes a checklist from a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - checklistId: The checklist identifier.
+  /// - Returns: The deleted checklist ID.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  public func removeChecklist(cardId: Int, checklistId: Int) async throws(KaitenError) -> Int {
+    let response = try await call {
+      try await client.remove_checklist(path: .init(card_id: cardId, id: checklistId))
+    }
+    let result: Components.Schemas.DeletedChecklistResponse = try decodeResponse(
+      response.toCase(), notFoundResource: ("checklist", checklistId)
+    ) { try $0.json }
+    return result.id!
+  }
+}
+
 // MARK: - Custom Properties
 
 extension KaitenClient {
