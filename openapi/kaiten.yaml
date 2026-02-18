@@ -1105,6 +1105,126 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/blockers:
+    get:
+      summary: List card blockers
+      operationId: list_card_blockers
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardBlocker'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    post:
+      summary: Create card blocker
+      operationId: create_card_blocker
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardBlockerRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardBlocker'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /cards/{card_id}/blockers/{id}:
+    patch:
+      summary: Update card blocker
+      operationId: update_card_blocker
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Blocker ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardBlockerRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardBlocker'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+    delete:
+      summary: Delete card blocker
+      operationId: delete_card_blocker
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Blocker ID
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardBlocker'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /company/custom-properties:
     get:
       summary: Get list of properties
@@ -3186,3 +3306,70 @@ components:
         id:
           type: integer
           description: Deleted card child ID
+    CardBlocker:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Blocker ID
+        reason:
+          type: string
+          description: Block reason
+        card_id:
+          type: integer
+          description: Blocked card ID
+        blocker_id:
+          type: integer
+          description: User ID who blocked card
+        blocker_card_id:
+          type:
+          - string
+          - 'null'
+          description: ID of blocking card
+        blocker_card_title:
+          type:
+          - string
+          - 'null'
+          description: Title of blocking card
+        released:
+          type: boolean
+          description: Is block released
+        released_by_id:
+          type: integer
+          description: ID of user who released block
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Block deadline
+        due_date_time_present:
+          type: boolean
+          description: Deadline has time component
+        created:
+          type: string
+          description: Create date
+        updated:
+          type: string
+          description: Last update timestamp
+    CreateCardBlockerRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 4096
+          description: Block reason
+        blocker_card_id:
+          type: integer
+          description: Blocker card ID
+    UpdateCardBlockerRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 4096
+          description: Block reason
+        blocker_card_id:
+          type: integer
+          description: Blocker card ID

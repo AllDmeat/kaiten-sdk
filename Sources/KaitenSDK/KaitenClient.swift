@@ -1337,6 +1337,70 @@ extension KaitenClient {
   }
 }
 
+// MARK: - Card Blockers
+
+extension KaitenClient {
+  /// Lists all blockers on a card.
+  public func listCardBlockers(cardId: Int) async throws(KaitenError) -> [Components.Schemas
+    .CardBlocker]
+  {
+    guard
+      let response = try await callList({
+        try await client.list_card_blockers(path: .init(card_id: cardId))
+      })
+    else {
+      return []
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
+
+  /// Creates a blocker on a card.
+  public func createCardBlocker(cardId: Int, reason: String? = nil, blockerCardId: Int? = nil)
+    async throws(KaitenError) -> Components.Schemas.CardBlocker
+  {
+    let response = try await call {
+      try await client.create_card_blocker(
+        path: .init(card_id: cardId),
+        body: .json(.init(reason: reason, blocker_card_id: blockerCardId))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("card", cardId)) {
+      try $0.json
+    }
+  }
+
+  /// Updates a card blocker.
+  public func updateCardBlocker(
+    cardId: Int, blockerId: Int, reason: String? = nil, blockerCardId: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.CardBlocker {
+    let response = try await call {
+      try await client.update_card_blocker(
+        path: .init(card_id: cardId, id: blockerId),
+        body: .json(.init(reason: reason, blocker_card_id: blockerCardId))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("blocker", blockerId)) {
+      try $0.json
+    }
+  }
+
+  /// Deletes a card blocker.
+  public func deleteCardBlocker(cardId: Int, blockerId: Int) async throws(KaitenError)
+    -> Components.Schemas.CardBlocker
+  {
+    let response = try await call {
+      try await client.delete_card_blocker(
+        path: .init(card_id: cardId, id: blockerId)
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("blocker", blockerId)) {
+      try $0.json
+    }
+  }
+}
+
 // MARK: - Helpers
 
 extension Optional {
