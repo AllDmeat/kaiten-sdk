@@ -153,6 +153,18 @@ extension Operations.update_checklist.Output {
 
 // MARK: - Checklist Items
 
+extension Operations.create_checklist_item.Output {
+  func toCase() -> KaitenClient.ResponseCase<Operations.create_checklist_item.Output.Ok.Body> {
+    switch self {
+    case .ok(let ok): .ok(ok.body)
+    case .unauthorized: .unauthorized
+    case .forbidden: .forbidden
+    case .notFound: .notFound
+    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
+    }
+  }
+}
+
 extension Operations.update_checklist_item.Output {
   func toCase() -> KaitenClient.ResponseCase<Operations.update_checklist_item.Output.Ok.Body> {
     switch self {

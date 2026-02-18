@@ -760,6 +760,47 @@ extension KaitenClient {
 // MARK: - Checklist Items
 
 extension KaitenClient {
+  /// Creates a new checklist item.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - checklistId: The checklist identifier.
+  ///   - text: Item content (1–4096 characters).
+  ///   - sortOrder: Position (must be > 0).
+  ///   - checked: Checked state.
+  ///   - dueDate: Due date in YYYY-MM-DD format.
+  ///   - responsibleId: Responsible user ID.
+  /// - Returns: The created checklist item.
+  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  public func createChecklistItem(
+    cardId: Int,
+    checklistId: Int,
+    text: String,
+    sortOrder: Double? = nil,
+    checked: Bool? = nil,
+    dueDate: String? = nil,
+    responsibleId: Int? = nil
+  ) async throws(KaitenError) -> Components.Schemas.ChecklistItem {
+    let response = try await call {
+      try await client.create_checklist_item(
+        path: .init(card_id: cardId, checklist_id: checklistId),
+        body: .json(
+          .init(
+            text: text,
+            sort_order: sortOrder,
+            checked: checked,
+            due_date: dueDate,
+            responsible_id: responsibleId
+          ))
+      )
+    }
+    return try decodeResponse(response.toCase(), notFoundResource: ("checklist", checklistId)) {
+      try $0.json
+    }
+  }
+}
+
+extension KaitenClient {
   /// Updates a checklist item on a card.
   ///
   /// All body parameters are optional — only provided values are changed.

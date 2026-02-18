@@ -159,3 +159,47 @@ struct UpdateChecklistItem: AsyncParsableCommand {
     try printJSON(item)
   }
 }
+
+struct CreateChecklistItem: AsyncParsableCommand {
+  static let configuration = CommandConfiguration(
+    commandName: "create-checklist-item",
+    abstract: "Add an item to a checklist"
+  )
+
+  @OptionGroup var global: GlobalOptions
+
+  @Option(name: .long, help: "Card ID")
+  var cardId: Int
+
+  @Option(name: .long, help: "Checklist ID")
+  var checklistId: Int
+
+  @Option(name: .long, help: "Item text")
+  var text: String
+
+  @Option(name: .long, help: "Sort order")
+  var sortOrder: Double?
+
+  @Option(name: .long, help: "Checked state")
+  var checked: Bool?
+
+  @Option(name: .long, help: "Due date (YYYY-MM-DD)")
+  var dueDate: String?
+
+  @Option(name: .long, help: "Responsible user ID")
+  var responsibleId: Int?
+
+  func run() async throws {
+    let client = try await global.makeClient()
+    let item = try await client.createChecklistItem(
+      cardId: cardId,
+      checklistId: checklistId,
+      text: text,
+      sortOrder: sortOrder,
+      checked: checked,
+      dueDate: dueDate,
+      responsibleId: responsibleId
+    )
+    try printJSON(item)
+  }
+}

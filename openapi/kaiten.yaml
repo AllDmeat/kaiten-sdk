@@ -676,6 +676,42 @@ paths:
           description: Forbidden
         '404':
           description: Not found
+  /cards/{card_id}/checklists/{checklist_id}/items:
+    post:
+      summary: Add item to checklist
+      operationId: create_checklist_item
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+      - name: checklist_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Checklist ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChecklistItemRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChecklistItem'
+        '401':
+          description: Invalid token
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
   /cards/{card_id}/checklists/{checklist_id}/items/{id}:
     patch:
       summary: Update checklist item
@@ -2558,3 +2594,25 @@ components:
           - integer
           - 'null'
           description: Responsible user ID (null to clear)
+    CreateChecklistItemRequest:
+      type: object
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: Item content
+        sort_order:
+          type: number
+          description: Position
+        checked:
+          type: boolean
+          description: Checked state
+        due_date:
+          type:
+          - string
+          - 'null'
+          description: Due date (YYYY-MM-DD)
+        responsible_id:
+          type: integer
+          description: Responsible user ID
