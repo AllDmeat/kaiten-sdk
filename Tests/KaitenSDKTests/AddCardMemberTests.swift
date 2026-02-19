@@ -10,7 +10,7 @@ struct AddCardMemberTests {
   @Test("200 returns member")
   func success() async throws {
     let json = """
-      {"id": 10, "full_name": "Alice", "type": 1}
+      {"id": 10, "full_name": "Alice", "type": 1, "avatar_type": 2}
       """
     let transport = MockClientTransport.returning(statusCode: 200, body: json)
     let client = try KaitenClient(
@@ -19,6 +19,7 @@ struct AddCardMemberTests {
     let member = try await client.addCardMember(cardId: 42, userId: 10)
     #expect(member.id == 10)
     #expect(member.full_name == "Alice")
+    #expect(member.avatar_type == 2)
   }
 
   @Test("404 throws notFound")

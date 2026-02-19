@@ -3281,7 +3281,7 @@ components:
           type: string
           description: User initials
         avatar_type:
-          type: string
+          type: integer
           description: 1 – gravatar, 2 – initials, 3 - uploaded
         lng:
           type: string
