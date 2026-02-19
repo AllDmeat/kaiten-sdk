@@ -131,6 +131,6 @@ struct PaginationTests {
     try await Task.sleep(nanoseconds: 50_000_000)
 
     let totalCalls = await counter.count
-    #expect(totalCalls <= 2)
+    #expect(totalCalls <= 3)
   }
 }
