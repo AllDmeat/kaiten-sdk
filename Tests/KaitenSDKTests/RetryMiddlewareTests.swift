@@ -8,6 +8,9 @@ import Testing
 
 @Suite("RetryMiddleware")
 struct RetryMiddlewareTests {
+  private enum NonTransientError: Error {
+    case failed
+  }
 
   @Test("429 then 200 succeeds after retry")
   func retryThenSuccess() async throws {
@@ -142,6 +145,26 @@ struct RetryMiddlewareTests {
         throw URLError(.networkConnectionLost)
       }
     }
+  }
+
+  @Test("Non-transient thrown errors are not retried")
+  func nonTransientErrorNoRetry() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
+    let callCount = Mutex(0)
+
+    await #expect(throws: NonTransientError.self) {
+      _ = try await middleware.intercept(
+        HTTPRequest(method: .get, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+        body: nil,
+        baseURL: URL(string: "https://test.kaiten.ru")!,
+        operationID: "test"
+      ) { _, _, _ in
+        callCount.withLock { $0 += 1 }
+        throw NonTransientError.failed
+      }
+    }
+
+    #expect(callCount.withLock { $0 } == 1)
   }
 
   @Test("Non-retryable status passes through immediately")

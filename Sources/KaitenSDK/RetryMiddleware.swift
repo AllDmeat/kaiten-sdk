@@ -40,13 +40,16 @@ struct RetryMiddleware: ClientMiddleware {
       do {
         (response, responseBody) = try await next(request, body, baseURL)
       } catch {
-        // Network error — retry with backoff
-        lastError = error
-        if attempt < attempts - 1 {
-          try await sleep(backoffDelay(attempt: attempt))
-          continue
+        if isTransientURLError(error) {
+          // Transient network error — retry with backoff
+          lastError = error
+          if attempt < attempts - 1 {
+            try await sleep(backoffDelay(attempt: attempt))
+            continue
+          }
+          throw KaitenError.networkError(underlying: error)
         }
-        throw KaitenError.networkError(underlying: error)
+        throw error
       }
 
       let statusCode = response.status.code
@@ -96,5 +99,16 @@ struct RetryMiddleware: ClientMiddleware {
 
   private func isRetryableMethod(_ method: HTTPRequest.Method) -> Bool {
     method == .get || method == .head
+  }
+
+  private func isTransientURLError(_ error: any Error) -> Bool {
+    guard let urlError = error as? URLError else { return false }
+    switch urlError.code {
+    case .timedOut, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed,
+      .notConnectedToInternet, .internationalRoamingOff, .callIsActive, .dataNotAllowed:
+      return true
+    default:
+      return false
+    }
   }
 }
