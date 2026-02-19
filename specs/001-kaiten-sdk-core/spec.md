@@ -122,6 +122,7 @@ A developer requests all spaces and boards — for navigation.
 - **NFR-005**: CI MUST cache SPM dependencies between runs to speed up builds
 - **NFR-006**: Code MUST NOT use `nonisolated(unsafe)`. For mutable state in a Sendable context, use `Mutex` from `import Synchronization`
 - **NFR-007**: All public types (structs, enums, protocols) and methods MUST have Swift doc comments (`///`) following DocC conventions. Doc comments MUST include `- Parameter`, `- Returns`, and `- Throws` tags where applicable.
+- **NFR-008**: SDK source files MUST be grouped by Kaiten API documentation domains (for example: cards, boards, spaces, users) to keep endpoint parity checks maintainable.
 
 ### Key Entities
 

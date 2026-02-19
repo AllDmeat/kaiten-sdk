@@ -92,6 +92,9 @@ stdout confirms it works.
 
 - **NFR-001**: The CLI MUST compile and run on macOS (ARM) and
   Linux (x86-64 and ARM).
+- **NFR-002**: CLI command source files MUST mirror the SDK/API domain
+  grouping from Kaiten documentation (for example: cards, boards,
+  spaces, users) while preserving existing command behavior.
 
 ## Success Criteria *(mandatory)*
 
