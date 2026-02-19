@@ -67,6 +67,17 @@ struct ListCardsTests {
     }
   }
 
+  @Test("200 with malformed JSON body throws decodingError")
+  func malformedJsonThrowsDecodingError() async throws {
+    let transport = MockClientTransport.returning(statusCode: 200, body: "[")
+    let client = try KaitenClient(
+      baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
+
+    await #expect(throws: KaitenError.self) {
+      _ = try await client.listCards(boardId: 10)
+    }
+  }
+
   @Test("401 throws unauthorized")
   func unauthorized() async throws {
     let transport = MockClientTransport.returning(statusCode: 401)

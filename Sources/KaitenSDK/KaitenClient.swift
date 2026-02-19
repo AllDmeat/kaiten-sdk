@@ -75,13 +75,16 @@ public struct KaitenClient: Sendable {
       // keyNotFound), the body was valid JSON but didn't match the
       // expected schema — propagate instead of hiding.
       // Other DecodingErrors (dataCorrupted from empty/invalid body)
-      // are treated as "no data" and return nil.
+      // are treated as "no data" only for truly empty bodies.
       if let decodingError = error.underlyingError as? DecodingError {
         switch decodingError {
         case .typeMismatch, .keyNotFound, .valueNotFound:
           throw .decodingError(underlying: error)
         case .dataCorrupted:
-          break  // treat as empty body
+          if await isEmptyBody(error.responseBody) {
+            return nil
+          }
+          throw .decodingError(underlying: error)
         @unknown default:
           throw .decodingError(underlying: error)
         }
@@ -100,6 +103,19 @@ public struct KaitenClient: Sendable {
       return try extract()
     } catch {
       throw .decodingError(underlying: error)
+    }
+  }
+
+  private func isEmptyBody(_ body: HTTPBody?) async -> Bool {
+    guard let body else { return true }
+
+    do {
+      for try await chunk in body {
+        if !chunk.isEmpty { return false }
+      }
+      return true
+    } catch {
+      return false
     }
   }
 
