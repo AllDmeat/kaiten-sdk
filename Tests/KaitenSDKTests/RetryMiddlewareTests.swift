@@ -12,6 +12,14 @@ struct RetryMiddlewareTests {
     case failed
   }
 
+  private static func httpDate(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+    return formatter.string(from: date)
+  }
+
   @Test("429 then 200 succeeds after retry")
   func retryThenSuccess() async throws {
     let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
@@ -204,5 +212,70 @@ struct RetryMiddlewareTests {
     }
 
     #expect(callCount.withLock { $0 } == 1)
+  }
+
+  @Test("429 uses X-RateLimit-Reset when remaining is zero")
+  func rateLimitResetHeaderPreferred() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 2, baseDelay: 0.01)
+    let callCount = Mutex(0)
+    let reset = String(Int(Date().timeIntervalSince1970))
+
+    let (response, _) = try await middleware.intercept(
+      HTTPRequest(method: .get, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+      body: nil,
+      baseURL: URL(string: "https://test.kaiten.ru")!,
+      operationID: "test"
+    ) { _, _, _ in
+      let count = callCount.withLock { value in
+        value += 1
+        return value
+      }
+      if count == 1 {
+        return (
+          HTTPResponse(
+            status: .tooManyRequests,
+            headerFields: HTTPFields([
+              HTTPField(name: HTTPField.Name("X-RateLimit-Remaining")!, value: "0"),
+              HTTPField(name: HTTPField.Name("X-RateLimit-Reset")!, value: reset),
+            ])), nil
+        )
+      }
+      return (HTTPResponse(status: .ok), HTTPBody("{}"))
+    }
+
+    #expect(response.status == .ok)
+    #expect(callCount.withLock { $0 } == 2)
+  }
+
+  @Test("429 supports Retry-After HTTP-date format")
+  func retryAfterHTTPDate() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 2, baseDelay: 0.01)
+    let callCount = Mutex(0)
+    let retryAfter = Self.httpDate(Date())
+
+    let (response, _) = try await middleware.intercept(
+      HTTPRequest(method: .get, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+      body: nil,
+      baseURL: URL(string: "https://test.kaiten.ru")!,
+      operationID: "test"
+    ) { _, _, _ in
+      let count = callCount.withLock { value in
+        value += 1
+        return value
+      }
+      if count == 1 {
+        return (
+          HTTPResponse(
+            status: .tooManyRequests,
+            headerFields: HTTPFields([
+              HTTPField(name: HTTPField.Name("Retry-After")!, value: retryAfter)
+            ])), nil
+        )
+      }
+      return (HTTPResponse(status: .ok), HTTPBody("{}"))
+    }
+
+    #expect(response.status == .ok)
+    #expect(callCount.withLock { $0 } == 2)
   }
 }

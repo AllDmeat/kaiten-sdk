@@ -56,10 +56,7 @@ struct RetryMiddleware: ClientMiddleware {
 
       // Success or non-retryable status
       if statusCode == 429 {
-        let retryAfter =
-          response.headerFields[HTTPField.Name("Retry-After")!]
-          .flatMap(TimeInterval.init)
-          ?? backoffDelay(attempt: attempt)
+        let retryAfter = resolveRateLimitDelay(response: response, attempt: attempt)
         lastRetryAfter = retryAfter
         if attempt < attempts - 1 {
           try await sleep(retryAfter)
@@ -110,5 +107,41 @@ struct RetryMiddleware: ClientMiddleware {
     default:
       return false
     }
+  }
+
+  private func resolveRateLimitDelay(response: HTTPResponse, attempt: Int) -> TimeInterval {
+    let remainingHeader = HTTPField.Name("X-RateLimit-Remaining")!
+    let resetHeader = HTTPField.Name("X-RateLimit-Reset")!
+    let retryAfterHeader = HTTPField.Name("Retry-After")!
+
+    if response.headerFields[remainingHeader].flatMap(Int.init) == 0,
+      let resetEpoch = response.headerFields[resetHeader].flatMap(TimeInterval.init)
+    {
+      return max(0, resetEpoch - Date().timeIntervalSince1970)
+    }
+
+    if let retryAfterRaw = response.headerFields[retryAfterHeader],
+      let parsed = parseRetryAfter(retryAfterRaw)
+    {
+      return parsed
+    }
+
+    return backoffDelay(attempt: attempt)
+  }
+
+  private func parseRetryAfter(_ value: String) -> TimeInterval? {
+    if let seconds = TimeInterval(value) {
+      return max(0, seconds)
+    }
+
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+    if let date = formatter.date(from: value) {
+      return max(0, date.timeIntervalSinceNow)
+    }
+
+    return nil
   }
 }
