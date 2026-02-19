@@ -133,4 +133,29 @@ struct PaginationTests {
     let totalCalls = await counter.count
     #expect(totalCalls <= 3)
   }
+
+  @Test("allPages fails fast when pageSize is zero or negative")
+  func invalidPageSize() async throws {
+    let client = try KaitenClient(
+      baseURL: "https://test.kaiten.ru/api/latest",
+      token: "test-token",
+      transport: MockClientTransport.returning(statusCode: 200, body: "[]")
+    )
+
+    let zeroSizeStream: AsyncThrowingStream<Int, Error> = client.allPages(pageSize: 0) {
+      (offset: Int, limit: Int) async throws -> Page<Int> in
+      Page(items: [offset], offset: offset, limit: limit)
+    }
+    await #expect(throws: KaitenError.self) {
+      _ = try await collect(zeroSizeStream)
+    }
+
+    let negativeSizeStream: AsyncThrowingStream<Int, Error> = client.allPages(pageSize: -1) {
+      (offset: Int, limit: Int) async throws -> Page<Int> in
+      Page(items: [offset], offset: offset, limit: limit)
+    }
+    await #expect(throws: KaitenError.self) {
+      _ = try await collect(negativeSizeStream)
+    }
+  }
 }

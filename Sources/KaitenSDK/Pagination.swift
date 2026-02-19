@@ -15,6 +15,11 @@ extension KaitenClient {
     fetch: @Sendable @escaping (Int, Int) async throws -> Page<T>
   ) -> AsyncThrowingStream<T, Error> {
     AsyncThrowingStream { continuation in
+      guard pageSize > 0 else {
+        continuation.finish(throwing: KaitenError.invalidPagination(pageSize: pageSize))
+        return
+      }
+
       let task = Task {
         var offset = 0
         while !Task.isCancelled {

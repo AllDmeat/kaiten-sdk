@@ -21,6 +21,7 @@ struct KaitenErrorTests {
       (.serverError(statusCode: 500, body: "oops"), "Server error 500: oops"),
       (.networkError(underlying: UnderlyingError()), "Network error: underlying error"),
       (.decodingError(underlying: UnderlyingError()), "Decoding error: underlying error"),
+      (.invalidPagination(pageSize: 0), "Invalid pageSize: 0. pageSize must be greater than 0"),
       (
         .unexpectedResponse(statusCode: 418, body: "teapot"),
         "Unexpected HTTP response: 418: teapot"
