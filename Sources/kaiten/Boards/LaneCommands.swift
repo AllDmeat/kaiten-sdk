@@ -71,27 +71,3 @@ struct UpdateLane: AsyncParsableCommand {
     try printJSON(lane)
   }
 }
-
-struct DeleteLane: AsyncParsableCommand {
-  static let configuration = CommandConfiguration(
-    commandName: "delete-lane",
-    abstract: "Delete a lane"
-  )
-
-  @OptionGroup var global: GlobalOptions
-
-  @Option(name: .long, help: "Board ID")
-  var boardId: Int
-
-  @Option(name: .long, help: "Lane ID")
-  var id: Int
-
-  func run() async throws {
-    let client = try await global.makeClient()
-    let deletedId = try await client.deleteLane(
-      boardId: boardId,
-      id: id
-    )
-    print("{\"id\": \(deletedId)}")
-  }
-}

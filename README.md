@@ -161,7 +161,6 @@ kaiten list-spaces \
 | `createSpace(...)` | Create a space |
 | `getSpace(...)` | Get a space by ID |
 | `updateSpace(...)` | Update a space |
-| `deleteSpace(...)` | Delete a space |
 
 ### Boards
 
@@ -171,7 +170,6 @@ kaiten list-spaces \
 | `getBoard(id:)` | Fetch a board by ID |
 | `createBoard(...)` | Create a board |
 | `updateBoard(...)` | Update a board |
-| `deleteBoard(...)` | Delete a board |
 
 ### Columns
 
@@ -193,7 +191,6 @@ kaiten list-spaces \
 | `getBoardLanes(boardId:)` | Get lanes for a board |
 | `createLane(...)` | Create a lane |
 | `updateLane(...)` | Update a lane |
-| `deleteLane(...)` | Delete a lane |
 
 ### Custom Properties
 

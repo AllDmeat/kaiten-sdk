@@ -689,18 +689,6 @@ extension Operations.update_space.Output {
   }
 }
 
-extension Operations.remove_space.Output {
-  func toCase() -> KaitenClient.ResponseCase<Operations.remove_space.Output.Ok.Body> {
-    switch self {
-    case .ok(let ok): .ok(ok.body)
-    case .unauthorized: .unauthorized
-    case .forbidden: .forbidden
-    case .notFound: .notFound
-    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
-    }
-  }
-}
-
 // MARK: - Boards CRUD
 
 extension Operations.create_board.Output {
@@ -718,19 +706,6 @@ extension Operations.create_board.Output {
 
 extension Operations.update_board.Output {
   func toCase() -> KaitenClient.ResponseCase<Operations.update_board.Output.Ok.Body> {
-    switch self {
-    case .ok(let ok): .ok(ok.body)
-    case .badRequest: .undocumented(statusCode: 400)
-    case .unauthorized: .unauthorized
-    case .forbidden: .forbidden
-    case .notFound: .notFound
-    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
-    }
-  }
-}
-
-extension Operations.remove_board.Output {
-  func toCase() -> KaitenClient.ResponseCase<Operations.remove_board.Output.Ok.Body> {
     switch self {
     case .ok(let ok): .ok(ok.body)
     case .badRequest: .undocumented(statusCode: 400)
@@ -853,19 +828,6 @@ extension Operations.create_lane.Output {
 
 extension Operations.update_lane.Output {
   func toCase() -> KaitenClient.ResponseCase<Operations.update_lane.Output.Ok.Body> {
-    switch self {
-    case .ok(let ok): .ok(ok.body)
-    case .badRequest: .undocumented(statusCode: 400)
-    case .unauthorized: .unauthorized
-    case .forbidden: .forbidden
-    case .notFound: .notFound
-    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)
-    }
-  }
-}
-
-extension Operations.remove_lane.Output {
-  func toCase() -> KaitenClient.ResponseCase<Operations.remove_lane.Output.Ok.Body> {
     switch self {
     case .ok(let ok): .ok(ok.body)
     case .badRequest: .undocumented(statusCode: 400)

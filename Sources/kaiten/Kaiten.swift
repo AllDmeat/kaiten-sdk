@@ -62,10 +62,8 @@ struct Kaiten: AsyncParsableCommand {
       CreateSpace.self,
       GetSpace.self,
       UpdateSpace.self,
-      DeleteSpace.self,
       CreateBoard.self,
       UpdateBoard.self,
-      DeleteBoard.self,
       CreateColumn.self,
       UpdateColumn.self,
       DeleteColumn.self,
@@ -75,7 +73,6 @@ struct Kaiten: AsyncParsableCommand {
       DeleteSubcolumn.self,
       CreateLane.self,
       UpdateLane.self,
-      DeleteLane.self,
       GetCardBaselines.self,
     ]
   )

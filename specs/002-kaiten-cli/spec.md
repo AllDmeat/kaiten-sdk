@@ -87,6 +87,8 @@ stdout confirms it works.
   (`ConfigReader` + `FileProvider<JSONSnapshot>`) to read the
   config file. `swift-configuration` is a dependency of the CLI
   target only, not the SDK.
+- **FR-008**: The CLI MUST NOT expose destructive delete commands for
+  spaces, boards, or lanes.
 
 ### Non-Functional Requirements
 

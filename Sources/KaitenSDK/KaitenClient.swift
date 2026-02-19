@@ -1642,19 +1642,6 @@ extension KaitenClient {
     ) { try $0.json }
   }
 
-  /// Deletes a space.
-  public func deleteSpace(
-    id: Int
-  ) async throws(KaitenError) -> Int {
-    let response = try await call {
-      try await client.remove_space(path: .init(space_id: id))
-    }
-    let result: Components.Schemas.DeletedIdResponse =
-      try decodeResponse(
-        response.toCase(), notFoundResource: ("space", id)
-      ) { try $0.json }
-    return result.id
-  }
 }
 
 // MARK: - Boards CRUD
@@ -1709,21 +1696,6 @@ extension KaitenClient {
     ) { try $0.json }
   }
 
-  /// Deletes a board.
-  public func deleteBoard(
-    spaceId: Int, id: Int
-  ) async throws(KaitenError) -> Int {
-    let response = try await call {
-      try await client.remove_board(
-        path: .init(space_id: spaceId, id: id)
-      )
-    }
-    let result: Components.Schemas.DeletedIdResponse =
-      try decodeResponse(
-        response.toCase(), notFoundResource: ("board", id)
-      ) { try $0.json }
-    return result.id
-  }
 }
 
 // MARK: - Columns CRUD
@@ -1944,21 +1916,6 @@ extension KaitenClient {
     ) { try $0.json }
   }
 
-  /// Deletes a lane.
-  public func deleteLane(
-    boardId: Int, id: Int
-  ) async throws(KaitenError) -> Int {
-    let response = try await call {
-      try await client.remove_lane(
-        path: .init(board_id: boardId, id: id)
-      )
-    }
-    let result: Components.Schemas.DeletedIdResponse =
-      try decodeResponse(
-        response.toCase(), notFoundResource: ("lane", id)
-      ) { try $0.json }
-    return result.id
-  }
 }
 
 // MARK: - Card Baselines

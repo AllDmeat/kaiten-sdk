@@ -78,21 +78,3 @@ struct UpdateSpace: AsyncParsableCommand {
     try printJSON(space)
   }
 }
-
-struct DeleteSpace: AsyncParsableCommand {
-  static let configuration = CommandConfiguration(
-    commandName: "delete-space",
-    abstract: "Delete a space"
-  )
-
-  @OptionGroup var global: GlobalOptions
-
-  @Option(name: .long, help: "Space ID")
-  var id: Int
-
-  func run() async throws {
-    let client = try await global.makeClient()
-    let deletedId = try await client.deleteSpace(id: id)
-    print("{\"id\": \(deletedId)}")
-  }
-}

@@ -72,29 +72,4 @@ struct BoardsCRUDTests {
     }
   }
 
-  // MARK: - deleteBoard
-
-  @Test("deleteBoard 200 returns deleted id")
-  func deleteBoardSuccess() async throws {
-    let json = """
-      {"id": 10}
-      """
-    let transport = MockClientTransport.returning(statusCode: 200, body: json)
-    let client = try KaitenClient(
-      baseURL: "https://test.kaiten.ru/api/latest", token: "t", transport: transport)
-
-    let deletedId = try await client.deleteBoard(spaceId: 1, id: 10)
-    #expect(deletedId == 10)
-  }
-
-  @Test("deleteBoard 404 throws notFound")
-  func deleteBoardNotFound() async throws {
-    let transport = MockClientTransport.returning(statusCode: 404)
-    let client = try KaitenClient(
-      baseURL: "https://test.kaiten.ru/api/latest", token: "t", transport: transport)
-
-    await #expect(throws: KaitenError.self) {
-      _ = try await client.deleteBoard(spaceId: 1, id: 999)
-    }
-  }
 }

@@ -1920,29 +1920,6 @@ paths:
           description: Forbidden
         '404':
           description: Not found
-    delete:
-      summary: Remove space
-      operationId: remove_space
-      parameters:
-      - name: space_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Space ID
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeletedIdResponse'
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Not found
   /spaces/{space_id}/boards/{id}:
     patch:
       summary: Update board
@@ -1973,37 +1950,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Board'
-        '400':
-          description: Bad request
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Not found
-    delete:
-      summary: Remove board
-      operationId: remove_board
-      parameters:
-      - name: space_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Space ID
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Board ID
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeletedIdResponse'
         '400':
           description: Bad request
         '401':
@@ -2237,37 +2183,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Lane'
-        '400':
-          description: Bad request
-        '401':
-          description: Invalid token
-        '403':
-          description: Forbidden
-        '404':
-          description: Not found
-    delete:
-      summary: Remove lane
-      operationId: remove_lane
-      parameters:
-      - name: board_id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Board ID
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: Lane ID
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeletedIdResponse'
         '400':
           description: Bad request
         '401':

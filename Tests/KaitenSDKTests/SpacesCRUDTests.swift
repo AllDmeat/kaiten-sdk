@@ -110,29 +110,4 @@ struct SpacesCRUDTests {
     }
   }
 
-  // MARK: - deleteSpace
-
-  @Test("deleteSpace 200 returns deleted id")
-  func deleteSpaceSuccess() async throws {
-    let json = """
-      {"id": 1}
-      """
-    let transport = MockClientTransport.returning(statusCode: 200, body: json)
-    let client = try KaitenClient(
-      baseURL: "https://test.kaiten.ru/api/latest", token: "t", transport: transport)
-
-    let deletedId = try await client.deleteSpace(id: 1)
-    #expect(deletedId == 1)
-  }
-
-  @Test("deleteSpace 404 throws notFound")
-  func deleteSpaceNotFound() async throws {
-    let transport = MockClientTransport.returning(statusCode: 404)
-    let client = try KaitenClient(
-      baseURL: "https://test.kaiten.ru/api/latest", token: "t", transport: transport)
-
-    await #expect(throws: KaitenError.self) {
-      _ = try await client.deleteSpace(id: 999)
-    }
-  }
 }

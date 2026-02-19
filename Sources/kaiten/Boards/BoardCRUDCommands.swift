@@ -68,27 +68,3 @@ struct UpdateBoard: AsyncParsableCommand {
     try printJSON(board)
   }
 }
-
-struct DeleteBoard: AsyncParsableCommand {
-  static let configuration = CommandConfiguration(
-    commandName: "delete-board",
-    abstract: "Delete a board"
-  )
-
-  @OptionGroup var global: GlobalOptions
-
-  @Option(name: .long, help: "Space ID")
-  var spaceId: Int
-
-  @Option(name: .long, help: "Board ID")
-  var id: Int
-
-  func run() async throws {
-    let client = try await global.makeClient()
-    let deletedId = try await client.deleteBoard(
-      spaceId: spaceId,
-      id: id
-    )
-    print("{\"id\": \(deletedId)}")
-  }
-}

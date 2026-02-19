@@ -112,6 +112,7 @@ A developer requests all spaces and boards — for navigation.
   - **Nullable and required strictly per the real API** — verify through requests, not just docs.
   - **Cross-checking is mandatory** — for any spec change, compare with documentation + verify against the real API. Documentation parsing guide: [docs/kaiten-docs-parsing.md](../../docs/kaiten-docs-parsing.md).
 - **FR-010**: SDK MUST support ALL query parameters documented in the Kaiten API for every endpoint in the spec. No subset, no phasing — every filter the API accepts MUST be present in the OpenAPI spec and exposed in the SDK's public API with backward-compatible optional defaults.
+- **FR-011**: SDK MUST NOT expose destructive delete operations for spaces, boards, and lanes.
 
 ### Non-Functional Requirements
 
