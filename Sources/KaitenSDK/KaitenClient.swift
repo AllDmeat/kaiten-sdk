@@ -18,8 +18,9 @@ public struct KaitenClient: Sendable {
   ///   - transport: Custom `ClientTransport` implementation.
   /// - Throws: ``KaitenError/invalidURL(_:)`` if `baseURL` cannot be parsed.
   init(baseURL: String, token: String, transport: any ClientTransport) throws(KaitenError) {
-    let url = try URL(string: baseURL)
-      .orThrow(KaitenError.invalidURL(baseURL))
+    guard let url = URL(string: baseURL) else {
+      throw KaitenError.invalidURL(baseURL)
+    }
     self.client = Client(
       serverURL: url,
       transport: transport,
@@ -37,8 +38,9 @@ public struct KaitenClient: Sendable {
   ///   - token: API bearer token.
   /// - Throws: ``KaitenError/invalidURL(_:)`` if `baseURL` cannot be parsed.
   public init(baseURL: String, token: String) throws(KaitenError) {
-    let url = try URL(string: baseURL)
-      .orThrow(KaitenError.invalidURL(baseURL))
+    guard let url = URL(string: baseURL) else {
+      throw KaitenError.invalidURL(baseURL)
+    }
 
     self.client = Client(
       serverURL: url,
@@ -1564,15 +1566,6 @@ extension KaitenClient {
       response.toCase(), notFoundResource: ("externalLink", linkId)
     ) { try $0.json }
     return result.id
-  }
-}
-
-// MARK: - Helpers
-
-extension Optional {
-  func orThrow(_ error: @autoclosure () -> KaitenError) throws(KaitenError) -> Wrapped {
-    guard let self else { throw error() }
-    return self
   }
 }
 
