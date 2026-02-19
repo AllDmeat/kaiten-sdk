@@ -31,8 +31,9 @@ struct RetryMiddleware: ClientMiddleware {
   ) async throws -> (HTTPResponse, HTTPBody?) {
     var lastError: (any Error)?
     var lastRetryAfter: TimeInterval?
+    let attempts = isRetryableMethod(request.method) ? maxAttempts : 1
 
-    for attempt in 0..<maxAttempts {
+    for attempt in 0..<attempts {
       let response: HTTPResponse
       let responseBody: HTTPBody?
 
@@ -41,7 +42,7 @@ struct RetryMiddleware: ClientMiddleware {
       } catch {
         // Network error — retry with backoff
         lastError = error
-        if attempt < maxAttempts - 1 {
+        if attempt < attempts - 1 {
           try await sleep(backoffDelay(attempt: attempt))
           continue
         }
@@ -57,7 +58,7 @@ struct RetryMiddleware: ClientMiddleware {
           .flatMap(TimeInterval.init)
           ?? backoffDelay(attempt: attempt)
         lastRetryAfter = retryAfter
-        if attempt < maxAttempts - 1 {
+        if attempt < attempts - 1 {
           try await sleep(retryAfter)
           continue
         }
@@ -65,7 +66,7 @@ struct RetryMiddleware: ClientMiddleware {
       }
 
       if (500...599).contains(statusCode) {
-        if attempt < maxAttempts - 1 {
+        if attempt < attempts - 1 {
           try await sleep(backoffDelay(attempt: attempt))
           continue
         }
@@ -91,5 +92,9 @@ struct RetryMiddleware: ClientMiddleware {
 
   private func sleep(_ duration: TimeInterval) async throws {
     try await Task.sleep(for: .seconds(duration))
+  }
+
+  private func isRetryableMethod(_ method: HTTPRequest.Method) -> Bool {
+    method == .get || method == .head
   }
 }

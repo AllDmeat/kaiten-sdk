@@ -162,4 +162,24 @@ struct RetryMiddlewareTests {
     #expect(response.status == .notFound)
     #expect(callCount.withLock { $0 } == 1)
   }
+
+  @Test("POST requests are not retried on 5xx")
+  func postNotRetriedOnServerError() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
+    let callCount = Mutex(0)
+
+    await #expect(throws: KaitenError.self) {
+      _ = try await middleware.intercept(
+        HTTPRequest(method: .post, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+        body: HTTPBody("{}"),
+        baseURL: URL(string: "https://test.kaiten.ru")!,
+        operationID: "test"
+      ) { _, _, _ in
+        callCount.withLock { $0 += 1 }
+        return (HTTPResponse(status: .internalServerError), nil)
+      }
+    }
+
+    #expect(callCount.withLock { $0 } == 1)
+  }
 }
