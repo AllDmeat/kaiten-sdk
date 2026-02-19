@@ -228,6 +228,6 @@ struct RemoveChecklistItem: AsyncParsableCommand {
       checklistId: checklistId,
       itemId: itemId
     )
-    print(deletedId)
+    try printJSON(["id": deletedId])
   }
 }

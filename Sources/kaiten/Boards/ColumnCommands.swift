@@ -89,7 +89,7 @@ struct DeleteColumn: AsyncParsableCommand {
       boardId: boardId,
       id: id
     )
-    print("{\"id\": \(deletedId)}")
+    try printJSON(["id": deletedId])
   }
 }
 
@@ -195,6 +195,6 @@ struct DeleteSubcolumn: AsyncParsableCommand {
       columnId: columnId,
       id: id
     )
-    print("{\"id\": \(deletedId)}")
+    try printJSON(["id": deletedId])
   }
 }
