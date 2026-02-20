@@ -31,4 +31,18 @@ struct CLIValidationTests {
       _ = try parseLaneCondition(999)
     }
   }
+
+  @Test("Column type parser rejects unknown value")
+  func columnTypeRejectsUnknown() {
+    #expect(throws: ValidationError.self) {
+      _ = try parseColumnType(999)
+    }
+  }
+
+  @Test("Integer CSV parser rejects invalid token")
+  func integerCSVRejectsInvalidToken() {
+    #expect(throws: ValidationError.self) {
+      _ = try parseIntegerCSV("1,abc", fieldName: "ids")
+    }
+  }
 }

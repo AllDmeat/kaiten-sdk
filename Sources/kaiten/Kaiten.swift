@@ -89,13 +89,7 @@ struct GlobalOptions: ParsableArguments {
 
   func makeClient() async throws -> KaitenClient {
     let configPath = Self.configPath
-
-    let providers: [ConfigProvider] = [
-      (try? await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))) as ConfigProvider?
-    ].compactMap { $0 }
-
-    // If no config file exists, don't create ConfigReader — rely on CLI flags (#81)
-    let config: ConfigReader? = providers.isEmpty ? nil : ConfigReader(providers: providers)
+    let config = try await Self.loadConfigReader(configPath: configPath)
 
     guard let baseURL = url ?? config?.string(forKey: "url") else {
       throw ValidationError(
@@ -114,6 +108,19 @@ struct GlobalOptions: ParsableArguments {
     let home = FileManager.default.homeDirectoryForCurrentUser
     return home.appendingPathComponent(".config/kaiten/config.json").path
   }
+
+  private static func loadConfigReader(configPath: String) async throws -> ConfigReader? {
+    guard FileManager.default.fileExists(atPath: configPath) else { return nil }
+
+    do {
+      let provider = try await FileProvider<JSONSnapshot>(filePath: FilePath(configPath))
+      return ConfigReader(providers: [provider])
+    } catch {
+      throw ValidationError(
+        "Failed to read configuration at \(configPath): \(error.localizedDescription)"
+      )
+    }
+  }
 }
 
 // MARK: - Helpers
@@ -123,4 +130,30 @@ func printJSON(_ value: some Encodable) throws {
   encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
   let data = try encoder.encode(value)
   print(String(decoding: data, as: UTF8.self))
+}
+
+func parseIntegerCSV(_ rawValue: String?, fieldName: String) throws -> [Int]? {
+  guard let rawValue else { return nil }
+  var result: [Int] = []
+  for token in rawValue.split(separator: ",", omittingEmptySubsequences: false) {
+    let trimmed = token.trimmingCharacters(in: .whitespaces)
+    guard let value = Int(trimmed) else {
+      throw ValidationError("Invalid \(fieldName) value: '\(trimmed)'")
+    }
+    result.append(value)
+  }
+  return result
+}
+
+func parseStringCSV(_ rawValue: String?, fieldName: String) throws -> [String]? {
+  guard let rawValue else { return nil }
+  var result: [String] = []
+  for token in rawValue.split(separator: ",", omittingEmptySubsequences: false) {
+    let trimmed = token.trimmingCharacters(in: .whitespaces)
+    guard !trimmed.isEmpty else {
+      throw ValidationError("Invalid \(fieldName) value: empty token")
+    }
+    result.append(trimmed)
+  }
+  return result
 }

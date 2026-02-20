@@ -1,6 +1,16 @@
 import ArgumentParser
 import KaitenSDK
 
+func parseColumnType(_ rawValue: Int?) throws -> ColumnType? {
+  guard let rawValue else { return nil }
+  guard let type = ColumnType(rawValue: rawValue) else {
+    throw ValidationError(
+      "Invalid column type: \(rawValue). Allowed values: 1 (queue), 2 (in progress), 3 (done)"
+    )
+  }
+  return type
+}
+
 struct CreateColumn: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "create-column",
@@ -27,7 +37,7 @@ struct CreateColumn: AsyncParsableCommand {
       boardId: boardId,
       title: title,
       sortOrder: sortOrder,
-      type: columnType.flatMap(ColumnType.init(rawValue:))
+      type: try parseColumnType(columnType)
     )
     try printJSON(column)
   }
@@ -63,7 +73,7 @@ struct UpdateColumn: AsyncParsableCommand {
       id: id,
       title: title,
       sortOrder: sortOrder,
-      type: columnType.flatMap(ColumnType.init(rawValue:))
+      type: try parseColumnType(columnType)
     )
     try printJSON(column)
   }
