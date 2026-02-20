@@ -87,11 +87,15 @@ A developer requests all spaces and boards — for navigation.
 - What happens on a network error (timeout, DNS)? → typed error, no crash
 - What if the API returns unknown fields? → they are ignored (forward compatibility)
 - What if the API returns 429 (rate limit)? → automatic retry with delay via `Task.retrying`
+- What if a request is cancelled by caller task? → cancellation MUST propagate as cancellation; it MUST NOT be converted to a network error
 - What if a custom property has an unknown type? → stored as raw value
 - What if `baseURL` uses a non-HTTPS scheme? → initialization MUST fail with a typed error
+- What if `baseURL` is HTTPS but has no host (or is otherwise non-absolute)? → initialization MUST fail with a typed error
 - What if list endpoints return HTTP 200 with malformed/partial payloads? → MUST throw a typed decoding/network error, MUST NOT silently return an empty list
 - What if pagination inputs are invalid (`offset < 0`, `limit <= 0`, or above API max)? → MUST fail fast with a typed validation error
 - What if retry headers request very large waits? → retry delay MUST be bounded; long waits MUST be surfaced to caller via typed rate-limit error
+- What if an endpoint returns HTTP 400 (bad request)? → SDK MUST surface a dedicated typed client-side validation/request error, not a generic unexpected-response error
+- What if auto-pagination receives a short page before completion? → pagination progression MUST use server/page semantics and MUST NOT assume `offset += requestedLimit`
 
 ## Requirements
 
@@ -120,6 +124,11 @@ A developer requests all spaces and boards — for navigation.
 - **FR-012**: SDK MUST enforce secure transport for API authentication. `baseURL` MUST use `https`; non-HTTPS URLs MUST fail during initialization with a typed error.
 - **FR-013**: SDK list methods MUST NOT convert unexpected successful-response parsing failures into empty results. Empty list fallback is allowed only for explicitly confirmed empty response bodies.
 - **FR-014**: SDK MUST validate pagination inputs for list methods. Invalid values (`offset < 0`, `limit <= 0`, or values above documented endpoint caps) MUST fail fast with typed validation errors.
+- **FR-015**: SDK async APIs MUST preserve cooperative cancellation semantics. If the caller task is cancelled, the SDK MUST propagate cancellation and MUST NOT remap it into `.networkError`.
+- **FR-016**: SDK auto-pagination helpers MUST advance offsets using page semantics from returned data (server-provided next position when available, otherwise `offset + page.items.count`). Fixed-step advancement by requested page size is forbidden.
+- **FR-017**: SDK initialization MUST validate that `baseURL` is an absolute HTTPS URL with a non-empty host component.
+- **FR-018**: SDK response mapping MUST preserve documented client error classes. HTTP 400 responses MUST map to a dedicated typed error case and MUST NOT be downgraded to generic unexpected/undocumented errors.
+- **FR-019**: SDK methods exposing `limit`/`offset` for users, card types, and sprints MUST enforce documented endpoint caps locally with typed validation errors before network calls.
 
 ### Non-Functional Requirements
 
@@ -183,3 +192,5 @@ A developer creates a new comment on a card with markdown text.
 - **SC-002**: SDK compiles without errors on macOS (ARM) and Linux (x86-64 and ARM) in CI
 - **SC-003**: All P1 user stories are covered by tests
 - **SC-004**: Adding a new endpoint = adding it to the OpenAPI spec (code is regenerated automatically)
+- **SC-005**: Cancellation-focused tests confirm cancelled operations are reported as cancellation, not network errors
+- **SC-006**: Auto-pagination tests confirm no item loss/duplication when a page contains fewer than requested items
