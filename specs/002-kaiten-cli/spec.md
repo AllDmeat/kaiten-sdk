@@ -11,7 +11,7 @@
 
 A DevOps engineer or developer uses the CLI to access Kaiten data
 without writing code. The CLI is a thin wrapper over the SDK — it
-parses CLI arguments and the config file, assembles a unified set
+parses the `--config` argument and the config file, assembles a unified set
 of parameters, and passes them to the SDK. No business logic.
 
 **Why this priority**: The sole purpose of this feature is to
@@ -28,15 +28,15 @@ stdout confirms it works.
    CLI outputs structured data to stdout.
 2. **Given** a valid config file exists at
    `~/.config/kaiten/config.json`, **When** the user runs
-   a subcommand without flags, **Then** the CLI reads parameters
+   a subcommand without `--config`, **Then** the CLI reads parameters
    from the config file.
-3. **Given** both `--url` and a config file are present with different URLs,
-   **When** the user specifies `--url`, **Then** `--url` takes priority for URL,
-   while token is still read from config only.
-4. **Given** neither flags nor the config file provide a required
+3. **Given** both default and custom config files exist with different values,
+   **When** the user specifies `--config`, **Then** the specified config path
+   takes priority over the default config path.
+4. **Given** neither selected config file nor default config file provide a required
    parameter, **When** the user runs a subcommand, **Then** the
    CLI exits with a clear error message indicating which parameter
-   is missing and where it can be set (flag or config file).
+   is missing and where it can be set (config file).
 5. **Given** the SDK returns an error, **When** the user runs a
    subcommand, **Then** the CLI outputs a human-readable error
    message to stderr and exits with a non-zero exit code.
@@ -60,8 +60,8 @@ stdout confirms it works.
   help and exit with a non-zero code.
 - What if the config file exists but contains invalid JSON? The CLI
   MUST output an error describing the configuration problem.
-- What if the config file does not exist and no flags are passed?
-  The CLI MUST output an error with instructions: pass flags or
+- What if the config file does not exist and no `--config` is passed?
+  The CLI MUST output an error with instructions: pass `--config` or
   create `~/.config/kaiten/config.json`.
 - What if enum-like options are invalid (for example lane condition,
   column type, card state)? The CLI MUST fail with a validation error
@@ -73,19 +73,16 @@ stdout confirms it works.
   or above endpoint max)? The CLI MUST fail locally before calling SDK.
 - What if a command exposes a parameter supported by the SDK (for example lane `rowCount`)?
   The CLI MUST forward the value to the SDK method and MUST NOT ignore it.
-- What if token is passed through process arguments (`--token`)?
+- What if URL/token are passed as direct command-line arguments?
   The CLI MUST reject this input with a clear validation error and instruct
-  the user to use a config file.
-- What if `--token-file` is passed?
-  The CLI MUST reject this input with a clear validation error and instruct
-  the user to use `--config` (or default `~/.config/kaiten/config.json`).
+  the user to provide values via config file only.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: The CLI MUST be a thin wrapper over the SDK with no
-  business logic of its own. The CLI parses arguments and the
+  business logic of its own. The CLI parses the `--config` argument and the
   config file, assembles a unified Input, and passes it to the SDK.
 - **FR-002**: The CLI MUST provide a subcommand for each SDK
   convenience method with corresponding arguments.
@@ -93,9 +90,8 @@ stdout confirms it works.
   to the configuration file path. If omitted, CLI uses the default
   `~/.config/kaiten/config.json`.
 - **FR-003**: The CLI MUST resolve connection parameters in
-   priority order: command-line flags > config file.
-   For URL, `--url` can override config.
-   For token, only config file input is allowed.
+   priority order: explicit `--config` path > default config path.
+   URL and token MUST be read from the selected config file.
    Environment variables are NOT used.
 - **FR-004**: The CLI MUST output structured data to stdout and
   errors to stderr.
@@ -143,9 +139,9 @@ stdout confirms it works.
   Silent dropping via optional coercion is forbidden.
 - **FR-015**: CSV/list-style ID filters MUST use strict token parsing consistently
   across commands (including `list-users --ids`); malformed tokens MUST fail locally.
-- **FR-016**: The CLI MUST NOT accept token input from command-line arguments.
-  `--token` and `--token-file` are forbidden and MUST fail with a validation error.
-  Token input is allowed only via config file (`--config` path or default config path).
+- **FR-016**: The CLI MUST NOT accept URL or token input from command-line arguments.
+  The only supported connection argument is `--config`.
+  URL and token input is allowed only via selected config file (`--config` path or default config path).
 
 ### Non-Functional Requirements
 
@@ -163,7 +159,7 @@ stdout confirms it works.
 ### Measurable Outcomes
 
 - **SC-001**: The CLI can be used in automation scripts — each
-  subcommand accepts all input via flags or config file and
+  subcommand accepts all input via selected config file and
   produces machine-readable output.
 - **SC-002**: The CLI contains no duplication of SDK logic — each
   subcommand only calls the corresponding SDK method.
