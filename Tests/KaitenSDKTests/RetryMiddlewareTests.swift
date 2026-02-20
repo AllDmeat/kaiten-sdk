@@ -278,4 +278,33 @@ struct RetryMiddlewareTests {
     #expect(response.status == .ok)
     #expect(callCount.withLock { $0 } == 2)
   }
+
+  @Test("429 caps very large Retry-After delay")
+  func capsLargeRetryAfter() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 1, baseDelay: 0.01, maxDelay: 2)
+
+    do {
+      _ = try await middleware.intercept(
+        HTTPRequest(method: .get, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+        body: nil,
+        baseURL: URL(string: "https://test.kaiten.ru")!,
+        operationID: "test"
+      ) { _, _, _ in
+        (
+          HTTPResponse(
+            status: .tooManyRequests,
+            headerFields: HTTPFields([
+              HTTPField(name: HTTPField.Name("Retry-After")!, value: "3600")
+            ])), nil
+        )
+      }
+      Issue.record("Expected rateLimited error")
+    } catch let error as KaitenError {
+      guard case .rateLimited(let retryAfter) = error else {
+        Issue.record("Unexpected error: \(error)")
+        return
+      }
+      #expect(retryAfter == 2)
+    }
+  }
 }

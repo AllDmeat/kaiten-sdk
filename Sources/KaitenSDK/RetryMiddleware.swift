@@ -9,14 +9,17 @@ import OpenAPIRuntime
 struct RetryMiddleware: ClientMiddleware {
   private let maxAttempts: Int
   private let baseDelay: TimeInterval
+  private let maxDelay: TimeInterval
 
   /// Creates a retry middleware.
   /// - Parameters:
   ///   - maxAttempts: Maximum number of attempts (default 3).
   ///   - baseDelay: Initial backoff delay in seconds (default 1.0).
-  init(maxAttempts: Int = 3, baseDelay: TimeInterval = 1.0) {
+  ///   - maxDelay: Maximum retry delay in seconds (default 60.0).
+  init(maxAttempts: Int = 3, baseDelay: TimeInterval = 1.0, maxDelay: TimeInterval = 60.0) {
     self.maxAttempts = maxAttempts
     self.baseDelay = baseDelay
+    self.maxDelay = maxDelay
   }
 
   // NOTE: Retrying with the same `body` reference is safe.
@@ -87,7 +90,7 @@ struct RetryMiddleware: ClientMiddleware {
   private func backoffDelay(attempt: Int) -> TimeInterval {
     let exponential = baseDelay * pow(2.0, Double(attempt))
     let jitter = Double.random(in: 0.5...1.5)
-    return exponential * jitter
+    return clampDelay(exponential * jitter)
   }
 
   private func sleep(_ duration: TimeInterval) async throws {
@@ -117,13 +120,13 @@ struct RetryMiddleware: ClientMiddleware {
     if response.headerFields[remainingHeader].flatMap(Int.init) == 0,
       let resetEpoch = response.headerFields[resetHeader].flatMap(TimeInterval.init)
     {
-      return max(0, resetEpoch - Date().timeIntervalSince1970)
+      return clampDelay(max(0, resetEpoch - Date().timeIntervalSince1970))
     }
 
     if let retryAfterRaw = response.headerFields[retryAfterHeader],
       let parsed = parseRetryAfter(retryAfterRaw)
     {
-      return parsed
+      return clampDelay(parsed)
     }
 
     return backoffDelay(attempt: attempt)
@@ -143,5 +146,9 @@ struct RetryMiddleware: ClientMiddleware {
     }
 
     return nil
+  }
+
+  private func clampDelay(_ value: TimeInterval) -> TimeInterval {
+    min(maxDelay, max(0, value))
   }
 }

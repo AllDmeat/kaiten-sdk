@@ -88,4 +88,21 @@ struct ListCardsTests {
       _ = try await client.listCards(boardId: 10)
     }
   }
+
+  @Test("invalid pagination throws invalidPagination")
+  func invalidPagination() async throws {
+    let transport = MockClientTransport.returning(statusCode: 200, body: "[]")
+    let client = try KaitenClient(
+      baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
+
+    await #expect(throws: KaitenError.self) {
+      _ = try await client.listCards(boardId: 10, offset: -1, limit: 100)
+    }
+    await #expect(throws: KaitenError.self) {
+      _ = try await client.listCards(boardId: 10, offset: 0, limit: 0)
+    }
+    await #expect(throws: KaitenError.self) {
+      _ = try await client.listCards(boardId: 10, offset: 0, limit: 101)
+    }
+  }
 }
