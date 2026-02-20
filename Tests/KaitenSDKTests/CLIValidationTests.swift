@@ -45,4 +45,26 @@ struct CLIValidationTests {
       _ = try parseIntegerCSV("1,abc", fieldName: "ids")
     }
   }
+
+  @Test("Global options reject legacy URL/token flags")
+  func globalOptionsRejectLegacyConnectionFlags() {
+    #expect(throws: Error.self) {
+      _ = try GlobalOptions.parse(["--url", "https://company.kaiten.ru/api/latest"])
+    }
+    #expect(throws: Error.self) {
+      _ = try GlobalOptions.parse(["--token", "secret"])
+    }
+    #expect(throws: Error.self) {
+      _ = try GlobalOptions.parse(["--token-file", "/tmp/token"])
+    }
+  }
+
+  @Test("Global options use selected config path")
+  func globalOptionsUseSelectedConfigPath() throws {
+    let explicit = try GlobalOptions.parse(["--config", "/tmp/custom-config.json"])
+    #expect(explicit.selectedConfigPath == "/tmp/custom-config.json")
+
+    let `default` = try GlobalOptions.parse([])
+    #expect(`default`.selectedConfigPath == GlobalOptions.defaultConfigPath)
+  }
 }

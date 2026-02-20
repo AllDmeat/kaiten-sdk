@@ -81,30 +81,31 @@ struct Kaiten: AsyncParsableCommand {
 // MARK: - Global Options
 
 struct GlobalOptions: ParsableArguments {
-  @Option(name: .long, help: "Kaiten API base URL (overrides config file)")
-  var url: String?
+  @Option(name: .long, help: "Path to Kaiten config.json")
+  var config: String?
 
-  @Option(name: .long, help: "Kaiten API token (overrides config file)")
-  var token: String?
+  var selectedConfigPath: String {
+    config ?? Self.defaultConfigPath
+  }
 
   func makeClient() async throws -> KaitenClient {
-    let configPath = Self.configPath
+    let configPath = selectedConfigPath
     let config = try await Self.loadConfigReader(configPath: configPath)
 
-    guard let baseURL = url ?? config?.string(forKey: "url") else {
+    guard let baseURL = config?.string(forKey: "url") else {
       throw ValidationError(
-        "Missing Kaiten API URL. Pass --url or set \"url\" in \(configPath)"
+        "Missing Kaiten API URL. Pass --config <path> or set \"url\" in \(configPath)"
       )
     }
-    guard let apiToken = token ?? config?.string(forKey: "token") else {
+    guard let apiToken = config?.string(forKey: "token") else {
       throw ValidationError(
-        "Missing Kaiten API token. Pass --token or set \"token\" in \(configPath)"
+        "Missing Kaiten API token. Pass --config <path> or set \"token\" in \(configPath)"
       )
     }
     return try KaitenClient(baseURL: baseURL, token: apiToken)
   }
 
-  private static var configPath: String {
+  static var defaultConfigPath: String {
     let home = FileManager.default.homeDirectoryForCurrentUser
     return home.appendingPathComponent(".config/kaiten/config.json").path
   }

@@ -85,19 +85,11 @@ Create `~/.config/kaiten/config.json`:
 }
 ```
 
-Then run commands without flags:
+Then run commands:
 
 ```bash
 kaiten list-spaces
 kaiten get-card --id 123
-```
-
-**Option 2 — Flags** (override config file):
-
-```bash
-kaiten list-spaces \
-  --url "https://your-company.kaiten.ru/api/latest" \
-  --token "your-api-token"
 ```
 
 ## API Reference
@@ -220,7 +212,7 @@ kaiten list-spaces \
 
 The CLI and MCP server share the same config file at `~/.config/kaiten/config.json` (see [Configure Credentials](#2-configure-credentials) above).
 
-The `--url` and `--token` CLI flags take priority over the config file.
+Use `--config` to provide a custom config file path when needed.
 
 ## Error Handling
 
