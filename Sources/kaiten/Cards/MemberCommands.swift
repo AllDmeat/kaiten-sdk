@@ -1,6 +1,13 @@
 import ArgumentParser
 import KaitenSDK
 
+func parseCardMemberRoleType(_ rawValue: Int) throws -> CardMemberRoleType {
+  guard let roleType = CardMemberRoleType(rawValue: rawValue) else {
+    throw ValidationError("Invalid role type: \(rawValue). Allowed values: 2 (responsible)")
+  }
+  return roleType
+}
+
 struct AddCardMember: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "add-card-member",
@@ -41,9 +48,7 @@ struct UpdateCardMemberRole: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    guard let roleType = CardMemberRoleType(rawValue: type) else {
-      throw KaitenError.unexpectedResponse(statusCode: 0)
-    }
+    let roleType = try parseCardMemberRoleType(type)
     let role = try await client.updateCardMemberRole(cardId: cardId, userId: userId, type: roleType)
     try printJSON(role)
   }

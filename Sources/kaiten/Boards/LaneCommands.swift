@@ -1,6 +1,15 @@
 import ArgumentParser
 import KaitenSDK
 
+func parseLaneCondition(_ rawValue: Int?) throws -> LaneCondition? {
+  guard let rawValue else { return nil }
+  guard let condition = LaneCondition(rawValue: rawValue) else {
+    throw ValidationError(
+      "Invalid lane condition: \(rawValue). Allowed values: 1 (live), 2 (archived)")
+  }
+  return condition
+}
+
 struct CreateLane: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "create-lane",
@@ -66,7 +75,8 @@ struct UpdateLane: AsyncParsableCommand {
       id: id,
       title: title,
       sortOrder: sortOrder,
-      condition: condition.flatMap(LaneCondition.init(rawValue:))
+      rowCount: rowCount,
+      condition: try parseLaneCondition(condition)
     )
     try printJSON(lane)
   }

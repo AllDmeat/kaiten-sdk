@@ -1,7 +1,26 @@
 import ArgumentParser
+import Foundation
 import KaitenSDK
 
 // MARK: - Cards
+
+func parseCardStates(_ rawValue: String?) throws -> [CardState]? {
+  guard let rawValue else { return nil }
+  var states: [CardState] = []
+
+  for token in rawValue.split(separator: ",", omittingEmptySubsequences: false) {
+    let trimmed = token.trimmingCharacters(in: .whitespaces)
+    guard !trimmed.isEmpty, let intValue = Int(trimmed), let state = CardState(rawValue: intValue)
+    else {
+      throw ValidationError(
+        "Invalid card state: '\(trimmed)'. Allowed values: 1 (queued), 2 (in progress), 3 (done)"
+      )
+    }
+    states.append(state)
+  }
+
+  return states
+}
 
 struct ListCards: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
@@ -194,9 +213,7 @@ struct ListCards: AsyncParsableCommand {
       excludeOwnerIds: excludeOwnerIds,
       excludeCardIds: excludeCardIds,
       condition: condition.flatMap(CardCondition.init(rawValue:)),
-      states: states?.split(separator: ",").compactMap {
-        Int($0).flatMap(CardState.init(rawValue:))
-      },
+      states: try parseCardStates(states),
       archived: archived,
       asap: asap,
       overdue: overdue,
