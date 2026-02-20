@@ -18,7 +18,10 @@ public struct KaitenClient: Sendable {
   ///   - transport: Custom `ClientTransport` implementation.
   /// - Throws: ``KaitenError/invalidURL(_:)`` if `baseURL` cannot be parsed.
   init(baseURL: String, token: String, transport: any ClientTransport) throws(KaitenError) {
-    guard let url = URL(string: baseURL) else {
+    guard
+      let url = URL(string: baseURL),
+      url.scheme?.lowercased() == "https"
+    else {
       throw KaitenError.invalidURL(baseURL)
     }
     self.client = Client(
@@ -38,7 +41,10 @@ public struct KaitenClient: Sendable {
   ///   - token: API bearer token.
   /// - Throws: ``KaitenError/invalidURL(_:)`` if `baseURL` cannot be parsed.
   public init(baseURL: String, token: String) throws(KaitenError) {
-    guard let url = URL(string: baseURL) else {
+    guard
+      let url = URL(string: baseURL),
+      url.scheme?.lowercased() == "https"
+    else {
       throw KaitenError.invalidURL(baseURL)
     }
 
