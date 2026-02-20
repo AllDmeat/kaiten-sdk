@@ -1,5 +1,6 @@
 import Foundation
 import HTTPTypes
+import OpenAPIRuntime
 import Testing
 
 @testable import KaitenSDK
@@ -70,6 +71,24 @@ struct ListCardsTests {
   @Test("200 with malformed JSON body throws decodingError")
   func malformedJsonThrowsDecodingError() async throws {
     let transport = MockClientTransport.returning(statusCode: 200, body: "[")
+    let client = try KaitenClient(
+      baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
+
+    await #expect(throws: KaitenError.self) {
+      _ = try await client.listCards(boardId: 10)
+    }
+  }
+
+  @Test("200 with stream failure throws instead of returning empty")
+  func streamFailureThrows() async throws {
+    let bodyStream = AsyncThrowingStream<HTTPBody.ByteChunk, any Error> { continuation in
+      continuation.yield(ArraySlice("[".utf8))
+      continuation.finish(throwing: URLError(.networkConnectionLost))
+    }
+    let body = HTTPBody(bodyStream, length: .unknown)
+    let transport = MockClientTransport { _, _, _, _ in
+      (HTTPResponse(status: .ok, headerFields: [.contentType: "application/json"]), body)
+    }
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 

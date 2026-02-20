@@ -97,7 +97,10 @@ public struct KaitenClient: Sendable {
           throw .decodingError(underlying: error)
         }
       }
-      return nil
+      if await isEmptyBody(error.responseBody) {
+        return nil
+      }
+      throw .networkError(underlying: error)
     } catch let error as KaitenError {
       throw error
     } catch {
