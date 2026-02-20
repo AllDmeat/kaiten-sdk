@@ -28,6 +28,9 @@
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
+- [x] Enum help text and parser validation rules are explicitly required to stay aligned
+- [x] CSV/list input validation consistency is explicitly required across commands
+- [x] Secure non-argv token input requirements are explicitly captured
 
 ## Notes
 

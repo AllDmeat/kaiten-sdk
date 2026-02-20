@@ -41,9 +41,16 @@ stdout confirms it works.
    subcommand, **Then** the CLI outputs a human-readable error
    message to stderr and exits with a non-zero exit code.
 6. **Given** invalid CLI filter or pagination input (for example,
-   unknown enum value, malformed CSV IDs, or invalid `offset/limit`),
+    unknown enum value, malformed CSV IDs, or invalid `offset/limit`),
    **When** the user runs a subcommand, **Then** the CLI fails fast
    with a clear validation error and MUST NOT silently drop invalid values.
+7. **Given** a command option mapped to an SDK enum (for example card
+   `position`, `condition`, `textFormatTypeId`), **When** the user passes
+   an unknown raw value, **Then** the CLI MUST fail with a validation
+   error and MUST NOT coerce it to `nil`.
+8. **Given** CLI help text lists allowed enum values, **When** a user
+   passes any value shown in help, **Then** validation MUST accept it;
+   help text and parser-accepted values MUST stay in sync.
 
 ---
 
@@ -66,6 +73,9 @@ stdout confirms it works.
   or above endpoint max)? The CLI MUST fail locally before calling SDK.
 - What if a command exposes a parameter supported by the SDK (for example lane `rowCount`)?
   The CLI MUST forward the value to the SDK method and MUST NOT ignore it.
+- What if token is passed through process arguments (`--token`)?
+  The CLI MUST provide a non-argv secret input mode and documentation MUST
+  recommend secure alternatives to avoid leaking credentials in process lists/history.
 
 ## Requirements *(mandatory)*
 
@@ -117,6 +127,17 @@ stdout confirms it works.
   the mapped SDK method signature. If a CLI option is defined for a
   command (for example lane `rowCount` in update-lane), it MUST be
   forwarded to the SDK call.
+- **FR-013**: CLI MUST keep help text and runtime validation aligned for enum-like options.
+  Any value documented as allowed in help MUST be accepted by validation;
+  stale/mismatched allowed-value lists are forbidden.
+- **FR-014**: For options that map to SDK enums (for example card `position`,
+  `condition`, `textFormatTypeId`), unknown values MUST produce validation errors.
+  Silent dropping via optional coercion is forbidden.
+- **FR-015**: CSV/list-style ID filters MUST use strict token parsing consistently
+  across commands (including `list-users --ids`); malformed tokens MUST fail locally.
+- **FR-016**: The CLI MUST offer a non-argv token input mode (for example stdin or
+  token file) and MUST document it as the preferred approach over `--token` to reduce
+  credential exposure in shell history and process listings.
 
 ### Non-Functional Requirements
 
@@ -125,6 +146,9 @@ stdout confirms it works.
 - **NFR-002**: CLI command source files MUST mirror the SDK/API domain
   grouping from Kaiten documentation (for example: cards, boards,
   spaces, users) while preserving existing command behavior.
+- **NFR-003**: Security-sensitive inputs in CLI UX/documentation MUST follow
+  least-exposure principles. Examples and docs MUST avoid recommending
+  command-line token literals as the primary workflow.
 
 ## Success Criteria *(mandatory)*
 
