@@ -43,9 +43,7 @@ struct ListCustomProperties: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let parsedIds = ids?.split(separator: ",").compactMap {
-      Int($0.trimmingCharacters(in: .whitespaces))
-    }
+    let parsedIds = try parseIntegerCSV(ids, fieldName: "ids")
     let page = try await client.listCustomProperties(
       offset: offset,
       limit: limit,
@@ -116,12 +114,8 @@ struct ListCustomPropertySelectValues: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let parsedIds = ids?.split(separator: ",").compactMap {
-      Int($0.trimmingCharacters(in: .whitespaces))
-    }
-    let parsedConditions = conditions?.split(separator: ",").map {
-      String($0.trimmingCharacters(in: .whitespaces))
-    }
+    let parsedIds = try parseIntegerCSV(ids, fieldName: "ids")
+    let parsedConditions = try parseStringCSV(conditions, fieldName: "conditions")
     let values = try await client.listCustomPropertySelectValues(
       propertyId: propertyId,
       v2SelectSearch: v2SelectSearch,

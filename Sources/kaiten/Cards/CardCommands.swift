@@ -22,6 +22,16 @@ func parseCardStates(_ rawValue: String?) throws -> [CardState]? {
   return states
 }
 
+func parseCardCondition(_ rawValue: Int?) throws -> CardCondition? {
+  guard let rawValue else { return nil }
+  guard let condition = CardCondition(rawValue: rawValue) else {
+    throw ValidationError(
+      "Invalid card condition: \(rawValue). Allowed values: 1 (on board), 2 (archived)"
+    )
+  }
+  return condition
+}
+
 struct ListCards: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "list-cards",
@@ -212,7 +222,7 @@ struct ListCards: AsyncParsableCommand {
       excludeColumnIds: excludeColumnIds,
       excludeOwnerIds: excludeOwnerIds,
       excludeCardIds: excludeCardIds,
-      condition: condition.flatMap(CardCondition.init(rawValue:)),
+      condition: try parseCardCondition(condition),
       states: try parseCardStates(states),
       archived: archived,
       asap: asap,
