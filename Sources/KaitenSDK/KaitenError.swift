@@ -20,6 +20,8 @@ public enum KaitenError: Error, Sendable {
   case decodingError(underlying: any Error)
   /// Invalid pagination parameters were provided.
   case invalidPagination(pageSize: Int)
+  /// Invalid pagination range was provided.
+  case invalidPaginationRange(offset: Int, limit: Int)
   /// The API returned an unexpected HTTP status code.
   case unexpectedResponse(statusCode: Int, body: String? = nil)
 }
@@ -51,6 +53,8 @@ extension KaitenError: LocalizedError {
       "Decoding error: \(underlying.localizedDescription)"
     case .invalidPagination(let pageSize):
       "Invalid pageSize: \(pageSize). pageSize must be greater than 0"
+    case .invalidPaginationRange(let offset, let limit):
+      "Invalid pagination: offset=\(offset), limit=\(limit). offset must be >= 0 and limit must be in 1...100"
     case .unexpectedResponse(let statusCode, let body):
       "Unexpected HTTP response: \(statusCode)" + (body.map { ": \($0)" } ?? "")
     }

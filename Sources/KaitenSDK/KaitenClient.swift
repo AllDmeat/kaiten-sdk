@@ -114,6 +114,12 @@ public struct KaitenClient: Sendable {
     }
   }
 
+  private func validatePagination(offset: Int, limit: Int) throws(KaitenError) {
+    guard offset >= 0, (1...100).contains(limit) else {
+      throw .invalidPaginationRange(offset: offset, limit: limit)
+    }
+  }
+
   private func isEmptyBody(_ body: HTTPBody?) async -> Bool {
     guard let body else { return true }
 
@@ -380,6 +386,7 @@ public struct KaitenClient: Sendable {
     boardId: Int? = nil, columnId: Int? = nil, laneId: Int? = nil, offset: Int = 0,
     limit: Int = 100, filter: CardFilter? = nil
   ) async throws(KaitenError) -> Page<Components.Schemas.Card> {
+    try validatePagination(offset: offset, limit: limit)
     let f = filter
     let queryParams = Operations.get_cards.Input.Query(
       board_id: boardId,
@@ -1038,6 +1045,7 @@ extension KaitenClient {
     orderBy: String? = nil,
     orderDirection: String? = nil
   ) async throws(KaitenError) -> Page<Components.Schemas.CustomProperty> {
+    try validatePagination(offset: offset, limit: limit)
     guard
       let response = try await callList({
         try await client.get_list_of_properties(
@@ -1092,6 +1100,7 @@ extension KaitenClient {
     offset: Int = 0,
     limit: Int = 100
   ) async throws(KaitenError) -> Page<Components.Schemas.CustomPropertySelectValue> {
+    try validatePagination(offset: offset, limit: limit)
     guard
       let response = try await callList({
         try await client.get_list_of_select_values(
