@@ -8,3 +8,10 @@ node = "latest"
 python = "latest"
 "pipx:specify-cli" = "latest"
 swift = "latest"
+
+[tasks.kaiten-docs-install-browsers]
+description = "Install Playwright Chromium browser binaries"
+run = '''
+export NODE_PATH="$(mise where npm:playwright)/lib/node_modules"
+playwright install chromium
+'''
