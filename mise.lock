@@ -1,0 +1,7 @@
+[[tools."pipx:specify-cli"]]
+version = "1.0.0"
+backend = "pipx:specify-cli"
+
+[[tools.swift]]
+version = "6.2.3"
+backend = "core:swift"

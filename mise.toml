@@ -1,6 +1,7 @@
 [settings]
 experimental = true
+lockfile = true
 
 [tools]
 "pipx:specify-cli" = "latest"
-swift = "6.2.3"
+swift = "latest"
