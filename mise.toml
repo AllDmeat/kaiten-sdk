@@ -1,6 +1,17 @@
 [settings]
 experimental = true
+lockfile = true
 
 [tools]
+node = "latest"
+"npm:playwright" = "latest"
+python = "latest"
 "pipx:specify-cli" = "latest"
-swift = "6.2.3"
+swift = "latest"
+
+[tasks.kaiten-docs-install-browsers]
+description = "Install Playwright Chromium browser binaries"
+run = '''
+export NODE_PATH="$(mise where npm:playwright)/lib/node_modules"
+playwright install chromium
+'''

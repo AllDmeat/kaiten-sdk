@@ -222,10 +222,45 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 The real API response is the source of truth. Docs may be incomplete or outdated — the API response shows the actual field names, types, and nullability.
 
 ### 9. Important Notes
-- **Node.js preferred** — Playwright JS is already installed (`require('playwright')`)
+- **Node.js preferred** — use Playwright JS (`require('playwright')`)
 - **One browser, many pages** — don't create a new browser for each URL
 - **wait_for_timeout(2000-3000)** — needed after networkidle for SPA rendering
 - **`--no-sandbox`** — required (running as root)
 - **Never use `document.body.innerText`** — it mixes sidebar nav with content
 - **Selector: `div.MuiBox-root`** — filter by content to find the endpoint div
 - **Exclude sidebar**: check that the div does NOT contain `Create new space` (sidebar marker)
+
+### 10. Troubleshooting (mise + npm:playwright)
+
+When Playwright is installed via `mise` as `npm:playwright`, the `playwright` CLI is available, but `node` may not resolve `require('playwright')` automatically.
+
+Use:
+
+```bash
+export NODE_PATH="$(mise where npm:playwright)/lib/node_modules"
+```
+
+If browser binaries are missing, install at least Chromium:
+
+```bash
+playwright install chromium
+```
+
+For this repository, install browser binaries with:
+
+```bash
+mise run kaiten-docs-install-browsers
+```
+
+Then run dedicated scripts by task:
+
+```bash
+# Parse sidebar/TOC links
+node scripts/kaiten-docs/parse-toc.js https://developers.kaiten.ru
+
+# Parse one endpoint page content
+node scripts/kaiten-docs/parse-endpoint.js https://developers.kaiten.ru/spaces/retrieve-list-of-spaces
+
+# Parse all "Schema" dialogs on an endpoint page
+node scripts/kaiten-docs/parse-schemas.js https://developers.kaiten.ru/spaces/retrieve-list-of-spaces
+```
