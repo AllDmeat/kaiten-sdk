@@ -3,5 +3,7 @@ experimental = true
 lockfile = true
 
 [tools]
+node = "latest"
+"npm:playwright" = "latest"
 "pipx:specify-cli" = "latest"
 swift = "latest"

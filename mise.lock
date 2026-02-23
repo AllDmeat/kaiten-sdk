@@ -1,3 +1,11 @@
+[[tools.node]]
+version = "25.6.1"
+backend = "core:node"
+
+[[tools."npm:playwright"]]
+version = "1.58.2"
+backend = "npm:playwright"
+
 [[tools."pipx:specify-cli"]]
 version = "1.0.0"
 backend = "pipx:specify-cli"
