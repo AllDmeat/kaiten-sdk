@@ -55,7 +55,7 @@ jobs:
           echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.archive-suffix }}
           path: ${{ steps.package.outputs.archive-name }}
