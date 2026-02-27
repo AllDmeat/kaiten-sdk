@@ -4199,8 +4199,13 @@ components:
         id:
           type: integer
           description: Blocker ID
-        reason:
+        uid:
           type: string
+          description: Blocker UID
+        reason:
+          type:
+          - string
+          - 'null'
           description: Block reason
         card_id:
           type: integer
@@ -4210,8 +4215,10 @@ components:
           description: User ID who blocked card
         blocker_card_id:
           type:
-          - string
+          - integer
           - 'null'
+          # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
+          # Verified by direct API call — response contains numeric value.
           description: ID of blocking card
         blocker_card_title:
           type:
@@ -4222,7 +4229,9 @@ components:
           type: boolean
           description: Is block released
         released_by_id:
-          type: integer
+          type:
+          - integer
+          - 'null'
           description: ID of user who released block
         due_date:
           type:
@@ -4238,6 +4247,21 @@ components:
         updated:
           type: string
           description: Last update timestamp
+        blocked_card:
+          allOf:
+          - $ref: '#/components/schemas/Card'
+          nullable: true
+          description: Blocked card info
+        card:
+          allOf:
+          - $ref: '#/components/schemas/Card'
+          nullable: true
+          description: Blocking card info
+        blocker:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          nullable: true
+          description: Info of user who blocked card
     CreateCardBlockerRequest:
       type: object
       properties:
