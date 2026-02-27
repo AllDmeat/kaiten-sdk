@@ -43,7 +43,7 @@ struct CreateCardBlockerTests {
     let blocker = try await client.createCardBlocker(cardId: 42, reason: "Blocked by dependency")
     #expect(blocker.id == 10)
     #expect(blocker.reason == "Blocked by dependency")
-    #expect(blocker.blockerCardId == nil)
+    #expect(blocker.blocker_card_id == nil)
   }
 
   @Test("200 returns CardBlocker with blocker_card_id as integer (not string)")
@@ -74,7 +74,7 @@ struct CreateCardBlockerTests {
     let blocker = try await client.createCardBlocker(cardId: 42, blockerCardId: 99)
     #expect(blocker.id == 11)
     #expect(blocker.reason == nil)
-    #expect(blocker.blockerCardId == 99)
+    #expect(blocker.blocker_card_id == 99)
 
     let payload = try await bodyString(transport.recordedRequests[0].body)
     let payloadObject =
