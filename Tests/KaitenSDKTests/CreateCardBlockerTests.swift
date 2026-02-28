@@ -76,7 +76,8 @@ struct CreateCardBlockerTests {
     #expect(blocker.reason == nil)
     #expect(blocker.blocker_card_id == 99)
 
-    let payload = try await bodyString(transport.recordedRequests[0].body)
+    let recorded = try #require(transport.recordedRequests[safe: 0])
+    let payload = try await bodyString(recorded.body)
     let payloadObject =
       try JSONSerialization.jsonObject(with: Data(payload.utf8)) as? [String: Any]
     #expect(payloadObject?["blocker_card_id"] as? Int == 99)
