@@ -48,7 +48,7 @@
 /// ```swift
 /// planned_start: plannedStart.map { $0.map(NullableString.value) ?? .null }
 /// ```
-public enum NullableString: Codable, Hashable, Sendable {
+public enum ExplicitNullString: Codable, Hashable, Sendable {
   /// A non-null string value.
   case value(String)
   /// An explicit JSON `null` — signals the server to clear the field.
@@ -74,7 +74,7 @@ public enum NullableString: Codable, Hashable, Sendable {
   }
 }
 
-extension NullableString: ExpressibleByStringLiteral {
+extension ExplicitNullString: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     self = .value(value)
   }

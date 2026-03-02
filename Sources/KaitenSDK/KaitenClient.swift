@@ -562,7 +562,7 @@ public struct KaitenClient: Sendable {
   ///     - `nil` (default): field omitted — server leaves value unchanged.
   ///     - `.some(nil)`: field sent as JSON `null` — server clears the value.
   ///     - `.some("2026-03-10")`: field sent as ISO 8601 string — server sets the value.
-  ///     See ``NullableString`` for implementation details.
+  ///     See ``ExplicitNullString`` for implementation details.
   ///   - plannedEnd: Planned end date. Same three-state semantics as `plannedStart`.
   ///   - properties: Custom properties object.
   /// - Returns: The updated card.
@@ -618,12 +618,12 @@ public struct KaitenClient: Sendable {
       owner_email: ownerEmail,
       prev_card_id: prevCardId,
       estimate_workload: estimateWorkload,
-      // Map String?? → NullableString?:
+      // Map String?? → ExplicitNullString?:
       //   nil          → nil          (field omitted from JSON, server leaves value unchanged)
       //   .some(nil)   → .some(.null) (field sent as JSON null, server clears the value)
       //   .some("x")   → .some(.value("x")) (field sent as string, server sets the value)
-      planned_start: plannedStart.map { $0.map(NullableString.value) ?? .null },
-      planned_end: plannedEnd.map { $0.map(NullableString.value) ?? .null },
+      planned_start: plannedStart.map { $0.map(ExplicitNullString.value) ?? .null },
+      planned_end: plannedEnd.map { $0.map(ExplicitNullString.value) ?? .null },
       properties: properties
     )
     let response = try await call {

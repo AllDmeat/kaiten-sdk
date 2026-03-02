@@ -3,8 +3,8 @@ import Testing
 
 @testable import KaitenSDK
 
-@Suite("NullableString")
-struct NullableStringTests {
+@Suite("ExplicitNullString")
+struct ExplicitNullStringTests {
 
   private let encoder = JSONEncoder()
   private let decoder = JSONDecoder()
@@ -13,14 +13,14 @@ struct NullableStringTests {
 
   @Test("encodes .value as JSON string")
   func encodeValue() throws {
-    let data = try encoder.encode(NullableString.value("2026-03-10"))
+    let data = try encoder.encode(ExplicitNullString.value("2026-03-10"))
     let json = String(data: data, encoding: .utf8)
     #expect(json == "\"2026-03-10\"")
   }
 
   @Test("encodes .null as JSON null")
   func encodeNull() throws {
-    let data = try encoder.encode(NullableString.null)
+    let data = try encoder.encode(ExplicitNullString.null)
     let json = String(data: data, encoding: .utf8)
     #expect(json == "null")
   }
@@ -28,7 +28,7 @@ struct NullableStringTests {
   @Test("optional .some(.value) encodes as string when wrapped in container")
   func encodeOptionalValue() throws {
     struct Wrapper: Encodable {
-      let field: NullableString?
+      let field: ExplicitNullString?
     }
     let data = try encoder.encode(Wrapper(field: .value("hello")))
     let json = String(data: data, encoding: .utf8)!
@@ -39,7 +39,7 @@ struct NullableStringTests {
   @Test("optional .some(.null) encodes as explicit null in container")
   func encodeOptionalNull() throws {
     struct Wrapper: Encodable {
-      let field: NullableString?
+      let field: ExplicitNullString?
     }
     let data = try encoder.encode(Wrapper(field: .null))
     let json = String(data: data, encoding: .utf8)!
@@ -51,7 +51,7 @@ struct NullableStringTests {
   @Test("optional nil omits key from container")
   func encodeOptionalNilOmitsKey() throws {
     struct Wrapper: Encodable {
-      let field: NullableString?
+      let field: ExplicitNullString?
     }
     let data = try encoder.encode(Wrapper(field: nil))
     let json = String(data: data, encoding: .utf8)!
@@ -64,14 +64,14 @@ struct NullableStringTests {
   @Test("decodes JSON string as .value")
   func decodeValue() throws {
     let data = Data("\"2026-03-10\"".utf8)
-    let result = try decoder.decode(NullableString.self, from: data)
+    let result = try decoder.decode(ExplicitNullString.self, from: data)
     #expect(result == .value("2026-03-10"))
   }
 
   @Test("decodes JSON null as .null")
   func decodeNull() throws {
     let data = Data("null".utf8)
-    let result = try decoder.decode(NullableString.self, from: data)
+    let result = try decoder.decode(ExplicitNullString.self, from: data)
     #expect(result == .null)
   }
 
@@ -79,17 +79,17 @@ struct NullableStringTests {
 
   @Test("round-trip .value")
   func roundTripValue() throws {
-    let original = NullableString.value("2026-12-31")
+    let original = ExplicitNullString.value("2026-12-31")
     let data = try encoder.encode(original)
-    let decoded = try decoder.decode(NullableString.self, from: data)
+    let decoded = try decoder.decode(ExplicitNullString.self, from: data)
     #expect(decoded == original)
   }
 
   @Test("round-trip .null")
   func roundTripNull() throws {
-    let original = NullableString.null
+    let original = ExplicitNullString.null
     let data = try encoder.encode(original)
-    let decoded = try decoder.decode(NullableString.self, from: data)
+    let decoded = try decoder.decode(ExplicitNullString.self, from: data)
     #expect(decoded == original)
   }
 
@@ -97,7 +97,7 @@ struct NullableStringTests {
 
   @Test("string literal creates .value")
   func stringLiteral() {
-    let ns: NullableString = "hello"
+    let ns: ExplicitNullString = "hello"
     #expect(ns == .value("hello"))
   }
 }
