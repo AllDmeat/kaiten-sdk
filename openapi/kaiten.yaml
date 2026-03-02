@@ -3217,8 +3217,8 @@ components:
           type: boolean
           description: User activated flag
         ui_version:
-          type: string
-          description: 1 - old ui. 2 - new ui
+          type: integer
+          description: 1 - old ui, 2 - new ui
         virtual:
           type: boolean
           description: Virtual user flag
