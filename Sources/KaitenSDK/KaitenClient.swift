@@ -558,11 +558,12 @@ public struct KaitenClient: Sendable {
   ///   - ownerEmail: Owner email address.
   ///   - prevCardId: Previous card ID for repositioning.
   ///   - estimateWorkload: Estimated workload.
-  ///   - plannedStart: Planned start date in ISO 8601 format. Pass `nil` (default) to leave unchanged.
-  ///     Note: `String?` is used intentionally — consistent with other nullable fields in this SDK
-  ///     (e.g. `dueDate`, `description`). Null-clearing via `String??` is not supported.
-  ///   - plannedEnd: Planned end date in ISO 8601 format. Pass `nil` (default) to leave unchanged.
-  ///     Note: same as `plannedStart` — `String?`, not `String??`.
+  ///   - plannedStart: Planned start date. Supports three states via `String??`:
+  ///     - `nil` (default): field omitted — server leaves value unchanged.
+  ///     - `.some(nil)`: field sent as JSON `null` — server clears the value.
+  ///     - `.some("2026-03-10")`: field sent as ISO 8601 string — server sets the value.
+  ///     See ``ExplicitNullString`` for implementation details.
+  ///   - plannedEnd: Planned end date. Same three-state semantics as `plannedStart`.
   ///   - properties: Custom properties object.
   /// - Returns: The updated card.
   /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
@@ -590,8 +591,8 @@ public struct KaitenClient: Sendable {
     ownerEmail: String? = nil,
     prevCardId: Int? = nil,
     estimateWorkload: Double? = nil,
-    plannedStart: String? = nil,
-    plannedEnd: String? = nil,
+    plannedStart: String?? = nil,
+    plannedEnd: String?? = nil,
     properties: Components.Schemas.UpdateCardRequest.propertiesPayload? = nil
   ) async throws(KaitenError) -> Components.Schemas.Card {
     let body = Components.Schemas.UpdateCardRequest(
@@ -617,8 +618,12 @@ public struct KaitenClient: Sendable {
       owner_email: ownerEmail,
       prev_card_id: prevCardId,
       estimate_workload: estimateWorkload,
-      planned_start: plannedStart,
-      planned_end: plannedEnd,
+      // Map String?? → ExplicitNullString?:
+      //   nil          → nil          (field omitted from JSON, server leaves value unchanged)
+      //   .some(nil)   → .some(.null) (field sent as JSON null, server clears the value)
+      //   .some("x")   → .some(.value("x")) (field sent as string, server sets the value)
+      planned_start: plannedStart.map { $0.map(ExplicitNullString.value) ?? .null },
+      planned_end: plannedEnd.map { $0.map(ExplicitNullString.value) ?? .null },
       properties: properties
     )
     let response = try await call {

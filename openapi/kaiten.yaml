@@ -3826,19 +3826,24 @@ components:
           minimum: 0
           description: Card estimate workload
         planned_start:
-          type:
-          - string
-          - 'null'
-          description: Planned start date in ISO 8601 format (null to clear)
+          $ref: '#/components/schemas/NullableString'
+          description: Planned start date in ISO 8601 format (null to clear, absent to leave unchanged)
         planned_end:
-          type:
-          - string
-          - 'null'
-          description: Planned end date in ISO 8601 format (null to clear)
+          $ref: '#/components/schemas/NullableString'
+          description: Planned end date in ISO 8601 format (null to clear, absent to leave unchanged)
         properties:
           type: object
           additionalProperties: true
           description: "Custom properties. Format: 'id_{custom_property_id}: value'. Pass null to remove."
+    NullableString:
+      description: >
+        A string that supports three distinct states when used in a PATCH request body:
+        absent (field omitted — leave unchanged), null (field cleared), or a string value (field set).
+        The generated Swift property is NullableString? — the outer optional handles absent vs present,
+        while the enum itself distinguishes null from a string value.
+      type:
+        - string
+        - 'null'
     CardBoardSummary:
       type: object
       # Kaiten docs (Schema button on GET /cards) show full Board here,

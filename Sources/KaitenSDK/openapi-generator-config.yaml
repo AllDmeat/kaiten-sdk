@@ -3,3 +3,12 @@ generate:
   - client
 accessModifier: public
 additionalImports: []
+# typeOverrides replaces the generated Swift type for the NullableString schema with our
+# hand-written ExplicitNullString enum (Sources/KaitenSDK/ExplicitNullString.swift).
+# This enables three-state encoding in PATCH request bodies:
+#   - NullableString? == nil       → field absent from JSON (server leaves value unchanged)
+#   - NullableString? == .some(.null)        → field encoded as JSON null (server clears value)
+#   - NullableString? == .some(.value("x"))  → field encoded as string (server sets value)
+typeOverrides:
+  schemas:
+    NullableString: ExplicitNullString
