@@ -422,14 +422,26 @@ struct UpdateCard: AsyncParsableCommand {
   @Option(name: .long, help: "Estimate workload")
   var estimateWorkload: Double?
 
-  @Option(name: .long, help: "Planned start date (ISO 8601)")
+  @Option(
+    name: .long,
+    help: "Planned start date (ISO 8601). Pass empty string \"\" to clear the value."
+  )
   var plannedStart: String?
 
-  @Option(name: .long, help: "Planned end date (ISO 8601)")
+  @Option(
+    name: .long,
+    help: "Planned end date (ISO 8601). Pass empty string \"\" to clear the value."
+  )
   var plannedEnd: String?
 
   func run() async throws {
     let client = try await global.makeClient()
+    // Map String? → String??:
+    //   nil (not passed)  → nil         (omit field, server leaves value unchanged)
+    //   ""  (empty)       → .some(nil)  (send JSON null, server clears the value)
+    //   "date"            → .some("date") (send string, server sets the value)
+    let plannedStartArg: String?? = plannedStart.map { $0.isEmpty ? nil : $0 }
+    let plannedEndArg: String?? = plannedEnd.map { $0.isEmpty ? nil : $0 }
     let card = try await client.updateCard(
       id: id,
       title: title,
@@ -453,8 +465,8 @@ struct UpdateCard: AsyncParsableCommand {
       ownerEmail: ownerEmail,
       prevCardId: prevCardId,
       estimateWorkload: estimateWorkload,
-      plannedStart: plannedStart,
-      plannedEnd: plannedEnd
+      plannedStart: plannedStartArg,
+      plannedEnd: plannedEndArg
     )
     try printJSON(card)
   }
