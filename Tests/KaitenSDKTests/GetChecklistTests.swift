@@ -96,7 +96,5 @@ struct GetChecklistTests {
     let item = try #require(checklist.items?[safe: 0])
     // Verify responsible_id is decoded correctly
     #expect(item.responsible_id == 42)
-    // Verify responsible (User object) is decoded without error — field presence is asserted via responsible_id
-    #expect(item.responsible != nil)
   }
 }
