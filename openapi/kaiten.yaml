@@ -3825,6 +3825,16 @@ components:
           type: number
           minimum: 0
           description: Card estimate workload
+        planned_start:
+          type:
+          - string
+          - 'null'
+          description: Planned start date in ISO 8601 format (null to clear)
+        planned_end:
+          type:
+          - string
+          - 'null'
+          description: Planned end date in ISO 8601 format (null to clear)
         properties:
           type: object
           additionalProperties: true
