@@ -422,6 +422,12 @@ struct UpdateCard: AsyncParsableCommand {
   @Option(name: .long, help: "Estimate workload")
   var estimateWorkload: Double?
 
+  @Option(name: .long, help: "Planned start date (ISO 8601)")
+  var plannedStart: String?
+
+  @Option(name: .long, help: "Planned end date (ISO 8601)")
+  var plannedEnd: String?
+
   func run() async throws {
     let client = try await global.makeClient()
     let card = try await client.updateCard(
@@ -446,7 +452,9 @@ struct UpdateCard: AsyncParsableCommand {
       textFormatTypeId: textFormatTypeId.flatMap(TextFormatType.init(rawValue:)),
       ownerEmail: ownerEmail,
       prevCardId: prevCardId,
-      estimateWorkload: estimateWorkload
+      estimateWorkload: estimateWorkload,
+      plannedStart: plannedStart,
+      plannedEnd: plannedEnd
     )
     try printJSON(card)
   }
