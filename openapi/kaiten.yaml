@@ -3218,6 +3218,8 @@ components:
           description: User activated flag
         ui_version:
           type: integer
+          # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
+          # Verified by direct API call — response contains numeric value (e.g. 2).
           description: 1 - old ui, 2 - new ui
         virtual:
           type: boolean
