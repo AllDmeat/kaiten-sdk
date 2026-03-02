@@ -558,8 +558,11 @@ public struct KaitenClient: Sendable {
   ///   - ownerEmail: Owner email address.
   ///   - prevCardId: Previous card ID for repositioning.
   ///   - estimateWorkload: Estimated workload.
-  ///   - plannedStart: Planned start date in ISO 8601 format (pass `nil` wrapped in `.some(nil)` to clear).
-  ///   - plannedEnd: Planned end date in ISO 8601 format (pass `nil` wrapped in `.some(nil)` to clear).
+  ///   - plannedStart: Planned start date in ISO 8601 format. Pass `nil` (default) to leave unchanged.
+  ///     Note: `String?` is used intentionally — consistent with other nullable fields in this SDK
+  ///     (e.g. `dueDate`, `description`). Null-clearing via `String??` is not supported.
+  ///   - plannedEnd: Planned end date in ISO 8601 format. Pass `nil` (default) to leave unchanged.
+  ///     Note: same as `plannedStart` — `String?`, not `String??`.
   ///   - properties: Custom properties object.
   /// - Returns: The updated card.
   /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
