@@ -3542,6 +3542,11 @@ components:
           - $ref: '#/components/schemas/User'
           - type: 'null'
           description: User who checked checklist item
+        responsible:
+          oneOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: User who is responsible for checklist item
         created:
           type: string
           description: Create date
