@@ -3540,15 +3540,11 @@ components:
           type: string
           description: Full-text search version
         checked_by:
-          oneOf:
-          - $ref: '#/components/schemas/User'
-          - type: 'null'
           description: User who checked checklist item
+          $ref: '#/components/schemas/User'
         responsible:
-          oneOf:
-          - $ref: '#/components/schemas/User'
-          - type: 'null'
           description: User who is responsible for checklist item
+          $ref: '#/components/schemas/User'
         created:
           type: string
           description: Create date
