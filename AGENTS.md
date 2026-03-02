@@ -62,6 +62,24 @@ Detailed guide for parsing Kaiten API documentation: [docs/kaiten-docs-parsing.m
 
 Do not modify the spec based on guesses or empirical data. Only based on documentation.
 
+### Annotating Discrepancies Between Docs and Actual API
+
+When the actual Kaiten API returns a value of a type **different** from what the official documentation declares, you **must** leave a comment in `openapi/kaiten.yaml` next to the affected field:
+
+```yaml
+field_name:
+  type: integer
+  # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
+  # Verified by direct API call — response contains numeric value (e.g. 2).
+  description: ...
+```
+
+Known examples already annotated:
+- `CardBlocker.blocker_card_id` — documented as `string`, actual API returns `integer`
+- `MemberDetailed.ui_version` — documented as `string`, actual API returns `integer`
+
+This prevents future contributors from re-introducing the same bug.
+
 ## Code Formatting
 
 This project uses [swift-format](https://github.com/swiftlang/swift-format) (bundled with the Swift toolchain) with default configuration.
