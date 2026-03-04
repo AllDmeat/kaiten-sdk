@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-${{ matrix.os }}-spm-${{ hashFiles('Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-spm-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
 
       - name: Resolve package dependencies
         if: steps.cache-spm.outputs.cache-hit != 'true'
@@ -112,10 +112,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          $binPath = "${{ steps.build.outputs.bin-path }}"
+          Remove-Item "$binPath\*.dll" -ErrorAction SilentlyContinue
           $swiftBin = Split-Path (Get-Command swift.exe).Source
           Write-Host "Copying Swift DLLs from $swiftBin"
           Get-ChildItem "$swiftBin\*.dll" | ForEach-Object {
-            Copy-Item $_.FullName -Destination "${{ steps.build.outputs.bin-path }}"
+            Copy-Item $_.FullName -Destination $binPath
             Write-Host "  Copied: $($_.Name)"
           }
 
