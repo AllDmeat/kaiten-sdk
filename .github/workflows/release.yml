@@ -50,17 +50,25 @@ jobs:
 
       - name: Install mise
         uses: jdx/mise-action@v3
+        # mise does not support Swift on Windows; Swift is installed via
+        # compnerd/gha-setup-swift below. mise still runs here to set up
+        # other tools (node, python, etc.) defined in mise.toml.
 
       - name: Get Swift version
         if: runner.os == 'Windows'
         id: swift-version
         run: |
+          # mise.lock is the single source of truth for the pinned Swift version
+          # (mise.toml uses swift = "latest" alias, not a concrete version).
+          # grep -oP is not available in Git bash on Windows, so we use sed.
           VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | sed 's/.*version = "\(.*\)".*/\1/')
           echo "branch=swift-${VERSION}-release" >> "$GITHUB_OUTPUT"
           echo "tag=${VERSION}-RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Install Swift (Windows)
         if: runner.os == 'Windows'
+        # mise does not support Swift on Windows (macOS/Linux only).
+        # compnerd/gha-setup-swift is the official GHA action for Windows Swift.
         uses: compnerd/gha-setup-swift@v0.3.0
         with:
           branch: ${{ steps.swift-version.outputs.branch }}
@@ -75,6 +83,9 @@ jobs:
         id: cache-spm
         uses: actions/cache/restore@v5
         with:
+          # Cache only .build/checkouts (dependency sources, not compiled artifacts).
+          # Saved immediately after resolve so that build outputs never end up in cache.
+          # Key includes mise.lock so the cache is invalidated when the Swift version changes.
           path: .build/checkouts
           key: spm-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
 
@@ -91,19 +102,24 @@ jobs:
 
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
-        shell: pwsh
         run: |
-          $checkout = Get-ChildItem ".build/checkouts" -Filter "swift-openapi-generator*" | Select-Object -First 1
-          if (-not $checkout) { Write-Error "swift-openapi-generator checkout not found"; exit 1 }
-          $sharedSrc = Join-Path $checkout.FullName "Plugins/PluginsShared"
-          foreach ($plugin in @("OpenAPIGenerator", "OpenAPIGeneratorCommand")) {
-            $symlinkPath = Join-Path $checkout.FullName "Plugins/$plugin/PluginsShared"
-            if (Test-Path $symlinkPath -PathType Leaf) {
-              Write-Host "Replacing symlink: $symlinkPath"
-              Remove-Item $symlinkPath
-              Copy-Item $sharedSrc $symlinkPath -Recurse
-            }
-          }
+          # swift-openapi-generator uses Unix symlinks inside its Plugins/ directory
+          # (Plugins/OpenAPIGenerator/PluginsShared -> Plugins/PluginsShared/).
+          # Git on Windows checks these out as plain text stub files instead of real
+          # directories, causing "cannot find 'PluginUtils' in scope" build errors.
+          # Workaround: replace stub files with real copies of the shared sources.
+          # Upstream issue: https://github.com/apple/swift-openapi-generator/issues/736
+          checkout=$(find .build/checkouts -maxdepth 1 -name "swift-openapi-generator*" -type d | head -1)
+          if [ -z "$checkout" ]; then echo "error: swift-openapi-generator checkout not found"; exit 1; fi
+          shared_src="$checkout/Plugins/PluginsShared"
+          for plugin in OpenAPIGenerator OpenAPIGeneratorCommand; do
+            symlink_path="$checkout/Plugins/$plugin/PluginsShared"
+            if [ -f "$symlink_path" ]; then
+              echo "Replacing symlink: $symlink_path"
+              rm "$symlink_path"
+              cp -r "$shared_src" "$symlink_path"
+            fi
+          done
 
       - name: Build release binary
         id: build
@@ -113,12 +129,18 @@ jobs:
             STATIC_FLAG="--static-swift-stdlib"
           fi
           swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
+          # --show-bin-path is used instead of a hardcoded .build/release path because
+          # on Windows SPM cannot create the .build/release convenience symlink
+          # (Win32Error 183) and outputs to .build/<triple>/release instead.
           BIN_PATH="$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)"
           echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Bundle Swift runtime DLLs (Windows)
         if: runner.os == 'Windows'
         run: |
+          # Windows binaries dynamically link against Swift runtime DLLs.
+          # --static-swift-stdlib is not supported on Windows, so we bundle
+          # the DLLs alongside the binary so end users don't need Swift installed.
           BIN_PATH="${{ steps.build.outputs.bin-path }}"
           SWIFT_BIN="$(dirname "$(which swift)")"
           echo "Copying Swift DLLs from $SWIFT_BIN"
@@ -133,6 +155,8 @@ jobs:
           ARCHIVE_NAME="${PRODUCT_NAME}_${GITHUB_REF_NAME}_${{ matrix.archive-suffix }}.tar.gz"
           BIN_PATH="${{ steps.build.outputs.bin-path }}"
           if [ "$RUNNER_OS" = "Windows" ]; then
+            # On Windows, cd into BIN_PATH first so tar paths are relative.
+            # The archive includes both the binary and bundled Swift runtime DLLs.
             ARCHIVE_ABS="$(pwd)/${ARCHIVE_NAME}"
             (cd "$BIN_PATH" && tar -czf "$ARCHIVE_ABS" "${{ matrix.bin-name }}" *.dll)
           else
