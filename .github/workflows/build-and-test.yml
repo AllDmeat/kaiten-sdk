@@ -57,10 +57,10 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
 
       - name: Build
-        run: swift build
+        run: swift build --verbose
 
       - name: Test
-        run: swift test
+        run: swift test --verbose
 
       - name: Upload binary
         uses: actions/upload-artifact@v7
