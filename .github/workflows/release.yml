@@ -32,11 +32,13 @@ jobs:
             archive-suffix: windows_x86_64
             bin-name: kaiten.exe
             static-swift-stdlib: false
+            swift-build-arch: amd64
           - os: windows-11-arm
             name: Windows ARM64
             archive-suffix: windows_arm64
             bin-name: kaiten.exe
             static-swift-stdlib: false
+            swift-build-arch: arm64
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -52,6 +54,7 @@ jobs:
         with:
           branch: swift-6.2.3-release
           tag: 6.2.3-RELEASE
+          build_arch: ${{ matrix.swift-build-arch }}
 
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'

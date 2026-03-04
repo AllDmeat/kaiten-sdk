@@ -26,9 +26,11 @@ jobs:
           - name: Windows x86_64
             os: windows-latest
             bin-name: kaiten.exe
+            swift-build-arch: amd64
           - name: Windows ARM64
             os: windows-11-arm
             bin-name: kaiten.exe
+            swift-build-arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -42,6 +44,7 @@ jobs:
         with:
           branch: swift-6.2.3-release
           tag: 6.2.3-RELEASE
+          build_arch: ${{ matrix.swift-build-arch }}
 
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
