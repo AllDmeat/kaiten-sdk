@@ -14,6 +14,9 @@ jobs:
   build-and-test:
     name: ${{ matrix.name }}
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +45,6 @@ jobs:
       - name: Get Swift version
         if: runner.os == 'Windows'
         id: swift-version
-        shell: bash
         run: |
           VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | sed 's/.*version = "\(.*\)".*/\1/')
           echo "branch=swift-${VERSION}-release" >> "$GITHUB_OUTPUT"
@@ -80,23 +82,21 @@ jobs:
 
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
-        shell: pwsh
         run: |
-          $checkout = Get-ChildItem ".build/checkouts" -Filter "swift-openapi-generator*" | Select-Object -First 1
-          if (-not $checkout) { Write-Error "swift-openapi-generator checkout not found"; exit 1 }
-          $sharedSrc = Join-Path $checkout.FullName "Plugins/PluginsShared"
-          foreach ($plugin in @("OpenAPIGenerator", "OpenAPIGeneratorCommand")) {
-            $symlinkPath = Join-Path $checkout.FullName "Plugins/$plugin/PluginsShared"
-            if (Test-Path $symlinkPath -PathType Leaf) {
-              Write-Host "Replacing symlink: $symlinkPath"
-              Remove-Item $symlinkPath
-              Copy-Item $sharedSrc $symlinkPath -Recurse
-            }
-          }
+          checkout=$(find .build/checkouts -maxdepth 1 -name "swift-openapi-generator*" -type d | head -1)
+          if [ -z "$checkout" ]; then echo "error: swift-openapi-generator checkout not found"; exit 1; fi
+          shared_src="$checkout/Plugins/PluginsShared"
+          for plugin in OpenAPIGenerator OpenAPIGeneratorCommand; do
+            symlink_path="$checkout/Plugins/$plugin/PluginsShared"
+            if [ -f "$symlink_path" ]; then
+              echo "Replacing symlink: $symlink_path"
+              rm "$symlink_path"
+              cp -r "$shared_src" "$symlink_path"
+            fi
+          done
 
       - name: Build
         id: build
-        shell: bash
         run: |
           swift build
           BIN_PATH="$(swift build --show-bin-path)"

@@ -42,6 +42,9 @@ jobs:
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v6
 
@@ -51,7 +54,6 @@ jobs:
       - name: Get Swift version
         if: runner.os == 'Windows'
         id: swift-version
-        shell: bash
         run: |
           VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | sed 's/.*version = "\(.*\)".*/\1/')
           echo "branch=swift-${VERSION}-release" >> "$GITHUB_OUTPUT"
@@ -105,7 +107,6 @@ jobs:
 
       - name: Build release binary
         id: build
-        shell: bash
         run: |
           STATIC_FLAG=""
           if [ "${{ matrix.static-swift-stdlib }}" = "true" ]; then
@@ -117,19 +118,17 @@ jobs:
 
       - name: Bundle Swift runtime DLLs (Windows)
         if: runner.os == 'Windows'
-        shell: pwsh
         run: |
-          $binPath = "${{ steps.build.outputs.bin-path }}"
-          $swiftBin = Split-Path (Get-Command swift.exe).Source
-          Write-Host "Copying Swift DLLs from $swiftBin"
-          Get-ChildItem "$swiftBin\*.dll" | ForEach-Object {
-            Copy-Item $_.FullName -Destination $binPath
-            Write-Host "  Copied: $($_.Name)"
-          }
+          BIN_PATH="${{ steps.build.outputs.bin-path }}"
+          SWIFT_BIN="$(dirname "$(which swift)")"
+          echo "Copying Swift DLLs from $SWIFT_BIN"
+          for dll in "$SWIFT_BIN"/*.dll; do
+            echo "  Copying: $(basename "$dll")"
+            cp "$dll" "$BIN_PATH/"
+          done
 
       - name: Package binary
         id: package
-        shell: bash
         run: |
           ARCHIVE_NAME="${PRODUCT_NAME}_${GITHUB_REF_NAME}_${{ matrix.archive-suffix }}.tar.gz"
           BIN_PATH="${{ steps.build.outputs.bin-path }}"
