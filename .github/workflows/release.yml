@@ -41,7 +41,7 @@ jobs:
             swift-build-arch: arm64
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     defaults:
       run:
         shell: bash
