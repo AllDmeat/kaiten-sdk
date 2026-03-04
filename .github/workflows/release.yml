@@ -53,7 +53,7 @@ jobs:
         id: swift-version
         shell: bash
         run: |
-          VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | grep -oP '"\K[^"]+')
+          VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | sed 's/.*version = "\(.*\)".*/\1/')
           echo "branch=swift-${VERSION}-release" >> "$GITHUB_OUTPUT"
           echo "tag=${VERSION}-RELEASE" >> "$GITHUB_OUTPUT"
 
