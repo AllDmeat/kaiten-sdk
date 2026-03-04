@@ -46,8 +46,11 @@ Download the binary for your platform from the [releases page](https://github.co
 
 ```bash
 swift build -c release
-# Binary: .build/release/kaiten
 ```
+
+The binary path varies by platform:
+- **macOS / Linux:** `.build/release/kaiten`
+- **Windows:** run `swift build -c release --show-bin-path` to get the path, binary is `kaiten.exe`
 
 #### Building on Windows
 
