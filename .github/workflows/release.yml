@@ -85,7 +85,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .build/checkouts
-          key: spm-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
+          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
 
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
