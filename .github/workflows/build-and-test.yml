@@ -56,6 +56,23 @@ jobs:
           path: .build
           key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
 
+      - name: Fix swift-openapi-generator symlinks (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          swift package resolve
+          $checkout = Get-ChildItem ".build/checkouts" -Filter "swift-openapi-generator*" | Select-Object -First 1
+          if (-not $checkout) { Write-Error "swift-openapi-generator checkout not found"; exit 1 }
+          $sharedSrc = Join-Path $checkout.FullName "Plugins/PluginsShared"
+          foreach ($plugin in @("OpenAPIGenerator", "OpenAPIGeneratorCommand")) {
+            $symlinkPath = Join-Path $checkout.FullName "Plugins/$plugin/PluginsShared"
+            if (Test-Path $symlinkPath -PathType Leaf) {
+              Write-Host "Replacing symlink: $symlinkPath"
+              Remove-Item $symlinkPath
+              Copy-Item $sharedSrc $symlinkPath -Recurse
+            }
+          }
+
       - name: Build
         run: swift build --verbose
 
