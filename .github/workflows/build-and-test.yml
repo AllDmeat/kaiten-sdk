@@ -39,6 +39,9 @@ jobs:
       - name: Install Swift (Windows)
         if: runner.os == 'Windows'
         uses: compnerd/gha-setup-swift@v0.3.0
+        with:
+          swift-version: swift-6.2.3-release
+          swift-build: 6.2.3-RELEASE
 
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
