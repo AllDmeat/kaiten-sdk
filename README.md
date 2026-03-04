@@ -40,12 +40,31 @@ mise use github:alldmeat/kaiten-sdk
 
 Download the binary for your platform from the [releases page](https://github.com/AllDmeat/kaiten-sdk/releases).
 
+> **Windows:** the archive includes the Swift runtime DLLs — no additional installation required. Extract and run `kaiten.exe` directly.
+
 ### From Source
 
 ```bash
 swift build -c release
 # Binary: .build/release/kaiten
 ```
+
+#### Building on Windows
+
+Install the prerequisites first:
+
+```powershell
+# Visual Studio Build Tools (C++ workload + Windows SDK)
+winget install --id Microsoft.VisualStudio.2022.BuildTools `
+  --custom "--add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
+             --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+             --add Microsoft.VisualStudio.Component.VC.Tools.ARM64"
+
+# Swift toolchain
+winget install --id Swift.Toolchain -e
+```
+
+Then build as usual: `swift build -c release`
 
 ## Quick Start
 
@@ -246,7 +265,7 @@ do {
 ## Requirements
 
 - Swift 6.2+
-- macOS 15+ (ARM) / Linux (x86-64, ARM)
+- macOS 15+ / Linux (x86-64, ARM) / Windows 10+ (x86-64, ARM64)
 
 ## License
 

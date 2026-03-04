@@ -71,12 +71,29 @@ jobs:
           swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
           echo "bin-path=$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)" >> $GITHUB_OUTPUT
 
+      - name: Bundle Swift runtime DLLs (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $swiftBin = Split-Path (Get-Command swift.exe).Source
+          Write-Host "Copying Swift DLLs from $swiftBin"
+          Get-ChildItem "$swiftBin\*.dll" | ForEach-Object {
+            Copy-Item $_.FullName -Destination "${{ steps.build.outputs.bin-path }}"
+            Write-Host "  Copied: $($_.Name)"
+          }
+
       - name: Package binary
         id: package
         shell: bash
         run: |
           ARCHIVE_NAME="${PRODUCT_NAME}_${GITHUB_REF_NAME}_${{ matrix.archive-suffix }}.tar.gz"
-          tar -czf "${ARCHIVE_NAME}" -C "${{ steps.build.outputs.bin-path }}" "${{ matrix.bin-name }}"
+          BIN_PATH="${{ steps.build.outputs.bin-path }}"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            ARCHIVE_ABS="$(pwd)/${ARCHIVE_NAME}"
+            (cd "$BIN_PATH" && tar -czf "$ARCHIVE_ABS" "${{ matrix.bin-name }}" *.dll)
+          else
+            tar -czf "${ARCHIVE_NAME}" -C "${BIN_PATH}" "${{ matrix.bin-name }}"
+          fi
           echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
