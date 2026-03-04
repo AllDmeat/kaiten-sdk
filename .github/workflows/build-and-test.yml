@@ -74,7 +74,11 @@ jobs:
           }
 
       - name: Build
-        run: swift build --verbose
+        id: build
+        shell: bash
+        run: |
+          swift build --verbose
+          echo "bin-path=$(swift build --show-bin-path)" >> $GITHUB_OUTPUT
 
       - name: Test
         run: swift test --verbose
@@ -83,5 +87,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kaiten-${{ matrix.name }}
-          path: .build/debug/${{ matrix.bin-name }}
+          path: ${{ steps.build.outputs.bin-path }}/${{ matrix.bin-name }}
           retention-days: 1
