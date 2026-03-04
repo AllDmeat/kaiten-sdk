@@ -80,12 +80,12 @@ jobs:
         id: build
         shell: bash
         run: |
-          swift build --verbose
+          swift build
           BIN_PATH="$(swift build --show-bin-path)"
           echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Test
-        run: swift test --verbose
+        run: swift test
 
       - name: Upload binary
         uses: actions/upload-artifact@v7
