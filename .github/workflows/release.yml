@@ -67,7 +67,7 @@ jobs:
 
       - name: Install Swift (Windows)
         if: runner.os == 'Windows'
-        # mise does not support Swift on Windows (macOS/Linux only).
+        # Neither mise nor swiftly (https://github.com/swiftlang/swiftly) support Swift on Windows.
         # compnerd/gha-setup-swift is a community action for installing Swift on Windows runners.
         uses: compnerd/gha-setup-swift@v0.3.0
         with:
