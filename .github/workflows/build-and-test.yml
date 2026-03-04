@@ -23,6 +23,8 @@ jobs:
             os: ubuntu-latest
           - name: Windows x86_64
             os: windows-latest
+          - name: Windows ARM64
+            os: windows-11-arm
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6

@@ -28,6 +28,10 @@ jobs:
             name: Windows x86_64
             archive-suffix: windows_x86_64
             static-swift-stdlib: false
+          - os: windows-11-arm
+            name: Windows ARM64
+            archive-suffix: windows_arm64
+            static-swift-stdlib: false
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
