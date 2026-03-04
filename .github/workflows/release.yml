@@ -120,7 +120,6 @@ jobs:
         shell: pwsh
         run: |
           $binPath = "${{ steps.build.outputs.bin-path }}"
-          Remove-Item "$binPath\*.dll" -ErrorAction SilentlyContinue
           $swiftBin = Split-Path (Get-Command swift.exe).Source
           Write-Host "Copying Swift DLLs from $swiftBin"
           Get-ChildItem "$swiftBin\*.dll" | ForEach-Object {
