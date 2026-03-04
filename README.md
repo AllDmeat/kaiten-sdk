@@ -243,7 +243,7 @@ do {
 ## Requirements
 
 - Swift 6.2+
-- macOS 15+ / Linux (x86-64, ARM) / Windows 10+ (x86-64, ARM64)
+- macOS 15+ (ARM) / Linux (x86-64, ARM) / Windows 10+ (x86-64, ARM64)
 
 ## License
 
