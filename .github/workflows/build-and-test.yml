@@ -36,6 +36,10 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@v3
 
+      - name: Install Swift (Windows)
+        if: runner.os == 'Windows'
+        uses: compnerd/gha-setup-swift@v0.3.0
+
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
