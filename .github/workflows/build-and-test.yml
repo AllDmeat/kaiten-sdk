@@ -56,11 +56,14 @@ jobs:
           path: .build
           key: ${{ runner.os }}-${{ matrix.os }}-spm-${{ hashFiles('Package.resolved') }}
 
+      - name: Resolve package dependencies
+        if: runner.os == 'Windows'
+        run: swift package resolve
+
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          swift package resolve
           $checkout = Get-ChildItem ".build/checkouts" -Filter "swift-openapi-generator*" | Select-Object -First 1
           if (-not $checkout) { Write-Error "swift-openapi-generator checkout not found"; exit 1 }
           $sharedSrc = Join-Path $checkout.FullName "Plugins/PluginsShared"
