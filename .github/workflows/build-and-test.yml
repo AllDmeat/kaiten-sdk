@@ -19,12 +19,16 @@ jobs:
         include:
           - name: macOS ARM64
             os: macos-26
+            bin-name: kaiten
           - name: Linux x86_64
             os: ubuntu-latest
+            bin-name: kaiten
           - name: Windows x86_64
             os: windows-latest
+            bin-name: kaiten.exe
           - name: Windows ARM64
             os: windows-11-arm
+            bin-name: kaiten.exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -52,5 +56,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kaiten-${{ matrix.name }}
-          path: .build/debug/kaiten${{ runner.os == 'Windows' && '.exe' || '' }}
+          path: .build/debug/${{ matrix.bin-name }}
           retention-days: 1
