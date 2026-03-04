@@ -21,6 +21,8 @@ jobs:
             os: macos-26
           - name: Linux x86_64
             os: ubuntu-latest
+          - name: Windows x86_64
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -48,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kaiten-${{ matrix.name }}
-          path: .build/debug/kaiten
+          path: .build/debug/kaiten${{ runner.os == 'Windows' && '.exe' || '' }}
           retention-days: 1

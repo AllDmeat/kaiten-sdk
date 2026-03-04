@@ -24,6 +24,10 @@ jobs:
             name: Linux ARM64
             archive-suffix: linux_arm64
             static-swift-stdlib: true
+          - os: windows-latest
+            name: Windows x86_64
+            archive-suffix: windows_x86_64
+            static-swift-stdlib: false
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -39,6 +43,7 @@ jobs:
 
       - name: Build release binary
         id: build
+        shell: bash
         run: |
           STATIC_FLAG=""
           if [ "${{ matrix.static-swift-stdlib }}" = "true" ]; then
@@ -49,9 +54,11 @@ jobs:
 
       - name: Package binary
         id: package
+        shell: bash
         run: |
           ARCHIVE_NAME="${PRODUCT_NAME}_${GITHUB_REF_NAME}_${{ matrix.archive-suffix }}.tar.gz"
-          tar -czf "${ARCHIVE_NAME}" -C "${{ steps.build.outputs.bin-path }}" "$PRODUCT_NAME"
+          BIN_NAME="${PRODUCT_NAME}${{ runner.os == 'Windows' && '.exe' || '' }}"
+          tar -czf "${ARCHIVE_NAME}" -C "${{ steps.build.outputs.bin-path }}" "${BIN_NAME}"
           echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
