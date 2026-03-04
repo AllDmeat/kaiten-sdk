@@ -54,7 +54,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-spm-${{ hashFiles('Package.resolved') }}
 
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows'
@@ -78,7 +78,8 @@ jobs:
         shell: bash
         run: |
           swift build --verbose
-          echo "bin-path=$(swift build --show-bin-path)" >> $GITHUB_OUTPUT
+          BIN_PATH="$(swift build --show-bin-path)"
+          echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Test
         run: swift test --verbose

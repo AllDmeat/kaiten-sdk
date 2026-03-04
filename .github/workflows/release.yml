@@ -69,7 +69,8 @@ jobs:
             STATIC_FLAG="--static-swift-stdlib"
           fi
           swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
-          echo "bin-path=$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)" >> $GITHUB_OUTPUT
+          BIN_PATH="$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)"
+          echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Bundle Swift runtime DLLs (Windows)
         if: runner.os == 'Windows'
@@ -94,7 +95,7 @@ jobs:
           else
             tar -czf "${ARCHIVE_NAME}" -C "${BIN_PATH}" "${{ matrix.bin-name }}"
           fi
-          echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
+          echo "archive-name=${ARCHIVE_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
