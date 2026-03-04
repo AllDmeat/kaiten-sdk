@@ -42,32 +42,7 @@ Download the binary for your platform from the [releases page](https://github.co
 
 > **Windows:** the archive includes the Swift runtime DLLs — no additional installation required. Extract and run `kaiten.exe` directly.
 
-### From Source
 
-```bash
-swift build -c release
-```
-
-The binary path varies by platform:
-- **macOS / Linux:** `.build/release/kaiten`
-- **Windows:** run `swift build -c release --show-bin-path` to get the path, binary is `kaiten.exe`
-
-#### Building on Windows
-
-Install the prerequisites first:
-
-```powershell
-# Visual Studio Build Tools (C++ workload + Windows SDK)
-winget install --id Microsoft.VisualStudio.2022.BuildTools `
-  --custom "--add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
-             --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
-             --add Microsoft.VisualStudio.Component.VC.Tools.ARM64"
-
-# Swift toolchain
-winget install --id Swift.Toolchain -e
-```
-
-Then build as usual: `swift build -c release`
 
 ## Quick Start
 
