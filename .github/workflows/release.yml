@@ -69,16 +69,23 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
 
-      - name: Cache SPM
+      - name: Restore SPM cache
         id: cache-spm
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
-          path: .build
-          key: ${{ runner.os }}-${{ matrix.os }}-spm-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
+          path: .build/checkouts
+          key: spm-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
 
       - name: Resolve package dependencies
         if: steps.cache-spm.outputs.cache-hit != 'true'
         run: swift package resolve
+
+      - name: Save SPM cache
+        if: steps.cache-spm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .build/checkouts
+          key: spm-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
 
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
