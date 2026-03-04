@@ -93,13 +93,6 @@ jobs:
         if: steps.cache-spm.outputs.cache-hit != 'true'
         run: swift package resolve
 
-      - name: Save SPM cache
-        if: steps.cache-spm.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
-        with:
-          path: .build/checkouts
-          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
-
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
         run: |
@@ -121,6 +114,13 @@ jobs:
             fi
           done
 
+      - name: Save SPM cache
+        if: steps.cache-spm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .build/checkouts
+          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
+
       - name: Build release binary
         id: build
         run: |
@@ -128,11 +128,12 @@ jobs:
           if [ "${{ matrix.static-swift-stdlib }}" = "true" ]; then
             STATIC_FLAG="--static-swift-stdlib"
           fi
-          swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
-          # --show-bin-path is used instead of a hardcoded .build/release path because
-          # on Windows SPM cannot create the .build/release convenience symlink
+          # --show-bin-path is called first (no compilation, just prints the path)
+          # to avoid invoking swift build twice.
+          # On Windows SPM cannot create the .build/release convenience symlink
           # (Win32Error 183) and outputs to .build/<triple>/release instead.
           BIN_PATH="$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)"
+          swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
           echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Bundle Swift runtime DLLs (Windows)

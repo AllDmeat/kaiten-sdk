@@ -84,13 +84,6 @@ jobs:
         if: steps.cache-spm.outputs.cache-hit != 'true'
         run: swift package resolve
 
-      - name: Save SPM cache
-        if: steps.cache-spm.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
-        with:
-          path: .build/checkouts
-          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
-
       - name: Fix swift-openapi-generator symlinks (Windows)
         if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
         run: |
@@ -112,14 +105,22 @@ jobs:
             fi
           done
 
+      - name: Save SPM cache
+        if: steps.cache-spm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .build/checkouts
+          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
+
       - name: Build
         id: build
         run: |
-          swift build
-          # --show-bin-path is used instead of a hardcoded .build/debug path because
-          # on Windows SPM cannot create the .build/debug convenience symlink
+          # --show-bin-path is called first (no compilation, just prints the path)
+          # to avoid invoking swift build twice.
+          # On Windows SPM cannot create the .build/debug convenience symlink
           # (Win32Error 183) and outputs to .build/<triple>/debug instead.
           BIN_PATH="$(swift build --show-bin-path)"
+          swift build
           echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Test
