@@ -13,33 +13,115 @@ concurrency:
 jobs:
   build-and-test:
     name: ${{ matrix.name }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: macOS ARM64
             os: macos-26
+            bin-name: kaiten
           - name: Linux x86_64
             os: ubuntu-latest
+            bin-name: kaiten
+          - name: Windows x86_64
+            os: windows-latest
+            bin-name: kaiten.exe
+            swift-build-arch: amd64
+          - name: Windows ARM64
+            os: windows-11-arm
+            bin-name: kaiten.exe
+            swift-build-arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
 
       - name: Install mise
         uses: jdx/mise-action@v3
+        # mise does not support Swift on Windows; Swift is installed via
+        # compnerd/gha-setup-swift below. mise still runs here to set up
+        # other tools (node, python, etc.) defined in mise.toml.
+
+      - name: Get Swift version
+        if: runner.os == 'Windows'
+        id: swift-version
+        run: |
+          # mise.lock is the single source of truth for the pinned Swift version
+          # (mise.toml uses swift = "latest" alias, not a concrete version).
+          # grep -oP is not available in Git bash on Windows, so we use sed.
+          VERSION=$(grep -A3 '\[\[tools.swift\]\]' mise.lock | grep 'version' | sed 's/.*version = "\(.*\)".*/\1/')
+          echo "branch=swift-${VERSION}-release" >> "$GITHUB_OUTPUT"
+          echo "tag=${VERSION}-RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Install Swift (Windows)
+        if: runner.os == 'Windows'
+        # Neither mise nor swiftly (https://github.com/swiftlang/swiftly) support Swift on Windows.
+        # compnerd/gha-setup-swift is a community action for installing Swift on Windows runners.
+        uses: compnerd/gha-setup-swift@v0.3.0
+        with:
+          branch: ${{ steps.swift-version.outputs.branch }}
+          tag: ${{ steps.swift-version.outputs.tag }}
+          build_arch: ${{ matrix.swift-build-arch }}
 
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
 
-      - name: Cache SPM
-        uses: actions/cache@v5
+      - name: Restore SPM cache
+        id: cache-spm
+        uses: actions/cache/restore@v5
         with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          # Cache only .build/checkouts (dependency sources, not compiled artifacts).
+          # Saved immediately after resolve so that build outputs never end up in cache.
+          # Key includes mise.lock so the cache is invalidated when the Swift version changes.
+          path: .build/checkouts
+          key: spm-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('mise.lock') }}-${{ hashFiles('Package.resolved') }}
+
+      - name: Resolve package dependencies
+        if: steps.cache-spm.outputs.cache-hit != 'true'
+        run: swift package resolve
+
+      - name: Fix swift-openapi-generator symlinks (Windows)
+        if: runner.os == 'Windows' && steps.cache-spm.outputs.cache-hit != 'true'
+        run: |
+          # swift-openapi-generator uses Unix symlinks inside its Plugins/ directory
+          # (Plugins/OpenAPIGenerator/PluginsShared -> Plugins/PluginsShared/).
+          # Git on Windows checks these out as plain text stub files instead of real
+          # directories, causing "cannot find 'PluginUtils' in scope" build errors.
+          # Workaround: replace stub files with real copies of the shared sources.
+          # Upstream issue: https://github.com/apple/swift-openapi-generator/issues/736
+          checkout=$(find .build/checkouts -maxdepth 1 -name "swift-openapi-generator*" -type d | head -1)
+          if [ -z "$checkout" ]; then echo "error: swift-openapi-generator checkout not found"; exit 1; fi
+          shared_src="$checkout/Plugins/PluginsShared"
+          for plugin in OpenAPIGenerator OpenAPIGeneratorCommand; do
+            symlink_path="$checkout/Plugins/$plugin/PluginsShared"
+            if [ -f "$symlink_path" ]; then
+              echo "Replacing symlink: $symlink_path"
+              rm "$symlink_path"
+              cp -r "$shared_src" "$symlink_path"
+            fi
+          done
+
+      - name: Save SPM cache
+        if: steps.cache-spm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .build/checkouts
+          key: ${{ steps.cache-spm.outputs.cache-primary-key }}
 
       - name: Build
-        run: swift build
+        id: build
+        run: |
+          # --show-bin-path is called first (no compilation, just prints the path)
+          # to avoid invoking swift build twice.
+          # On Windows SPM cannot create the .build/debug convenience symlink
+          # (Win32Error 183) and outputs to .build/<triple>/debug instead.
+          BIN_PATH="$(swift build --show-bin-path)"
+          swift build
+          echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Test
         run: swift test
@@ -48,5 +130,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kaiten-${{ matrix.name }}
-          path: .build/debug/kaiten
+          path: ${{ steps.build.outputs.bin-path }}/${{ matrix.bin-name }}
           retention-days: 1
