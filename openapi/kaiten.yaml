@@ -4309,7 +4309,7 @@ components:
           type: string
           # NOTE: Kaiten API documentation lists this field as integer,
           # but the real API returns a quoted string (e.g. "3418058").
-          # Verified against dodopizza.kaiten.ru. Type is string here.
+          # Verified against a real Kaiten instance. Type is string here.
           description: Movement event ID
         card_id:
           type: integer
