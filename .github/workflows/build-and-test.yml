@@ -8,6 +8,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  PRODUCT_NAME: kaiten
+
 jobs:
   build-and-test:
     name: ${{ matrix.name }}
@@ -22,16 +25,29 @@ jobs:
           - name: macOS ARM64
             os: macos-26
             bin-name: kaiten
+            archive-suffix: darwin_arm64
+            static-swift-stdlib: false
           - name: Linux x86_64
             os: ubuntu-latest
             bin-name: kaiten
+            archive-suffix: linux_x86_64
+            static-swift-stdlib: true
+          - name: Linux ARM64
+            os: ubuntu-24.04-arm
+            bin-name: kaiten
+            archive-suffix: linux_arm64
+            static-swift-stdlib: true
           - name: Windows x86_64
             os: windows-latest
             bin-name: kaiten.exe
+            archive-suffix: windows_x86_64
+            static-swift-stdlib: false
             swift-build-arch: amd64
           - name: Windows ARM64
             os: windows-11-arm
             bin-name: kaiten.exe
+            archive-suffix: windows_arm64
+            static-swift-stdlib: false
             swift-build-arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
@@ -110,23 +126,56 @@ jobs:
           path: .build/checkouts
           key: ${{ steps.cache-spm.outputs.cache-primary-key }}
 
-      - name: Build
-        id: build
-        run: |
-          # --show-bin-path is called first (no compilation, just prints the path)
-          # to avoid invoking swift build twice.
-          # On Windows SPM cannot create the .build/debug convenience symlink
-          # (Win32Error 183) and outputs to .build/<triple>/debug instead.
-          BIN_PATH="$(swift build --show-bin-path)"
-          swift build
-          echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
-
       - name: Test
         run: swift test
 
-      - name: Upload binary
+      - name: Build release binary
+        id: build
+        run: |
+          STATIC_FLAG=""
+          if [ "${{ matrix.static-swift-stdlib }}" = "true" ]; then
+            STATIC_FLAG="--static-swift-stdlib"
+          fi
+          # --show-bin-path is called first (no compilation, just prints the path)
+          # to avoid invoking swift build twice.
+          # On Windows SPM cannot create the .build/release convenience symlink
+          # (Win32Error 183) and outputs to .build/<triple>/release instead.
+          BIN_PATH="$(swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG --show-bin-path)"
+          swift build -c release --product "$PRODUCT_NAME" $STATIC_FLAG
+          echo "bin-path=$BIN_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle Swift runtime DLLs (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Windows binaries dynamically link against Swift runtime DLLs.
+          # --static-swift-stdlib is not supported on Windows, so we bundle
+          # the DLLs alongside the binary so end users don't need Swift installed.
+          BIN_PATH="${{ steps.build.outputs.bin-path }}"
+          SWIFT_BIN="$(dirname "$(which swift)")"
+          echo "Copying Swift DLLs from $SWIFT_BIN"
+          for dll in "$SWIFT_BIN"/*.dll; do
+            echo "  Copying: $(basename "$dll")"
+            cp "$dll" "$BIN_PATH/"
+          done
+
+      - name: Package binary
+        id: package
+        run: |
+          ARCHIVE_NAME="${PRODUCT_NAME}_pr${{ github.event.pull_request.number }}_${{ matrix.archive-suffix }}.tar.gz"
+          BIN_PATH="${{ steps.build.outputs.bin-path }}"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # On Windows, cd into BIN_PATH first so tar paths are relative.
+            # The archive includes both the binary and bundled Swift runtime DLLs.
+            ARCHIVE_ABS="$(pwd)/${ARCHIVE_NAME}"
+            (cd "$BIN_PATH" && tar -czf "$ARCHIVE_ABS" "${{ matrix.bin-name }}" *.dll)
+          else
+            tar -czf "${ARCHIVE_NAME}" -C "${BIN_PATH}" "${{ matrix.bin-name }}"
+          fi
+          echo "archive-name=${ARCHIVE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: kaiten-${{ matrix.name }}
-          path: ${{ steps.build.outputs.bin-path }}/${{ matrix.bin-name }}
-          retention-days: 1
+          name: ${{ matrix.archive-suffix }}
+          path: ${{ steps.package.outputs.archive-name }}
+          retention-days: 7
