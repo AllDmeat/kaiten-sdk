@@ -2262,6 +2262,8 @@ components:
           type: integer
           description: Column ID
         lane_id:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null for cards not placed in a specific lane.
           type:
           - integer
           - 'null'
@@ -2273,6 +2275,8 @@ components:
           type: integer
           description: Owner user ID
         type_id:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null when no card type is assigned.
           type:
           - integer
           - 'null'
@@ -2329,6 +2333,8 @@ components:
           - 'null'
           description: Milestone ID
         sprint_id:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null for cards not in a sprint.
           type:
           - integer
           - 'null'
@@ -2367,6 +2373,8 @@ components:
           - 'null'
           description: Last moved to done timestamp
         service_id:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null for non-service-desk cards.
           type:
           - integer
           - 'null'
@@ -2452,6 +2460,8 @@ components:
             type: integer
           description: Parent link IDs
         fifo_order:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null when FIFO ordering is not enabled.
           type:
           - integer
           - 'null'
@@ -2525,6 +2535,8 @@ components:
           - 'null'
           description: Lock status
         source:
+          # NOTE: Kaiten docs list this as `enum | null` but provide no valid enum values.
+          # Actual API returns a plain string. Observed values: "app", "api".
           type: string
           description: Card source
         lane:
@@ -2662,6 +2674,8 @@ components:
           type: integer
           description: Width
         wip_limit:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null when no limit is set.
           type:
           - integer
           - 'null'
@@ -2676,6 +2690,8 @@ components:
           type: integer
           description: Board id
         column_id:
+          # NOTE: Kaiten docs list this as type `null` with no base type at all.
+          # Actual API returns null for root columns and an integer id for subcolumns.
           type:
           - integer
           - 'null'
@@ -2693,6 +2709,8 @@ components:
           - 'null'
           description: External id
         default_tags:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null when no default tags are set.
           type:
           - string
           - 'null'
@@ -2720,9 +2738,11 @@ components:
           type: boolean
           description: Indicates whether the SLA timer should be paused in this column
         uid:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every column response.
           type: string
           description: Column UID
         locked:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every column response.
           type:
           - string
           - 'null'
@@ -2749,6 +2769,8 @@ components:
           type: integer
           description: Height
         wip_limit:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null when no limit is set.
           type:
           - integer
           - 'null'
@@ -2770,6 +2792,8 @@ components:
           - 'null'
           description: External id
         default_tags:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null when no default tags are set.
           type:
           - string
           - 'null'
@@ -2787,9 +2811,11 @@ components:
           type: integer
           description: 1 - live, 2 - archived, 3 - deleted
         uid:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every lane response.
           type: string
           description: Lane UID
         locked:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every lane response.
           type:
           - string
           - 'null'
@@ -2966,9 +2992,13 @@ components:
           type: string
           description: Custom property type
         show_on_facade:
+          # NOTE: Kaiten docs declare this as string, but actual API returns boolean.
+          # Verified by direct API call — response contains true/false.
           type: boolean
           description: Should show property on card's facade
         multiline:
+          # NOTE: Kaiten docs declare this as string, but actual API returns boolean.
+          # Verified by direct API call — response contains true/false.
           type: boolean
           description: Should render multiline text field
         fields_settings:
@@ -3124,6 +3154,8 @@ components:
           type: integer
           description: Comment ID
         uid:
+          # NOTE: Kaiten docs declare this as integer, but actual API returns a UUID string.
+          # Verified by direct API call — response contains UUID format (e.g. "62b986ed-6ec4-473d-9161-1c19b14cacbc").
           type: string
           description: Comment UID
         text:
@@ -3151,6 +3183,8 @@ components:
           type: boolean
           description: Deleted flag
         sd_external_recipients_cc:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null for non-service-desk comments.
           type:
           - string
           - 'null'
@@ -3159,6 +3193,8 @@ components:
           type: boolean
           description: Flag indicating comment is used as request description
         notification_sent:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null when no notification has been sent yet.
           type:
           - string
           - 'null'
@@ -3371,9 +3407,13 @@ components:
           type: string
           description: Time zone
         theme:
+          # NOTE: Kaiten docs list this as type `enum` but provide no valid enum values.
+          # Actual API returns a plain string. Observed values: "light", "dark", "auto".
           type: string
           description: light - light color theme, dark - dark color theme, auto - based on OS settings
         ui_version:
+          # NOTE: Kaiten docs declare this as string, but actual API returns integer.
+          # Verified by direct API call — response contains numeric value (e.g. 2).
           type: integer
           description: 1 - old ui, 2 - new
         virtual:
@@ -3577,6 +3617,8 @@ components:
           - 'null'
           description: Template checklist id
         items:
+          # NOTE: Kaiten docs list this as non-nullable array.
+          # Actual API returns null in contexts where item data is not included (e.g. list-cards).
           type:
           - array
           - 'null'
@@ -3590,6 +3632,8 @@ components:
           type: integer
           description: Card id
         checklist_id:
+          # NOTE: Kaiten docs declare this as string, but actual API returns integer.
+          # Verified by direct API call — response contains numeric value identical to id.
           type: integer
           description: Checklist id
         sort_order:
@@ -4218,9 +4262,12 @@ components:
           type: integer
           description: Blocker ID
         uid:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every blocker response.
           type: string
           description: Blocker UID
         reason:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null for card-link blockers (no text reason).
           type:
           - string
           - 'null'
@@ -4247,11 +4294,14 @@ components:
           type: boolean
           description: Is block released
         released_by_id:
+          # NOTE: Kaiten docs list this as non-nullable integer.
+          # Actual API returns null while the blocker is still active.
           type:
           - integer
           - 'null'
           description: ID of user who released block
         due_date:
+          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every blocker response.
           type:
           - string
           - 'null'
@@ -4352,6 +4402,8 @@ components:
           type: string
           description: Sprint title
         goal:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null when no goal is set.
           type:
           - string
           - 'null'
@@ -4378,6 +4430,8 @@ components:
           type: string
           description: Sprint planned finish date
         actual_finish_date:
+          # NOTE: Kaiten docs list this as non-nullable string.
+          # Actual API returns null for sprints that haven't finished yet.
           type:
           - string
           - 'null'
