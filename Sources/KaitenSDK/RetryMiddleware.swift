@@ -112,18 +112,22 @@ struct RetryMiddleware: ClientMiddleware {
     }
   }
 
-  private func resolveRateLimitDelay(response: HTTPResponse, attempt: Int) -> TimeInterval {
-    let remainingHeader = HTTPField.Name("X-RateLimit-Remaining")!
-    let resetHeader = HTTPField.Name("X-RateLimit-Reset")!
-    let retryAfterHeader = HTTPField.Name("Retry-After")!
+  private enum RateLimitHeaders {
+    // swiftlint:disable force_unwrapping
+    static let remaining = HTTPField.Name("X-RateLimit-Remaining")!
+    static let reset = HTTPField.Name("X-RateLimit-Reset")!
+    static let retryAfter = HTTPField.Name("Retry-After")!
+    // swiftlint:enable force_unwrapping
+  }
 
-    if response.headerFields[remainingHeader].flatMap(Int.init) == 0,
-      let resetEpoch = response.headerFields[resetHeader].flatMap(TimeInterval.init)
+  private func resolveRateLimitDelay(response: HTTPResponse, attempt: Int) -> TimeInterval {
+    if response.headerFields[RateLimitHeaders.remaining].flatMap(Int.init) == 0,
+      let resetEpoch = response.headerFields[RateLimitHeaders.reset].flatMap(TimeInterval.init)
     {
       return clampDelay(max(0, resetEpoch - Date().timeIntervalSince1970))
     }
 
-    if let retryAfterRaw = response.headerFields[retryAfterHeader],
+    if let retryAfterRaw = response.headerFields[RateLimitHeaders.retryAfter],
       let parsed = parseRetryAfter(retryAfterRaw)
     {
       return clampDelay(parsed)
