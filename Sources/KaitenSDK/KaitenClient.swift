@@ -1340,16 +1340,16 @@ extension KaitenClient {
   ///
   /// - Parameters:
   ///   - cardId: The parent card identifier.
-  ///   - childId: The child card identifier.
+  ///   - childCardId: The child card identifier.
   /// - Returns: The deleted child ID.
   /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or child does not exist.
-  public func removeCardChild(cardId: Int, childId: Int) async throws(KaitenError) -> Int {
+  public func removeCardChild(cardId: Int, childCardId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_card_child(
-        path: .init(card_id: cardId, id: childId)
+        path: .init(card_id: cardId, id: childCardId)
       )
     }
-    let body = try decodeResponse(response.toCase(), notFoundResource: ("child", childId)) {
+    let body = try decodeResponse(response.toCase(), notFoundResource: ("child", childCardId)) {
       try $0.json
     }
     return body.id
