@@ -64,21 +64,24 @@ Do not modify the spec based on guesses or empirical data. Only based on documen
 
 ### Annotating Discrepancies Between Docs and Actual API
 
-When the actual Kaiten API returns a value of a type **different** from what the official documentation declares, you **must** leave a comment in `openapi/kaiten.yaml` next to the affected field:
+When the actual Kaiten API behaves differently from what the official documentation declares,
+you **must** leave a `# DOC_MISMATCH:` comment in `openapi/kaiten.yaml` directly above the affected field.
+
+**Format — always a single line:**
 
 ```yaml
-field_name:
-  type: integer
-  # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
-  # Verified by direct API call — response contains numeric value (e.g. 2).
-  description: ...
+# DOC_MISMATCH: docs=`string`, actual=`integer` — https://developers.kaiten.ru/...
+# DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/...
+# DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/...
+# DOC_MISMATCH: docs=`enum` (no values listed), actual=`string`; observed: "a", "b" — https://developers.kaiten.ru/...
 ```
 
-Known examples already annotated:
-- `CardBlocker.blocker_card_id` — documented as `string`, actual API returns `integer`
-- `MemberDetailed.ui_version` — documented as `string`, actual API returns `integer`
+Rules:
+- Place the comment **before** `type:`, not after `description:`
+- The URL must point to the **specific documentation page** where the field is described
+- One line per discrepancy
 
-This prevents future contributors from re-introducing the same bug.
+This prevents future contributors from re-introducing the same bugs.
 
 ## Code Formatting
 
