@@ -16,7 +16,7 @@ struct CreateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    let card = try await client.createCard(title: "New card", boardId: 1)
+    let card = try await client.createCard(CardCreateOptions(title: "New card", boardId: 1))
     #expect(card.id == 123)
     #expect(card.title == "New card")
   }
@@ -28,7 +28,7 @@ struct CreateCardTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.createCard(title: "Test", boardId: 1)
+      _ = try await client.createCard(CardCreateOptions(title: "Test", boardId: 1))
     }
   }
 
@@ -39,7 +39,7 @@ struct CreateCardTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.createCard(title: "Test", boardId: 1)
+      _ = try await client.createCard(CardCreateOptions(title: "Test", boardId: 1))
     }
   }
 
@@ -50,7 +50,7 @@ struct CreateCardTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.createCard(title: "Test", boardId: 1)
+      _ = try await client.createCard(CardCreateOptions(title: "Test", boardId: 1))
     }
   }
 }

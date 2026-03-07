@@ -6,7 +6,7 @@
 
 /// Card condition on a board.
 ///
-/// Used in ``KaitenClient/CardFilter``, ``KaitenClient/updateCard(id:...)``.
+/// Used in ``KaitenClient/CardFilter`` and ``CardUpdateOptions``.
 /// - SeeAlso: [Kaiten API – Cards](https://developers.kaiten.ru/cards/retrieve-card-list)
 public enum CardCondition: Int, Sendable, CaseIterable {
   /// Card is on the board (active).
@@ -55,7 +55,7 @@ public enum CardMemberRoleType: Int, Sendable, CaseIterable {
 
 /// Text format for card description.
 ///
-/// Used in ``KaitenClient/createCard(...)`` and ``KaitenClient/updateCard(id:...)``.
+/// Used in ``CardCreateOptions`` and ``CardUpdateOptions``.
 /// - SeeAlso: [Kaiten API – Create Card](https://developers.kaiten.ru/cards/create-card)
 public enum TextFormatType: Int, Sendable, CaseIterable {
   /// Markdown format (default).
