@@ -1,0 +1,242 @@
+#!/usr/bin/env swift
+//
+// generate-response-mapping.swift
+//
+// Generates Sources/KaitenSDK/ResponseMapping.swift from a declarative
+// configuration. Run from the repository root:
+//
+//   swift scripts/generate-response-mapping.swift
+//
+// Each operation is described by its name and the set of error cases its
+// OpenAPI-generated Output enum contains (besides `.ok` and `.undocumented`,
+// which are always present).
+
+// MARK: - Configuration
+
+/// Error cases that an Output enum may contain (besides `.ok` and `.undocumented`).
+enum ErrorCase: String {
+  case badRequest
+  case unauthorized
+  case forbidden
+  case notFound
+}
+
+struct Operation {
+  let name: String
+  let errors: [ErrorCase]
+}
+
+struct Section {
+  let mark: String
+  let operations: [Operation]
+}
+
+let sections: [Section] = [
+  Section(mark: "Cards", operations: [
+    Operation(name: "get_cards", errors: [.unauthorized]),
+    Operation(name: "create_card", errors: [.badRequest, .unauthorized, .forbidden]),
+    Operation(name: "get_card", errors: [.unauthorized, .notFound]),
+    Operation(name: "update_card", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Card Members & Comments", operations: [
+    Operation(name: "retrieve_list_of_card_members", errors: [.unauthorized, .forbidden]),
+    Operation(name: "add_card_member", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_card_member_role", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_card_member", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "retrieve_card_comments", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "create_card_comment", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_card_comment", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Checklists", operations: [
+    Operation(name: "create_checklist", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "get_checklist", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "delete_card", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "delete_card_comment", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_checklist", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_checklist", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Checklist Items", operations: [
+    Operation(name: "create_checklist_item", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_checklist_item", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_checklist_item", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Custom Properties", operations: [
+    Operation(name: "get_list_of_properties", errors: [.unauthorized, .forbidden]),
+    Operation(name: "get_property", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "get_list_of_select_values", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "get_select_value", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Boards", operations: [
+    Operation(name: "get_board", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "get_list_of_columns", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "get_list_of_lanes", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Spaces", operations: [
+    Operation(name: "retrieve_list_of_spaces", errors: [.unauthorized]),
+    Operation(name: "get_list_of_boards", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Card Tags", operations: [
+    Operation(name: "list_card_children", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "add_card_child", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_card_child", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "list_card_tags", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "add_card_tag", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_card_tag", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Users", operations: [
+    Operation(name: "retrieve_list_of_users", errors: [.unauthorized]),
+    Operation(name: "retrieve_current_user", errors: [.unauthorized]),
+  ]),
+  Section(mark: "Card Blockers", operations: [
+    Operation(name: "list_card_blockers", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "create_card_blocker", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_card_blocker", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "delete_card_blocker", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Card Types", operations: [
+    Operation(name: "list_card_types", errors: [.unauthorized, .forbidden]),
+  ]),
+  Section(mark: "Sprints", operations: [
+    Operation(name: "list_sprints", errors: [.unauthorized, .forbidden]),
+  ]),
+  Section(mark: "External Links", operations: [
+    Operation(name: "list_card_external_links", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "create_card_external_link", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_card_external_link", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_card_external_link", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Card Location History", operations: [
+    Operation(name: "get_card_location_history", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Sprint Summary", operations: [
+    Operation(name: "get_sprint_summary", errors: [.unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Spaces CRUD", operations: [
+    Operation(name: "create_space", errors: [.badRequest, .unauthorized, .forbidden]),
+    Operation(name: "retrieve_space", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_space", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Boards CRUD", operations: [
+    Operation(name: "create_board", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_board", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Columns CRUD", operations: [
+    Operation(name: "create_column", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_column", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_column", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Subcolumns", operations: [
+    Operation(name: "get_list_of_subcolumns", errors: [.unauthorized, .forbidden, .notFound]),
+    Operation(name: "create_subcolumn", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_subcolumn", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "remove_subcolumn", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Lanes CRUD", operations: [
+    Operation(name: "create_lane", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+    Operation(name: "update_lane", errors: [.badRequest, .unauthorized, .forbidden, .notFound]),
+  ]),
+  Section(mark: "Card Baselines", operations: [
+    Operation(name: "get_card_baselines", errors: [.unauthorized, .forbidden]),
+  ]),
+]
+
+// MARK: - Generator
+
+func generateExtension(_ op: Operation) -> String {
+  let typeName = "Operations.\(op.name).Output"
+  let returnType = "KaitenClient.ResponseCase<\(typeName).Ok.Body>"
+
+  // Build switch cases
+  var cases: [String] = []
+  cases.append("    case .ok(let ok): .ok(ok.body)")
+
+  for error in op.errors {
+    switch error {
+    case .badRequest:
+      cases.append("    case .badRequest: .undocumented(statusCode: 400)")
+    case .unauthorized:
+      cases.append("    case .unauthorized: .unauthorized")
+    case .forbidden:
+      cases.append("    case .forbidden: .forbidden")
+    case .notFound:
+      cases.append("    case .notFound: .notFound")
+    }
+  }
+
+  cases.append("    case .undocumented(statusCode: let code, _): .undocumented(statusCode: code)")
+
+  // Determine if we need a line break in the signature
+  let signatureLine = "  func toCase() -> \(returnType)"
+  let needsLineBreak = signatureLine.count > 100
+
+  var lines: [String] = []
+  lines.append("extension \(typeName) {")
+  if needsLineBreak {
+    lines.append("  func toCase()")
+    lines.append("    -> \(returnType)")
+    lines.append("  {")
+  } else {
+    lines.append("  func toCase() -> \(returnType) {")
+  }
+  lines.append("    switch self {")
+  lines.append(contentsOf: cases)
+  lines.append("    }")
+  lines.append("  }")
+  lines.append("}")
+
+  return lines.joined(separator: "\n")
+}
+
+func generate() -> String {
+  var output: [String] = []
+
+  output.append("""
+    // MARK: - ResponseMapping
+    //
+    // Auto-generated by scripts/generate-response-mapping.swift
+    // DO NOT EDIT THIS FILE MANUALLY.
+    //
+    // To regenerate, run from the repository root:
+    //   swift scripts/generate-response-mapping.swift
+    //
+    // Maps OpenAPI-generated Output enums to the unified ResponseCase type.
+    // Each extension converts operation-specific cases into a common shape,
+    // eliminating repetitive switch boilerplate in KaitenClient methods.
+    """)
+
+  for section in sections {
+    output.append("")
+    output.append("// MARK: - \(section.mark)")
+
+    for op in section.operations {
+      output.append("")
+      output.append(generateExtension(op))
+    }
+  }
+
+  return output.joined(separator: "\n") + "\n"
+}
+
+// MARK: - Main
+
+import Foundation
+
+let repoRoot: String
+if CommandLine.arguments.count > 1 {
+  repoRoot = CommandLine.arguments[1]
+} else {
+  repoRoot = FileManager.default.currentDirectoryPath
+}
+
+let outputPath = "\(repoRoot)/Sources/KaitenSDK/ResponseMapping.swift"
+let content = generate()
+
+do {
+  try content.write(toFile: outputPath, atomically: true, encoding: .utf8)
+  print("Generated \(outputPath)")
+  let opCount = sections.reduce(0) { $0 + $1.operations.count }
+  print("\(opCount) operations across \(sections.count) sections")
+} catch {
+  fputs("Error writing file: \(error)\n", stderr)
+  exit(1)
+}
