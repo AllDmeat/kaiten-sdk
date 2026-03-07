@@ -4329,7 +4329,10 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          # NOTE: Kaiten API documentation lists this field as integer,
+          # but the real API returns a quoted string (e.g. "3418058").
+          # Verified against a real Kaiten instance. Type is string here.
           description: Movement event ID
         card_id:
           type: integer
@@ -4356,6 +4359,9 @@ components:
         author_id:
           type: integer
           description: Author user ID
+        author:
+          $ref: '#/components/schemas/User'
+          description: User who performed the movement
         condition:
           type: integer
           description: 1 = Active, 2 = Archived, 3 = Deleted
