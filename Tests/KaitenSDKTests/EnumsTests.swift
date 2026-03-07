@@ -23,6 +23,7 @@ struct EnumsTests {
     assertRoundTrip(CardPosition.self)
     assertRoundTrip(ColumnType.self)
     assertRoundTrip(WipLimitType.self)
+    assertRoundTrip(CardHistoryCondition.self)
   }
 
   @Test("invalid raw values return nil for all public enums")
@@ -35,6 +36,7 @@ struct EnumsTests {
     #expect(CardPosition(rawValue: 999) == nil)
     #expect(ColumnType(rawValue: 999) == nil)
     #expect(WipLimitType(rawValue: 999) == nil)
+    #expect(CardHistoryCondition(rawValue: 999) == nil)
   }
 
   @Test("case counts are stable for public enums")
@@ -47,6 +49,14 @@ struct EnumsTests {
     #expect(CardPosition.allCases.count == 2)
     #expect(ColumnType.allCases.count == 3)
     #expect(WipLimitType.allCases.count == 2)
+    #expect(CardHistoryCondition.allCases.count == 3)
+  }
+
+  @Test("CardHistoryCondition raw values match Kaiten API")
+  func cardHistoryConditionValues() {
+    #expect(CardHistoryCondition.active.rawValue == 1)
+    #expect(CardHistoryCondition.archived.rawValue == 2)
+    #expect(CardHistoryCondition.deleted.rawValue == 3)
   }
 
   @Test("listCards query uses expected enum raw values")

@@ -100,3 +100,16 @@ public enum WipLimitType: Int, Sendable, CaseIterable {
   /// Limit by card size.
   case cardSize = 2
 }
+
+/// Card location history event condition.
+///
+/// Describes the board state at the time the movement event was recorded.
+/// - SeeAlso: [Kaiten API – Card Location History](https://developers.kaiten.ru/cards/retrieve-card-location-history)
+public enum CardHistoryCondition: Int, Sendable, CaseIterable {
+  /// Card was on the board (active) at the time of the event.
+  case active = 1
+  /// Card was archived at the time of the event.
+  case archived = 2
+  /// Card was deleted at the time of the event.
+  case deleted = 3
+}
