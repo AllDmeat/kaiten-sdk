@@ -1,9 +1,10 @@
 import Foundation
 import HTTPTypes
 import OpenAPIRuntime
+import Synchronization
 
 /// A mock client transport for testing that records all requests and returns configurable responses.
-final class MockClientTransport: ClientTransport, @unchecked Sendable {
+final class MockClientTransport: ClientTransport, Sendable {
 
   /// A recorded request with all parameters passed to `send`.
   struct RecordedRequest: Sendable {
@@ -18,11 +19,10 @@ final class MockClientTransport: ClientTransport, @unchecked Sendable {
     @Sendable (HTTPRequest, HTTPBody?, URL, String) async throws -> (HTTPResponse, HTTPBody?)
 
   /// All requests recorded so far.
-  private let _lock = NSLock()
-  private var _recordedRequests: [RecordedRequest] = []
+  private let _recordedRequests = Mutex<[RecordedRequest]>([])
 
   var recordedRequests: [RecordedRequest] {
-    _lock.withLock { _recordedRequests }
+    _recordedRequests.withLock { $0 }
   }
 
   /// Creates a mock transport with a custom handler.
@@ -61,7 +61,7 @@ final class MockClientTransport: ClientTransport, @unchecked Sendable {
   ) async throws -> (HTTPResponse, HTTPBody?) {
     let recorded = RecordedRequest(
       request: request, body: body, baseURL: baseURL, operationID: operationID)
-    _lock.withLock { _recordedRequests.append(recorded) }
+    _recordedRequests.withLock { $0.append(recorded) }
     return try await handler(request, body, baseURL, operationID)
   }
 }
