@@ -79,8 +79,7 @@ you **must** leave a `# DOC_MISMATCH:` comment in `openapi/kaiten.yaml` directly
 Rules:
 - Place the comment **before** `type:`, not after `description:`
 - The URL must point to the **specific documentation page** where the field is described
-- One line per discrepancy — no multi-line `# NOTE:` blocks
-- Do **not** use the old `# NOTE:` format — always use `# DOC_MISMATCH:`
+- One line per discrepancy
 
 This prevents future contributors from re-introducing the same bugs.
 
