@@ -2262,8 +2262,7 @@ components:
           type: integer
           description: Column ID
         lane_id:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null for cards not placed in a specific lane.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/cards/retrieve-card
           type:
           - integer
           - 'null'
@@ -2275,8 +2274,7 @@ components:
           type: integer
           description: Owner user ID
         type_id:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null when no card type is assigned.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/cards/retrieve-card
           type:
           - integer
           - 'null'
@@ -2333,8 +2331,7 @@ components:
           - 'null'
           description: Milestone ID
         sprint_id:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null for cards not in a sprint.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/cards/retrieve-card
           type:
           - integer
           - 'null'
@@ -2373,8 +2370,7 @@ components:
           - 'null'
           description: Last moved to done timestamp
         service_id:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null for non-service-desk cards.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/cards/retrieve-card
           type:
           - integer
           - 'null'
@@ -2460,8 +2456,7 @@ components:
             type: integer
           description: Parent link IDs
         fifo_order:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null when FIFO ordering is not enabled.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/cards/retrieve-card
           type:
           - integer
           - 'null'
@@ -2535,8 +2530,7 @@ components:
           - 'null'
           description: Lock status
         source:
-          # NOTE: Kaiten docs list this as `enum | null` but provide no valid enum values.
-          # Actual API returns a plain string. Observed values: "app", "api".
+          # DOC_MISMATCH: docs=`enum | null` (no values listed), actual=`string`; observed: "app", "api" — https://developers.kaiten.ru/cards/retrieve-card
           type: string
           description: Card source
         lane:
@@ -2546,8 +2540,7 @@ components:
           type: object
           description: Inline column summary
         board:
-          # NOTE: Kaiten docs show full Board schema here, but API actually
-          # returns only 6 fields: id, uid, title, external_id, card_properties, settings.
+          # DOC_MISMATCH: docs show full Board schema, actual API returns only 6 fields: id, uid, title, external_id, card_properties, settings — https://developers.kaiten.ru/cards/retrieve-card
           $ref: '#/components/schemas/CardBoardSummary'
         type:
           $ref: '#/components/schemas/CardType'
@@ -2674,8 +2667,7 @@ components:
           type: integer
           description: Width
         wip_limit:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null when no limit is set.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/columns/get-list-of-columns
           type:
           - integer
           - 'null'
@@ -2690,8 +2682,7 @@ components:
           type: integer
           description: Board id
         column_id:
-          # NOTE: Kaiten docs list this as type `null` with no base type at all.
-          # Actual API returns null for root columns and an integer id for subcolumns.
+          # DOC_MISMATCH: docs=`null` (no base type), actual=`integer | null` — https://developers.kaiten.ru/columns/get-list-of-columns
           type:
           - integer
           - 'null'
@@ -2709,8 +2700,7 @@ components:
           - 'null'
           description: External id
         default_tags:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null when no default tags are set.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/columns/get-list-of-columns
           type:
           - string
           - 'null'
@@ -2738,11 +2728,11 @@ components:
           type: boolean
           description: Indicates whether the SLA timer should be paused in this column
         uid:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every column response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/columns/get-list-of-columns
           type: string
           description: Column UID
         locked:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every column response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/columns/get-list-of-columns
           type:
           - string
           - 'null'
@@ -2769,8 +2759,7 @@ components:
           type: integer
           description: Height
         wip_limit:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null when no limit is set.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/lanes/get-list-of-lanes
           type:
           - integer
           - 'null'
@@ -2792,8 +2781,7 @@ components:
           - 'null'
           description: External id
         default_tags:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null when no default tags are set.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/lanes/get-list-of-lanes
           type:
           - string
           - 'null'
@@ -2811,11 +2799,11 @@ components:
           type: integer
           description: 1 - live, 2 - archived, 3 - deleted
         uid:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every lane response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/lanes/get-list-of-lanes
           type: string
           description: Lane UID
         locked:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every lane response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/lanes/get-list-of-lanes
           type:
           - string
           - 'null'
@@ -2992,13 +2980,11 @@ components:
           type: string
           description: Custom property type
         show_on_facade:
-          # NOTE: Kaiten docs declare this as string, but actual API returns boolean.
-          # Verified by direct API call — response contains true/false.
+          # DOC_MISMATCH: docs=`string`, actual=`boolean` — https://developers.kaiten.ru/custom-properties/get-list-of-properties
           type: boolean
           description: Should show property on card's facade
         multiline:
-          # NOTE: Kaiten docs declare this as string, but actual API returns boolean.
-          # Verified by direct API call — response contains true/false.
+          # DOC_MISMATCH: docs=`string`, actual=`boolean` — https://developers.kaiten.ru/custom-properties/get-list-of-properties
           type: boolean
           description: Should render multiline text field
         fields_settings:
@@ -3154,8 +3140,7 @@ components:
           type: integer
           description: Comment ID
         uid:
-          # NOTE: Kaiten docs declare this as integer, but actual API returns a UUID string.
-          # Verified by direct API call — response contains UUID format (e.g. "62b986ed-6ec4-473d-9161-1c19b14cacbc").
+          # DOC_MISMATCH: docs=`integer`, actual=`string` (UUID) — https://developers.kaiten.ru/card-comments/retrieve-card-comments
           type: string
           description: Comment UID
         text:
@@ -3183,8 +3168,7 @@ components:
           type: boolean
           description: Deleted flag
         sd_external_recipients_cc:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null for non-service-desk comments.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/card-comments/retrieve-card-comments
           type:
           - string
           - 'null'
@@ -3193,8 +3177,7 @@ components:
           type: boolean
           description: Flag indicating comment is used as request description
         notification_sent:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null when no notification has been sent yet.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/card-comments/retrieve-card-comments
           type:
           - string
           - 'null'
@@ -3254,8 +3237,7 @@ components:
           description: User activated flag
         ui_version:
           type: integer
-          # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
-          # Verified by direct API call — response contains numeric value (e.g. 2).
+          # DOC_MISMATCH: docs=`string`, actual=`integer` — https://developers.kaiten.ru/users/retrieve-current-user
           description: 1 - old ui, 2 - new ui
         virtual:
           type: boolean
@@ -3407,13 +3389,11 @@ components:
           type: string
           description: Time zone
         theme:
-          # NOTE: Kaiten docs list this as type `enum` but provide no valid enum values.
-          # Actual API returns a plain string. Observed values: "light", "dark", "auto".
+          # DOC_MISMATCH: docs=`enum` (no values listed), actual=`string`; observed: "light", "dark", "auto" — https://developers.kaiten.ru/users/retrieve-current-user
           type: string
           description: light - light color theme, dark - dark color theme, auto - based on OS settings
         ui_version:
-          # NOTE: Kaiten docs declare this as string, but actual API returns integer.
-          # Verified by direct API call — response contains numeric value (e.g. 2).
+          # DOC_MISMATCH: docs=`string`, actual=`integer` — https://developers.kaiten.ru/users/retrieve-current-user
           type: integer
           description: 1 - old ui, 2 - new
         virtual:
@@ -3617,8 +3597,7 @@ components:
           - 'null'
           description: Template checklist id
         items:
-          # NOTE: Kaiten docs list this as non-nullable array.
-          # Actual API returns null in contexts where item data is not included (e.g. list-cards).
+          # DOC_MISMATCH: docs=non-nullable `array`, actual=`array | null` — https://developers.kaiten.ru/card-checklists/retrieve-card-checklist
           type:
           - array
           - 'null'
@@ -3632,8 +3611,7 @@ components:
           type: integer
           description: Card id
         checklist_id:
-          # NOTE: Kaiten docs declare this as string, but actual API returns integer.
-          # Verified by direct API call — response contains numeric value identical to id.
+          # DOC_MISMATCH: docs=`string`, actual=`integer` — https://developers.kaiten.ru/card-checklists/retrieve-card-checklist
           type: integer
           description: Checklist id
         sort_order:
@@ -3890,9 +3868,7 @@ components:
         - 'null'
     CardBoardSummary:
       type: object
-      # Kaiten docs (Schema button on GET /cards) show full Board here,
-      # but the API actually returns only 6 fields. This schema reflects
-      # the real API response, not the docs.
+      # DOC_MISMATCH: docs show full Board schema, actual API returns only 6 fields: id, uid, title, external_id, card_properties, settings — https://developers.kaiten.ru/cards/retrieve-card
       required:
       - id
       - uid
@@ -4262,12 +4238,11 @@ components:
           type: integer
           description: Blocker ID
         uid:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every blocker response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/card-blockers/retrieve-card-blockers-list
           type: string
           description: Blocker UID
         reason:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null for card-link blockers (no text reason).
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/card-blockers/retrieve-card-blockers-list
           type:
           - string
           - 'null'
@@ -4282,8 +4257,7 @@ components:
           type:
           - integer
           - 'null'
-          # NOTE: Kaiten API docs declare this as string, but actual API returns integer.
-          # Verified by direct API call — response contains numeric value.
+          # DOC_MISMATCH: docs=`string`, actual=`integer | null` — https://developers.kaiten.ru/card-blockers/retrieve-card-blockers-list
           description: ID of blocking card
         blocker_card_title:
           type:
@@ -4294,14 +4268,13 @@ components:
           type: boolean
           description: Is block released
         released_by_id:
-          # NOTE: Kaiten docs list this as non-nullable integer.
-          # Actual API returns null while the blocker is still active.
+          # DOC_MISMATCH: docs=non-nullable `integer`, actual=`integer | null` — https://developers.kaiten.ru/card-blockers/retrieve-card-blockers-list
           type:
           - integer
           - 'null'
           description: ID of user who released block
         due_date:
-          # NOTE: Not listed in Kaiten docs Response Attributes. Present in every blocker response.
+          # DOC_MISMATCH: not in docs, present in actual API responses — https://developers.kaiten.ru/card-blockers/retrieve-card-blockers-list
           type:
           - string
           - 'null'
@@ -4402,8 +4375,7 @@ components:
           type: string
           description: Sprint title
         goal:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null when no goal is set.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/sprints/get-sprints-list
           type:
           - string
           - 'null'
@@ -4430,8 +4402,7 @@ components:
           type: string
           description: Sprint planned finish date
         actual_finish_date:
-          # NOTE: Kaiten docs list this as non-nullable string.
-          # Actual API returns null for sprints that haven't finished yet.
+          # DOC_MISMATCH: docs=non-nullable `string`, actual=`string | null` — https://developers.kaiten.ru/sprints/get-sprints-list
           type:
           - string
           - 'null'
