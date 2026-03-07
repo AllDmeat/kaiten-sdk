@@ -17,7 +17,10 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    let card = try await client.updateCard(id: 42, title: "Updated title", description: "New desc")
+    var opts = CardUpdateOptions()
+    opts.title = "Updated title"
+    opts.description = "New desc"
+    let card = try await client.updateCard(id: 42, opts)
     #expect(card.id == 42)
     #expect(card.title == "Updated title")
     #expect(card.description == "New desc")
@@ -30,7 +33,9 @@ struct UpdateCardTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.updateCard(id: 999, title: "x")
+      var opts = CardUpdateOptions()
+      opts.title = "x"
+      _ = try await client.updateCard(id: 999, opts)
     }
   }
 
@@ -41,7 +46,9 @@ struct UpdateCardTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.updateCard(id: 1, title: "x")
+      var opts = CardUpdateOptions()
+      opts.title = "x"
+      _ = try await client.updateCard(id: 1, opts)
     }
   }
 
@@ -62,7 +69,7 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedStart: nil)
+    _ = try await client.updateCard(id: 42, CardUpdateOptions())
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_start"] == nil, "planned_start should be absent when nil")
@@ -74,7 +81,9 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedStart: .some(nil))
+    var opts = CardUpdateOptions()
+    opts.plannedStart = .some(nil)
+    _ = try await client.updateCard(id: 42, opts)
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_start"] is NSNull, "planned_start should be JSON null when .some(nil)")
@@ -86,7 +95,9 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedStart: "2026-03-10")
+    var opts = CardUpdateOptions()
+    opts.plannedStart = "2026-03-10"
+    _ = try await client.updateCard(id: 42, opts)
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_start"] as? String == "2026-03-10")
@@ -98,7 +109,7 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedEnd: nil)
+    _ = try await client.updateCard(id: 42, CardUpdateOptions())
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_end"] == nil, "planned_end should be absent when nil")
@@ -110,7 +121,9 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedEnd: .some(nil))
+    var opts = CardUpdateOptions()
+    opts.plannedEnd = .some(nil)
+    _ = try await client.updateCard(id: 42, opts)
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_end"] is NSNull, "planned_end should be JSON null when .some(nil)")
@@ -122,7 +135,9 @@ struct UpdateCardTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    _ = try await client.updateCard(id: 42, plannedEnd: "2026-12-31")
+    var opts = CardUpdateOptions()
+    opts.plannedEnd = "2026-12-31"
+    _ = try await client.updateCard(id: 42, opts)
 
     let body = try await requestBodyJSON(from: transport)
     #expect(body["planned_end"] as? String == "2026-12-31")

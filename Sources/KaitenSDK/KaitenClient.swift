@@ -460,69 +460,32 @@ public struct KaitenClient: Sendable {
 
   /// Creates a new card on a board.
   ///
-  /// - Parameters:
-  ///   - title: Card title (required, max 1024 characters).
-  ///   - boardId: Board ID where the card will be created (required).
-  ///   - columnId: Column ID. If omitted the board's default column is used.
-  ///   - laneId: Lane ID. If omitted the board's default lane is used.
-  ///   - description: Card description (max 32768 characters).
-  ///   - asap: ASAP marker.
-  ///   - dueDate: Deadline in ISO 8601 format.
-  ///   - dueDateTimePresent: Whether deadline includes hours and minutes.
-  ///   - sortOrder: Position in the cell.
-  ///   - expiresLater: Fixed deadline flag.
-  ///   - sizeText: Size text (e.g. "1", "S", "XL").
-  ///   - ownerId: Owner user ID.
-  ///   - responsibleId: Responsible user ID.
-  ///   - ownerEmail: Owner email address (only works if email belongs to company user).
-  ///   - position: Card position in cell. Overrides sort_order if present.
-  ///   - typeId: Card type ID.
-  ///   - externalId: External identifier.
-  ///   - textFormatTypeId: Text format for card description.
-  ///   - properties: Custom properties object.
+  /// - Parameter options: Creation options. See ``CardCreateOptions``.
   /// - Returns: The created card.
   /// - Throws: ``KaitenError``
   public func createCard(
-    title: String,
-    boardId: Int,
-    columnId: Int? = nil,
-    laneId: Int? = nil,
-    description: String? = nil,
-    asap: Bool? = nil,
-    dueDate: String? = nil,
-    dueDateTimePresent: Bool? = nil,
-    sortOrder: Double? = nil,
-    expiresLater: Bool? = nil,
-    sizeText: String? = nil,
-    ownerId: Int? = nil,
-    responsibleId: Int? = nil,
-    ownerEmail: String? = nil,
-    position: CardPosition? = nil,
-    typeId: Int? = nil,
-    externalId: String? = nil,
-    textFormatTypeId: TextFormatType? = nil,
-    properties: Components.Schemas.CreateCardRequest.propertiesPayload? = nil
+    _ options: CardCreateOptions
   ) async throws(KaitenError) -> Components.Schemas.Card {
     let body = Components.Schemas.CreateCardRequest(
-      title: title,
-      board_id: boardId,
-      column_id: columnId,
-      lane_id: laneId,
-      description: description,
-      asap: asap,
-      due_date: dueDate,
-      due_date_time_present: dueDateTimePresent,
-      sort_order: sortOrder,
-      expires_later: expiresLater,
-      size_text: sizeText,
-      owner_id: ownerId,
-      responsible_id: responsibleId,
-      owner_email: ownerEmail,
-      position: position?.rawValue,
-      type_id: typeId,
-      external_id: externalId,
-      text_format_type_id: textFormatTypeId?.rawValue,
-      properties: properties
+      title: options.title,
+      board_id: options.boardId,
+      column_id: options.columnId,
+      lane_id: options.laneId,
+      description: options.description,
+      asap: options.asap,
+      due_date: options.dueDate,
+      due_date_time_present: options.dueDateTimePresent,
+      sort_order: options.sortOrder,
+      expires_later: options.expiresLater,
+      size_text: options.sizeText,
+      owner_id: options.ownerId,
+      responsible_id: options.responsibleId,
+      owner_email: options.ownerEmail,
+      position: options.position?.rawValue,
+      type_id: options.typeId,
+      external_id: options.externalId,
+      text_format_type_id: options.textFormatTypeId?.rawValue,
+      properties: options.properties
     )
     let response = try await call {
       try await client.create_card(body: .json(body))
@@ -532,99 +495,47 @@ public struct KaitenClient: Sendable {
 
   /// Updates a card by its identifier.
   ///
-  /// All fields in the request body are optional — only provided values are changed.
+  /// All fields in ``CardUpdateOptions`` are optional — only set values are changed.
   ///
   /// - Parameters:
   ///   - id: The card identifier.
-  ///   - title: New card title.
-  ///   - description: New description (pass `nil` wrapped in `.some(nil)` to clear).
-  ///   - asap: ASAP marker.
-  ///   - dueDate: Deadline in ISO 8601 format (pass `nil` wrapped in `.some(nil)` to clear).
-  ///   - dueDateTimePresent: Whether deadline includes hours and minutes.
-  ///   - sortOrder: Position in the cell.
-  ///   - expiresLater: Fixed deadline flag.
-  ///   - sizeText: Size text (e.g. "1", "S", "XL").
-  ///   - boardId: Target board ID.
-  ///   - columnId: Target column ID.
-  ///   - laneId: Target lane ID.
-  ///   - ownerId: Owner user ID.
-  ///   - typeId: Card type ID.
-  ///   - serviceId: Service ID.
-  ///   - blocked: Send `false` to release all blocks.
-  ///   - condition: Card condition (on board or archived).
-  ///   - externalId: External identifier.
-  ///   - textFormatTypeId: Text format for card description.
-  ///   - sdNewComment: Service Desk new comment flag.
-  ///   - ownerEmail: Owner email address.
-  ///   - prevCardId: Previous card ID for repositioning.
-  ///   - estimateWorkload: Estimated workload.
-  ///   - plannedStart: Planned start date. Supports three states via `String??`:
-  ///     - `nil` (default): field omitted — server leaves value unchanged.
-  ///     - `.some(nil)`: field sent as JSON `null` — server clears the value.
-  ///     - `.some("2026-03-10")`: field sent as ISO 8601 string — server sets the value.
-  ///     See ``ExplicitNullString`` for implementation details.
-  ///   - plannedEnd: Planned end date. Same three-state semantics as `plannedStart`.
-  ///   - properties: Custom properties object.
+  ///   - options: Update options. See ``CardUpdateOptions``.
   /// - Returns: The updated card.
   /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
   public func updateCard(
     id: Int,
-    title: String? = nil,
-    description: String? = nil,
-    asap: Bool? = nil,
-    dueDate: String? = nil,
-    dueDateTimePresent: Bool? = nil,
-    sortOrder: Double? = nil,
-    expiresLater: Bool? = nil,
-    sizeText: String? = nil,
-    boardId: Int? = nil,
-    columnId: Int? = nil,
-    laneId: Int? = nil,
-    ownerId: Int? = nil,
-    typeId: Int? = nil,
-    serviceId: Int? = nil,
-    blocked: Bool? = nil,
-    condition: CardCondition? = nil,
-    externalId: String? = nil,
-    textFormatTypeId: TextFormatType? = nil,
-    sdNewComment: Bool? = nil,
-    ownerEmail: String? = nil,
-    prevCardId: Int? = nil,
-    estimateWorkload: Double? = nil,
-    plannedStart: String?? = nil,
-    plannedEnd: String?? = nil,
-    properties: Components.Schemas.UpdateCardRequest.propertiesPayload? = nil
+    _ options: CardUpdateOptions
   ) async throws(KaitenError) -> Components.Schemas.Card {
     let body = Components.Schemas.UpdateCardRequest(
-      title: title,
-      description: description,
-      asap: asap,
-      due_date: dueDate,
-      due_date_time_present: dueDateTimePresent,
-      sort_order: sortOrder,
-      expires_later: expiresLater,
-      size_text: sizeText,
-      board_id: boardId,
-      column_id: columnId,
-      lane_id: laneId,
-      owner_id: ownerId,
-      type_id: typeId,
-      service_id: serviceId,
-      blocked: blocked,
-      condition: condition?.rawValue,
-      external_id: externalId,
-      text_format_type_id: textFormatTypeId?.rawValue,
-      sd_new_comment: sdNewComment,
-      owner_email: ownerEmail,
-      prev_card_id: prevCardId,
-      estimate_workload: estimateWorkload,
+      title: options.title,
+      description: options.description,
+      asap: options.asap,
+      due_date: options.dueDate,
+      due_date_time_present: options.dueDateTimePresent,
+      sort_order: options.sortOrder,
+      expires_later: options.expiresLater,
+      size_text: options.sizeText,
+      board_id: options.boardId,
+      column_id: options.columnId,
+      lane_id: options.laneId,
+      owner_id: options.ownerId,
+      type_id: options.typeId,
+      service_id: options.serviceId,
+      blocked: options.blocked,
+      condition: options.condition?.rawValue,
+      external_id: options.externalId,
+      text_format_type_id: options.textFormatTypeId?.rawValue,
+      sd_new_comment: options.sdNewComment,
+      owner_email: options.ownerEmail,
+      prev_card_id: options.prevCardId,
+      estimate_workload: options.estimateWorkload,
       // Map String?? → ExplicitNullString?:
       //   nil          → nil          (field omitted from JSON, server leaves value unchanged)
       //   .some(nil)   → .some(.null) (field sent as JSON null, server clears the value)
       //   .some("x")   → .some(.value("x")) (field sent as string, server sets the value)
-      planned_start: plannedStart.map { $0.map(ExplicitNullString.value) ?? .null },
-      planned_end: plannedEnd.map { $0.map(ExplicitNullString.value) ?? .null },
-      properties: properties
+      planned_start: options.plannedStart.map { $0.map(ExplicitNullString.value) ?? .null },
+      planned_end: options.plannedEnd.map { $0.map(ExplicitNullString.value) ?? .null },
+      properties: options.properties
     )
     let response = try await call {
       try await client.update_card(

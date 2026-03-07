@@ -306,26 +306,24 @@ struct CreateCard: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
-    let card = try await client.createCard(
-      title: title,
-      boardId: boardId,
-      columnId: columnId,
-      laneId: laneId,
-      description: description,
-      asap: asap,
-      dueDate: dueDate,
-      dueDateTimePresent: dueDateTimePresent,
-      sortOrder: sortOrder,
-      expiresLater: expiresLater,
-      sizeText: sizeText,
-      ownerId: ownerId,
-      responsibleId: responsibleId,
-      ownerEmail: ownerEmail,
-      position: position.flatMap(CardPosition.init(rawValue:)),
-      typeId: typeId,
-      externalId: externalId,
-      textFormatTypeId: textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
-    )
+    var opts = CardCreateOptions(title: title, boardId: boardId)
+    opts.columnId = columnId
+    opts.laneId = laneId
+    opts.description = description
+    opts.asap = asap
+    opts.dueDate = dueDate
+    opts.dueDateTimePresent = dueDateTimePresent
+    opts.sortOrder = sortOrder
+    opts.expiresLater = expiresLater
+    opts.sizeText = sizeText
+    opts.ownerId = ownerId
+    opts.responsibleId = responsibleId
+    opts.ownerEmail = ownerEmail
+    opts.position = position.flatMap(CardPosition.init(rawValue:))
+    opts.typeId = typeId
+    opts.externalId = externalId
+    opts.textFormatTypeId = textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
+    let card = try await client.createCard(opts)
     try printJSON(card)
   }
 }
@@ -436,38 +434,35 @@ struct UpdateCard: AsyncParsableCommand {
 
   func run() async throws {
     let client = try await global.makeClient()
+    var opts = CardUpdateOptions()
+    opts.title = title
+    opts.description = description
+    opts.asap = asap
+    opts.dueDate = dueDate
+    opts.dueDateTimePresent = dueDateTimePresent
+    opts.sortOrder = sortOrder
+    opts.expiresLater = expiresLater
+    opts.sizeText = sizeText
+    opts.boardId = boardId
+    opts.columnId = columnId
+    opts.laneId = laneId
+    opts.ownerId = ownerId
+    opts.typeId = typeId
+    opts.serviceId = serviceId
+    opts.blocked = blocked
+    opts.condition = condition.flatMap(CardCondition.init(rawValue:))
+    opts.externalId = externalId
+    opts.textFormatTypeId = textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
+    opts.ownerEmail = ownerEmail
+    opts.prevCardId = prevCardId
+    opts.estimateWorkload = estimateWorkload
     // Map String? → String??:
     //   nil (not passed)  → nil         (omit field, server leaves value unchanged)
     //   ""  (empty)       → .some(nil)  (send JSON null, server clears the value)
     //   "date"            → .some("date") (send string, server sets the value)
-    let plannedStartArg: String?? = plannedStart.map { $0.isEmpty ? nil : $0 }
-    let plannedEndArg: String?? = plannedEnd.map { $0.isEmpty ? nil : $0 }
-    let card = try await client.updateCard(
-      id: id,
-      title: title,
-      description: description,
-      asap: asap,
-      dueDate: dueDate,
-      dueDateTimePresent: dueDateTimePresent,
-      sortOrder: sortOrder,
-      expiresLater: expiresLater,
-      sizeText: sizeText,
-      boardId: boardId,
-      columnId: columnId,
-      laneId: laneId,
-      ownerId: ownerId,
-      typeId: typeId,
-      serviceId: serviceId,
-      blocked: blocked,
-      condition: condition.flatMap(CardCondition.init(rawValue:)),
-      externalId: externalId,
-      textFormatTypeId: textFormatTypeId.flatMap(TextFormatType.init(rawValue:)),
-      ownerEmail: ownerEmail,
-      prevCardId: prevCardId,
-      estimateWorkload: estimateWorkload,
-      plannedStart: plannedStartArg,
-      plannedEnd: plannedEndArg
-    )
+    opts.plannedStart = plannedStart.map { $0.isEmpty ? nil : $0 }
+    opts.plannedEnd = plannedEnd.map { $0.isEmpty ? nil : $0 }
+    let card = try await client.updateCard(id: id, opts)
     try printJSON(card)
   }
 }
