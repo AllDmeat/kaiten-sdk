@@ -59,11 +59,11 @@ struct RemoveCardChild: AsyncParsableCommand {
   var cardId: Int
 
   @Option(name: .long, help: "Child Card ID")
-  var childId: Int
+  var childCardId: Int
 
   func run() async throws {
     let client = try await global.makeClient()
-    let deletedId = try await client.removeCardChild(cardId: cardId, childId: childId)
+    let deletedId = try await client.removeCardChild(cardId: cardId, childCardId: childCardId)
     try printJSON(["id": deletedId])
   }
 }

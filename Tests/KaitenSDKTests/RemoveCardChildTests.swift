@@ -16,7 +16,7 @@ struct RemoveCardChildTests {
     let client = try KaitenClient(
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
-    let deletedId = try await client.removeCardChild(cardId: 42, childId: 5)
+    let deletedId = try await client.removeCardChild(cardId: 42, childCardId: 5)
     #expect(deletedId == 5)
   }
 
@@ -27,7 +27,7 @@ struct RemoveCardChildTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.removeCardChild(cardId: 42, childId: 999)
+      _ = try await client.removeCardChild(cardId: 42, childCardId: 999)
     }
   }
 
@@ -38,7 +38,7 @@ struct RemoveCardChildTests {
       baseURL: "https://test.kaiten.ru/api/latest", token: "test-token", transport: transport)
 
     await #expect(throws: KaitenError.self) {
-      _ = try await client.removeCardChild(cardId: 1, childId: 1)
+      _ = try await client.removeCardChild(cardId: 1, childCardId: 1)
     }
   }
 }
