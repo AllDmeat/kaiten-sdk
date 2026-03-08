@@ -428,7 +428,12 @@ public struct KaitenClient: Sendable {
   ///   - limit: Maximum number of cards to return (default `100`).
   ///   - filter: Optional ``CardFilter`` with additional query parameters.
   /// - Returns: A ``Page`` of cards. Returns an empty page when no cards match.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/invalidPaginationRange(offset:limit:)`` if pagination parameters are out of range.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for undocumented HTTP status codes.
   public func listCards(
     boardId: Int? = nil, columnId: Int? = nil, laneId: Int? = nil, offset: Int = 0,
     limit: Int = 100, filter: CardFilter? = nil
@@ -496,7 +501,12 @@ public struct KaitenClient: Sendable {
   ///
   /// - Parameter id: The card identifier.
   /// - Returns: The full card object with all fields including custom properties.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for undocumented HTTP status codes.
   public func getCard(id: Int) async throws(KaitenError) -> Components.Schemas.Card {
     let response = try await call { try await client.get_card(path: .init(card_id: id)) }
     return try decodeResponse(response.toCase(), notFoundResource: ("card", id)) { try $0.json }
@@ -506,7 +516,11 @@ public struct KaitenClient: Sendable {
   ///
   /// - Parameter options: Creation options. See ``CardCreateOptions``.
   /// - Returns: The created card.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createCard(
     _ options: CardCreateOptions
   ) async throws(KaitenError) -> Components.Schemas.Card {
@@ -545,7 +559,12 @@ public struct KaitenClient: Sendable {
   ///   - id: The card identifier.
   ///   - options: Update options. See ``CardUpdateOptions``.
   /// - Returns: The updated card.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateCard(
     id: Int,
     _ options: CardUpdateOptions
@@ -596,7 +615,11 @@ public struct KaitenClient: Sendable {
   ///
   /// - Parameter cardId: The card identifier.
   /// - Returns: An array of detailed member objects. Returns an empty array if no members are assigned.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCardMembers(cardId: Int) async throws(KaitenError) -> [Components.Schemas
     .MemberDetailed]
   {
@@ -616,7 +639,12 @@ public struct KaitenClient: Sendable {
   ///   - cardId: The card identifier.
   ///   - userId: The user identifier to add.
   /// - Returns: The added member details.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func addCardMember(cardId: Int, userId: Int) async throws(KaitenError)
     -> Components.Schemas.MemberDetailed
   {
@@ -638,7 +666,12 @@ public struct KaitenClient: Sendable {
   ///   - userId: The user identifier.
   ///   - type: The member role type.
   /// - Returns: The updated card member role.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the member does not exist on the card.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateCardMemberRole(cardId: Int, userId: Int, type: CardMemberRoleType)
     async throws(KaitenError)
     -> Components.Schemas.CardMemberRole
@@ -660,7 +693,12 @@ public struct KaitenClient: Sendable {
   ///   - cardId: The card identifier.
   ///   - userId: The user identifier to remove.
   /// - Returns: The removed user ID.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the member does not exist on the card.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeCardMember(cardId: Int, userId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_card_member(path: .init(card_id: cardId, id: userId))
@@ -677,7 +715,12 @@ public struct KaitenClient: Sendable {
   ///   - cardId: The card identifier.
   ///   - text: Comment text (markdown).
   /// - Returns: The created comment.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func createComment(cardId: Int, text: String) async throws(KaitenError)
     -> Components.Schemas.Comment
   {
@@ -697,7 +740,12 @@ public struct KaitenClient: Sendable {
   ///   - commentId: The comment identifier.
   ///   - text: New comment text (markdown).
   /// - Returns: The updated comment.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or comment does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or comment does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateComment(cardId: Int, commentId: Int, text: String) async throws(KaitenError)
     -> Components.Schemas.Comment
   {
@@ -716,7 +764,12 @@ public struct KaitenClient: Sendable {
   ///
   /// - Parameter cardId: The card identifier.
   /// - Returns: An array of comments. Returns an empty array if the card has no comments.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCardComments(cardId: Int) async throws(KaitenError) -> [Components.Schemas.Comment]
   {
     guard
@@ -734,6 +787,12 @@ public struct KaitenClient: Sendable {
   ///
   /// - Parameter id: The card identifier.
   /// - Returns: The deleted card.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func deleteCard(id: Int) async throws(KaitenError) -> Components.Schemas.Card {
     let response = try await call {
       try await client.delete_card(path: .init(card_id: id))
@@ -749,6 +808,12 @@ public struct KaitenClient: Sendable {
   ///   - cardId: The card identifier.
   ///   - commentId: The comment identifier.
   /// - Returns: The deleted comment ID.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or comment does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func deleteComment(cardId: Int, commentId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.delete_card_comment(
@@ -769,7 +834,12 @@ public struct KaitenClient: Sendable {
   ///   - name: Checklist name (required).
   ///   - sortOrder: Position (optional).
   /// - Returns: The created checklist.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func createChecklist(cardId: Int, name: String, sortOrder: Double? = nil)
     async throws(KaitenError) -> Components.Schemas.Checklist
   {
@@ -794,7 +864,12 @@ extension KaitenClient {
   ///   - cardId: The card identifier.
   ///   - checklistId: The checklist identifier.
   /// - Returns: The checklist object.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getChecklist(cardId: Int, checklistId: Int) async throws(KaitenError)
     -> Components.Schemas.Checklist
   {
@@ -816,7 +891,12 @@ extension KaitenClient {
   ///   - cardId: The card identifier.
   ///   - checklistId: The checklist identifier.
   /// - Returns: The deleted checklist ID.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeChecklist(cardId: Int, checklistId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_checklist(path: .init(card_id: cardId, id: checklistId))
@@ -842,7 +922,12 @@ extension KaitenClient {
   ///   - dueDate: Due date in YYYY-MM-DD format.
   ///   - responsibleId: Responsible user ID.
   /// - Returns: The created checklist item.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func createChecklistItem(
     cardId: Int,
     checklistId: Int,
@@ -887,7 +972,12 @@ extension KaitenClient {
   ///   - dueDate: Due date in YYYY-MM-DD format (pass `nil` to clear).
   ///   - responsibleId: Responsible user ID (pass `nil` to clear).
   /// - Returns: The updated checklist item.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card, checklist, or item does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card, checklist, or item does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateChecklistItem(
     cardId: Int,
     checklistId: Int,
@@ -929,7 +1019,12 @@ extension KaitenClient {
   ///   - checklistId: The checklist identifier.
   ///   - itemId: The checklist item identifier.
   /// - Returns: The deleted item ID.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card, checklist, or item does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card, checklist, or item does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeChecklistItem(
     cardId: Int,
     checklistId: Int,
@@ -959,7 +1054,12 @@ extension KaitenClient {
   ///   - sortOrder: New position.
   ///   - moveToCardId: Move checklist to another card.
   /// - Returns: The updated checklist object.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or checklist does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateChecklist(
     cardId: Int,
     checklistId: Int,
@@ -1004,7 +1104,12 @@ extension KaitenClient {
   ///   - orderBy: Field to order by.
   ///   - orderDirection: Order direction: asc or desc.
   /// - Returns: A ``Page`` of custom property definitions.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/invalidPaginationRange(offset:limit:)`` if pagination parameters are out of range.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCustomProperties(
     offset: Int = 0,
     limit: Int = 100,
@@ -1039,7 +1144,12 @@ extension KaitenClient {
   ///
   /// - Parameter id: The custom property identifier.
   /// - Returns: The custom property definition.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the property does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the property does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCustomProperty(id: Int) async throws(KaitenError)
     -> Components.Schemas.CustomProperty
   {
@@ -1061,7 +1171,13 @@ extension KaitenClient {
   ///   - offset: Number of records to skip (requires `v2SelectSearch`).
   ///   - limit: Maximum number of values to return (requires `v2SelectSearch`, default `100`).
   /// - Returns: A ``Page`` of select values.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/invalidPaginationRange(offset:limit:)`` if pagination parameters are out of range.
+  ///   - ``KaitenError/notFound(resource:id:)`` if the property does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCustomPropertySelectValues(
     propertyId: Int,
     v2SelectSearch: Bool? = nil,
@@ -1096,7 +1212,12 @@ extension KaitenClient {
   ///   - propertyId: The custom property identifier.
   ///   - id: The select value identifier.
   /// - Returns: The select value.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the value does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the value does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCustomPropertySelectValue(
     propertyId: Int,
     id: Int
@@ -1121,7 +1242,12 @@ extension KaitenClient {
   ///
   /// - Parameter id: The board identifier.
   /// - Returns: The full board object.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getBoard(id: Int) async throws(KaitenError) -> Components.Schemas.Board {
     let response = try await call { try await client.get_board(path: .init(id: id)) }
     return try decodeResponse(response.toCase(), notFoundResource: ("board", id)) { try $0.json }
@@ -1131,7 +1257,12 @@ extension KaitenClient {
   ///
   /// - Parameter boardId: The board identifier.
   /// - Returns: An array of columns. Returns an empty array if the board has no columns.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getBoardColumns(boardId: Int) async throws(KaitenError) -> [Components.Schemas.Column]
   {
     guard
@@ -1152,7 +1283,12 @@ extension KaitenClient {
   ///   - boardId: The board identifier.
   ///   - condition: Optional lane condition filter.
   /// - Returns: An array of lanes. Returns an empty array if the board has no lanes.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getBoardLanes(boardId: Int, condition: LaneCondition? = nil) async throws(KaitenError)
     -> [Components.Schemas.Lane]
   {
@@ -1176,7 +1312,11 @@ extension KaitenClient {
   /// Lists all spaces visible to the authenticated user.
   ///
   /// - Returns: An array of spaces. Returns an empty array if no spaces are available.
-  /// - Throws: ``KaitenError``
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for undocumented HTTP status codes.
   public func listSpaces() async throws(KaitenError) -> [Components.Schemas.Space] {
     guard let response = try await callList({ try await client.retrieve_list_of_spaces() }) else {
       return []
@@ -1188,7 +1328,12 @@ extension KaitenClient {
   ///
   /// - Parameter spaceId: The space identifier.
   /// - Returns: An array of boards. Returns an empty array if the space has no boards.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the space does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the space does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listBoards(spaceId: Int) async throws(KaitenError) -> [Components.Schemas
     .BoardInSpace]
   {
@@ -1212,7 +1357,12 @@ extension KaitenClient {
   ///
   /// - Parameter cardId: The card identifier.
   /// - Returns: An array of card tags.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCardTags(cardId: Int) async throws(KaitenError) -> [Components.Schemas.CardTag] {
     guard
       let response = try await callList({
@@ -1232,7 +1382,12 @@ extension KaitenClient {
   ///   - cardId: The card identifier.
   ///   - name: The tag name.
   /// - Returns: The created tag.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func addCardTag(cardId: Int, name: String) async throws(KaitenError)
     -> Components
     .Schemas.Tag
@@ -1254,7 +1409,12 @@ extension KaitenClient {
   ///
   /// - Parameter cardId: The card identifier.
   /// - Returns: An array of card children.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCardChildren(cardId: Int) async throws(KaitenError) -> [Components.Schemas
     .CardChild]
   {
@@ -1276,7 +1436,12 @@ extension KaitenClient {
   ///   - cardId: The parent card identifier.
   ///   - childCardId: The child card identifier.
   /// - Returns: The created card child.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func addCardChild(cardId: Int, childCardId: Int) async throws(KaitenError)
     -> Components.Schemas.CardChild
   {
@@ -1297,7 +1462,12 @@ extension KaitenClient {
   ///   - cardId: The parent card identifier.
   ///   - childCardId: The child card identifier.
   /// - Returns: The deleted child ID.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or child does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or child does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeCardChild(cardId: Int, childCardId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_card_child(
@@ -1316,7 +1486,12 @@ extension KaitenClient {
   ///   - cardId: The card identifier.
   ///   - tagId: The tag identifier.
   /// - Returns: The deleted tag ID.
-  /// - Throws: ``KaitenError/notFound(resource:id:)`` if the card or tag does not exist.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card or tag does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeCardTag(cardId: Int, tagId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_card_tag(
@@ -1343,6 +1518,11 @@ extension KaitenClient {
   ///   - offset: Pagination offset.
   ///   - includeInactive: Include inactive users.
   /// - Returns: An array of users.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for undocumented HTTP status codes.
   public func listUsers(
     type: String? = nil,
     query: String? = nil,
@@ -1373,6 +1553,11 @@ extension KaitenClient {
   /// Retrieves the currently authenticated user.
   ///
   /// - Returns: The current user.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for undocumented HTTP status codes.
   public func getCurrentUser() async throws(KaitenError) -> Components.Schemas.User {
     let response = try await call { try await client.retrieve_current_user() }
     return try decodeResponse(response.toCase()) { try $0.json }
@@ -1383,6 +1568,15 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Lists all blockers on a card.
+  ///
+  /// - Parameter cardId: The card identifier.
+  /// - Returns: An array of card blockers. Returns an empty array if the card has no blockers.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCardBlockers(cardId: Int) async throws(KaitenError) -> [Components.Schemas
     .CardBlocker]
   {
@@ -1399,6 +1593,18 @@ extension KaitenClient {
   }
 
   /// Creates a blocker on a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - reason: The reason for the blocker.
+  ///   - blockerCardId: The identifier of the blocking card.
+  /// - Returns: The created card blocker.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func createCardBlocker(cardId: Int, reason: String? = nil, blockerCardId: Int? = nil)
     async throws(KaitenError) -> Components.Schemas.CardBlocker
   {
@@ -1414,6 +1620,19 @@ extension KaitenClient {
   }
 
   /// Updates a card blocker.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - blockerId: The blocker identifier.
+  ///   - reason: The updated reason for the blocker.
+  ///   - blockerCardId: The updated identifier of the blocking card.
+  /// - Returns: The updated card blocker.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the blocker does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateCardBlocker(
     cardId: Int, blockerId: Int, reason: String? = nil, blockerCardId: Int? = nil
   ) async throws(KaitenError) -> Components.Schemas.CardBlocker {
@@ -1429,6 +1648,17 @@ extension KaitenClient {
   }
 
   /// Deletes a card blocker.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - blockerId: The blocker identifier.
+  /// - Returns: The deleted card blocker.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the blocker does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func deleteCardBlocker(cardId: Int, blockerId: Int) async throws(KaitenError)
     -> Components.Schemas.CardBlocker
   {
@@ -1447,6 +1677,16 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Lists card types.
+  ///
+  /// - Parameters:
+  ///   - limit: Maximum number of card types to return.
+  ///   - offset: Pagination offset.
+  /// - Returns: An array of card types.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listCardTypes(
     limit: Int? = nil, offset: Int? = nil
   ) async throws(KaitenError) -> [Components.Schemas.CardType] {
@@ -1465,6 +1705,17 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Lists sprints.
+  ///
+  /// - Parameters:
+  ///   - active: Filter by active status.
+  ///   - limit: Maximum number of sprints to return.
+  ///   - offset: Pagination offset.
+  /// - Returns: An array of sprints.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listSprints(
     active: Bool? = nil, limit: Int? = nil, offset: Int? = nil
   ) async throws(KaitenError) -> [Components.Schemas.Sprint] {
@@ -1483,6 +1734,15 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Gets card location history.
+  ///
+  /// - Parameter cardId: The card identifier.
+  /// - Returns: An array of location history entries. Returns an empty array if no history exists.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCardLocationHistory(
     cardId: Int
   ) async throws(KaitenError) -> [Components.Schemas.CardLocationHistory] {
@@ -1501,6 +1761,15 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Lists all external links on a card.
+  ///
+  /// - Parameter cardId: The card identifier.
+  /// - Returns: An array of external links. Returns an empty array if the card has no external links.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listExternalLinks(cardId: Int) async throws(KaitenError) -> [Components.Schemas
     .ExternalLink]
   {
@@ -1515,6 +1784,18 @@ extension KaitenClient {
   }
 
   /// Creates an external link on a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - url: The external link URL.
+  ///   - description: An optional description for the link.
+  /// - Returns: The created external link.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the card does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func createExternalLink(cardId: Int, url: String, description: String? = nil)
     async throws(KaitenError) -> Components.Schemas.ExternalLink
   {
@@ -1528,6 +1809,19 @@ extension KaitenClient {
   }
 
   /// Updates an external link on a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - linkId: The external link identifier.
+  ///   - url: The updated URL.
+  ///   - description: The updated description.
+  /// - Returns: The updated external link.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the external link does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func updateExternalLink(
     cardId: Int, linkId: Int, url: String? = nil, description: String? = nil
   )
@@ -1545,6 +1839,17 @@ extension KaitenClient {
   }
 
   /// Removes an external link from a card.
+  ///
+  /// - Parameters:
+  ///   - cardId: The card identifier.
+  ///   - linkId: The external link identifier.
+  /// - Returns: The deleted external link ID.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the external link does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func removeExternalLink(cardId: Int, linkId: Int) async throws(KaitenError) -> Int {
     let response = try await call {
       try await client.remove_card_external_link(path: .init(card_id: cardId, id: linkId))
@@ -1560,6 +1865,17 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Gets a sprint summary by ID.
+  ///
+  /// - Parameters:
+  ///   - id: The sprint identifier.
+  ///   - excludeDeletedCards: Whether to exclude deleted cards from the summary.
+  /// - Returns: The sprint summary.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the sprint does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getSprintSummary(
     id: Int, excludeDeletedCards: Bool? = nil
   ) async throws(KaitenError) -> Components.Schemas.SprintSummary {
@@ -1579,6 +1895,18 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Creates a new space.
+  ///
+  /// - Parameters:
+  ///   - title: The space title.
+  ///   - externalId: An optional external identifier.
+  ///   - parentEntityUid: An optional parent entity UID.
+  ///   - sortOrder: An optional sort order.
+  /// - Returns: The created space.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createSpace(
     title: String,
     externalId: String? = nil,
@@ -1601,6 +1929,15 @@ extension KaitenClient {
   }
 
   /// Gets a space by ID.
+  ///
+  /// - Parameter id: The space identifier.
+  /// - Returns: The space.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the space does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getSpace(
     id: Int
   ) async throws(KaitenError) -> Components.Schemas.Space {
@@ -1613,6 +1950,21 @@ extension KaitenClient {
   }
 
   /// Updates a space.
+  ///
+  /// - Parameters:
+  ///   - id: The space identifier.
+  ///   - title: The updated title.
+  ///   - externalId: The updated external identifier.
+  ///   - sortOrder: The updated sort order.
+  ///   - access: The updated access level.
+  ///   - parentEntityUid: The updated parent entity UID.
+  /// - Returns: The updated space.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the space does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateSpace(
     id: Int,
     title: String? = nil,
@@ -1644,6 +1996,20 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Creates a new board in a space.
+  ///
+  /// - Parameters:
+  ///   - spaceId: The space identifier.
+  ///   - title: The board title.
+  ///   - description: An optional board description.
+  ///   - sortOrder: An optional sort order.
+  ///   - externalId: An optional external identifier.
+  /// - Returns: The created board.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the space does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createBoard(
     spaceId: Int,
     title: String,
@@ -1668,6 +2034,21 @@ extension KaitenClient {
   }
 
   /// Updates a board.
+  ///
+  /// - Parameters:
+  ///   - spaceId: The space identifier.
+  ///   - id: The board identifier.
+  ///   - title: The updated title.
+  ///   - description: The updated description.
+  ///   - sortOrder: The updated sort order.
+  ///   - externalId: The updated external identifier.
+  /// - Returns: The updated board.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateBoard(
     spaceId: Int,
     id: Int,
@@ -1698,6 +2079,22 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Creates a new column on a board.
+  ///
+  /// - Parameters:
+  ///   - boardId: The board identifier.
+  ///   - title: The column title.
+  ///   - sortOrder: An optional sort order.
+  ///   - type: An optional column type.
+  ///   - wipLimit: An optional WIP limit.
+  ///   - wipLimitType: An optional WIP limit type.
+  ///   - colCount: An optional column count.
+  /// - Returns: The created column.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createColumn(
     boardId: Int,
     title: String,
@@ -1726,6 +2123,23 @@ extension KaitenClient {
   }
 
   /// Updates a column.
+  ///
+  /// - Parameters:
+  ///   - boardId: The board identifier.
+  ///   - id: The column identifier.
+  ///   - title: The updated title.
+  ///   - sortOrder: The updated sort order.
+  ///   - type: The updated column type.
+  ///   - wipLimit: The updated WIP limit.
+  ///   - wipLimitType: The updated WIP limit type.
+  ///   - colCount: The updated column count.
+  /// - Returns: The updated column.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the column does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateColumn(
     boardId: Int,
     id: Int,
@@ -1755,6 +2169,17 @@ extension KaitenClient {
   }
 
   /// Deletes a column.
+  ///
+  /// - Parameters:
+  ///   - boardId: The board identifier.
+  ///   - id: The column identifier.
+  /// - Returns: The deleted column ID.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the column does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func deleteColumn(
     boardId: Int, id: Int
   ) async throws(KaitenError) -> Int {
@@ -1775,6 +2200,15 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Lists subcolumns of a column.
+  ///
+  /// - Parameter columnId: The parent column identifier.
+  /// - Returns: An array of subcolumns. Returns an empty array if the column has no subcolumns.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the column does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func listSubcolumns(
     columnId: Int
   ) async throws(KaitenError) -> [Components.Schemas.Column] {
@@ -1793,6 +2227,19 @@ extension KaitenClient {
   }
 
   /// Creates a subcolumn.
+  ///
+  /// - Parameters:
+  ///   - columnId: The parent column identifier.
+  ///   - title: The subcolumn title.
+  ///   - sortOrder: An optional sort order.
+  ///   - type: An optional column type.
+  /// - Returns: The created subcolumn.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the column does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createSubcolumn(
     columnId: Int,
     title: String,
@@ -1815,6 +2262,20 @@ extension KaitenClient {
   }
 
   /// Updates a subcolumn.
+  ///
+  /// - Parameters:
+  ///   - columnId: The parent column identifier.
+  ///   - id: The subcolumn identifier.
+  ///   - title: The updated title.
+  ///   - sortOrder: The updated sort order.
+  ///   - type: The updated column type.
+  /// - Returns: The updated subcolumn.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the subcolumn does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateSubcolumn(
     columnId: Int,
     id: Int,
@@ -1838,6 +2299,17 @@ extension KaitenClient {
   }
 
   /// Deletes a subcolumn.
+  ///
+  /// - Parameters:
+  ///   - columnId: The parent column identifier.
+  ///   - id: The subcolumn identifier.
+  /// - Returns: The deleted subcolumn ID.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the subcolumn does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func deleteSubcolumn(
     columnId: Int, id: Int
   ) async throws(KaitenError) -> Int {
@@ -1858,6 +2330,21 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Creates a new lane on a board.
+  ///
+  /// - Parameters:
+  ///   - boardId: The board identifier.
+  ///   - title: The lane title.
+  ///   - sortOrder: An optional sort order.
+  ///   - wipLimit: An optional WIP limit.
+  ///   - wipLimitType: An optional WIP limit type.
+  ///   - rowCount: An optional row count.
+  /// - Returns: The created lane.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the board does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func createLane(
     boardId: Int,
     title: String,
@@ -1884,6 +2371,23 @@ extension KaitenClient {
   }
 
   /// Updates a lane.
+  ///
+  /// - Parameters:
+  ///   - boardId: The board identifier.
+  ///   - id: The lane identifier.
+  ///   - title: The updated title.
+  ///   - sortOrder: The updated sort order.
+  ///   - wipLimit: The updated WIP limit.
+  ///   - wipLimitType: The updated WIP limit type.
+  ///   - rowCount: The updated row count.
+  ///   - condition: The updated lane condition.
+  /// - Returns: The updated lane.
+  /// - Throws:
+  ///   - ``KaitenError/notFound(resource:id:)`` if the lane does not exist.
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for bad request (400), forbidden (403), or other undocumented HTTP status codes.
   public func updateLane(
     boardId: Int,
     id: Int,
@@ -1918,6 +2422,14 @@ extension KaitenClient {
 
 extension KaitenClient {
   /// Gets card baselines.
+  ///
+  /// - Parameter cardId: The card identifier.
+  /// - Returns: An array of card baselines. Returns an empty array if no baselines exist.
+  /// - Throws:
+  ///   - ``KaitenError/unauthorized`` if the API token is invalid or lacks permissions.
+  ///   - ``KaitenError/decodingError(underlying:)`` if the response body cannot be decoded.
+  ///   - ``KaitenError/networkError(underlying:)`` for connectivity failures.
+  ///   - ``KaitenError/unexpectedResponse(statusCode:body:)`` for forbidden (403) or other undocumented HTTP status codes.
   public func getCardBaselines(
     cardId: Int
   ) async throws(KaitenError)
