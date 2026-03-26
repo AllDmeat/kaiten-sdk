@@ -1,6 +1,7 @@
 import Foundation
 import HTTPTypes
 import OpenAPIRuntime
+import Synchronization
 
 /// A middleware that retries requests on transient failures:
 /// - HTTP 429 (Too Many Requests) respecting `Retry-After` header
@@ -136,16 +137,21 @@ struct RetryMiddleware: ClientMiddleware {
     return backoffDelay(attempt: attempt)
   }
 
+  private static let httpDateFormatter = Mutex(
+    {
+      let f = DateFormatter()
+      f.locale = Locale(identifier: "en_US_POSIX")
+      f.timeZone = TimeZone(secondsFromGMT: 0)
+      f.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+      return f
+    }())
+
   private func parseRetryAfter(_ value: String) -> TimeInterval? {
     if let seconds = TimeInterval(value) {
       return max(0, seconds)
     }
 
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.timeZone = TimeZone(secondsFromGMT: 0)
-    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
-    if let date = formatter.date(from: value) {
+    if let date = Self.httpDateFormatter.withLock({ $0.date(from: value) }) {
       return max(0, date.timeIntervalSinceNow)
     }
 
