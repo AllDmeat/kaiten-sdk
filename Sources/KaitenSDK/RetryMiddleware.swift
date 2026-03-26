@@ -73,11 +73,12 @@ struct RetryMiddleware: ClientMiddleware {
           try await sleep(backoffDelay(attempt: attempt))
           continue
         }
-        let bodyString = if let responseBody {
-          try? await String(collecting: responseBody, upTo: 8192)
-        } else {
-          String?.none
-        }
+        let bodyString =
+          if let responseBody {
+            try? await String(collecting: responseBody, upTo: 8192)
+          } else {
+            String?.none
+          }
         throw KaitenError.serverError(statusCode: statusCode, body: bodyString)
       }
 
