@@ -3,7 +3,8 @@ import KaitenSDK
 
 func parseLaneCondition(_ rawValue: Int?) throws -> LaneCondition? {
   guard let rawValue else { return nil }
-  guard let condition = LaneCondition(rawValue: rawValue) else {
+  let condition = LaneCondition(rawValue: rawValue)
+  guard LaneCondition.allCases.contains(condition) else {
     throw ValidationError(
       "Invalid lane condition: \(rawValue). Allowed values: 1 (live), 2 (archived)")
   }
