@@ -205,6 +205,94 @@ kaiten get-card --id 123
 | `listSprints()` | List sprints |
 | `getSprintSummary(...)` | Get sprint summary |
 
+## Pagination
+
+Most list endpoints accept `offset` and `limit` parameters and return a `Page<T>`:
+
+```swift
+let page = try await client.listCards(boardId: 42, offset: 0, limit: 20)
+print(page.items)   // [Card] — the items in this page
+print(page.hasMore) // true if more pages are available
+```
+
+To fetch the next page, increment `offset` by `limit` and repeat until `hasMore` is `false`.
+
+### Auto-pagination
+
+Convenience methods handle pagination automatically and return an `AsyncThrowingStream` so you can iterate all items without managing offsets:
+
+```swift
+for try await card in client.allCards(boardId: 42) {
+    print(card.title)
+}
+```
+
+Available auto-pagination methods:
+
+| Method | Description |
+|--------|-------------|
+| `allCards(boardId:columnId:laneId:filter:pageSize:)` | All cards matching the given criteria |
+| `allUsers(type:query:includeInactive:pageSize:)` | All users |
+| `allCustomProperties(query:pageSize:)` | All custom property definitions |
+| `allCustomPropertySelectValues(propertyId:pageSize:)` | All select values for a property |
+| `allCardTypes(pageSize:)` | All card types |
+| `allSprints(active:pageSize:)` | All sprints |
+
+Each method accepts an optional `pageSize` parameter (default `100`).
+
+## Filtering Cards
+
+Use `CardFilter` to narrow results when listing cards. All properties are optional — set only the ones you need:
+
+```swift
+let overdueCards = try await client.listCards(
+    filter: CardFilter(memberIds: "10,25", overdue: true)
+)
+```
+
+Search by text within a space:
+
+```swift
+let results = try await client.listCards(
+    filter: CardFilter(query: "login bug", spaceId: 42)
+)
+```
+
+Filters work with auto-pagination too:
+
+```swift
+let filter = CardFilter(states: [.inProgress], orderBy: "updated_at")
+for try await card in client.allCards(boardId: 1, filter: filter) {
+    print(card.title)
+}
+```
+
+Commonly used filter properties include `query`, `memberIds`, `states`, `overdue`, `spaceId`, `typeId`, `condition`, and date ranges like `createdAfter`/`createdBefore`. See `CardFilter` source for the full list of 40+ parameters.
+
+## Creating & Updating Cards
+
+### CardCreateOptions
+
+Create a card by providing a title and board ID. Set additional properties as needed:
+
+```swift
+var opts = CardCreateOptions(title: "Bug fix", boardId: 1)
+opts.columnId = 42
+opts.description = "Fix the login crash"
+let card = try await client.createCard(opts)
+```
+
+### CardUpdateOptions
+
+Update specific fields on an existing card — only the properties you set are sent to the server:
+
+```swift
+var opts = CardUpdateOptions()
+opts.title = "Updated Title"
+opts.columnId = 42
+let card = try await client.updateCard(id: 123, opts)
+```
+
 ## Configuration
 
 The CLI and MCP server share the same config file at `~/.config/kaiten/config.json` (see [Configure Credentials](#2-configure-credentials) above).
