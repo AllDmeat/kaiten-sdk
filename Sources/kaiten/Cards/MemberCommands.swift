@@ -2,7 +2,8 @@ import ArgumentParser
 import KaitenSDK
 
 func parseCardMemberRoleType(_ rawValue: Int) throws -> CardMemberRoleType {
-  guard let roleType = CardMemberRoleType(rawValue: rawValue) else {
+  let roleType = CardMemberRoleType(rawValue: rawValue)
+  guard CardMemberRoleType.allCases.contains(roleType) else {
     throw ValidationError("Invalid role type: \(rawValue). Allowed values: 2 (responsible)")
   }
   return roleType

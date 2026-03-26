@@ -10,8 +10,13 @@ func parseCardStates(_ rawValue: String?) throws -> [CardState]? {
 
   for token in rawValue.split(separator: ",", omittingEmptySubsequences: false) {
     let trimmed = token.trimmingCharacters(in: .whitespaces)
-    guard !trimmed.isEmpty, let intValue = Int(trimmed), let state = CardState(rawValue: intValue)
-    else {
+    guard !trimmed.isEmpty, let intValue = Int(trimmed) else {
+      throw ValidationError(
+        "Invalid card state: '\(trimmed)'. Allowed values: 1 (queued), 2 (in progress), 3 (done)"
+      )
+    }
+    let state = CardState(rawValue: intValue)
+    guard CardState.allCases.contains(state) else {
       throw ValidationError(
         "Invalid card state: '\(trimmed)'. Allowed values: 1 (queued), 2 (in progress), 3 (done)"
       )
@@ -24,7 +29,8 @@ func parseCardStates(_ rawValue: String?) throws -> [CardState]? {
 
 func parseCardCondition(_ rawValue: Int?) throws -> CardCondition? {
   guard let rawValue else { return nil }
-  guard let condition = CardCondition(rawValue: rawValue) else {
+  let condition = CardCondition(rawValue: rawValue)
+  guard CardCondition.allCases.contains(condition) else {
     throw ValidationError(
       "Invalid card condition: \(rawValue). Allowed values: 1 (on board), 2 (archived)"
     )
@@ -319,10 +325,10 @@ struct CreateCard: AsyncParsableCommand {
     opts.ownerId = ownerId
     opts.responsibleId = responsibleId
     opts.ownerEmail = ownerEmail
-    opts.position = position.flatMap(CardPosition.init(rawValue:))
+    opts.position = position.map(CardPosition.init(rawValue:))
     opts.typeId = typeId
     opts.externalId = externalId
-    opts.textFormatTypeId = textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
+    opts.textFormatTypeId = textFormatTypeId.map(TextFormatType.init(rawValue:))
     let card = try await client.createCard(opts)
     try printJSON(card)
   }
@@ -450,9 +456,9 @@ struct UpdateCard: AsyncParsableCommand {
     opts.typeId = typeId
     opts.serviceId = serviceId
     opts.blocked = blocked
-    opts.condition = condition.flatMap(CardCondition.init(rawValue:))
+    opts.condition = condition.map(CardCondition.init(rawValue:))
     opts.externalId = externalId
-    opts.textFormatTypeId = textFormatTypeId.flatMap(TextFormatType.init(rawValue:))
+    opts.textFormatTypeId = textFormatTypeId.map(TextFormatType.init(rawValue:))
     opts.ownerEmail = ownerEmail
     opts.prevCardId = prevCardId
     opts.estimateWorkload = estimateWorkload

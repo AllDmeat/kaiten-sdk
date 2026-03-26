@@ -5,38 +5,48 @@ import Testing
 
 @Suite("Enums")
 struct EnumsTests {
-  private func assertRoundTrip<T: CaseIterable & RawRepresentable & Equatable>(
-    _ type: T.Type
-  ) where T.RawValue == Int {
-    for value in T.allCases {
-      #expect(T(rawValue: value.rawValue) == value)
+  @Test("all public enums support raw value round-trip for known cases")
+  func roundTrip() {
+    for c in CardCondition.allCases {
+      #expect(CardCondition(rawValue: c.rawValue) == c)
+    }
+    for c in LaneCondition.allCases {
+      #expect(LaneCondition(rawValue: c.rawValue) == c)
+    }
+    for c in CardState.allCases {
+      #expect(CardState(rawValue: c.rawValue) == c)
+    }
+    for c in CardMemberRoleType.allCases {
+      #expect(CardMemberRoleType(rawValue: c.rawValue) == c)
+    }
+    for c in TextFormatType.allCases {
+      #expect(TextFormatType(rawValue: c.rawValue) == c)
+    }
+    for c in CardPosition.allCases {
+      #expect(CardPosition(rawValue: c.rawValue) == c)
+    }
+    for c in ColumnType.allCases {
+      #expect(ColumnType(rawValue: c.rawValue) == c)
+    }
+    for c in WipLimitType.allCases {
+      #expect(WipLimitType(rawValue: c.rawValue) == c)
+    }
+    for c in CardHistoryCondition.allCases {
+      #expect(CardHistoryCondition(rawValue: c.rawValue) == c)
     }
   }
 
-  @Test("all public enums support raw value round-trip")
-  func roundTrip() {
-    assertRoundTrip(CardCondition.self)
-    assertRoundTrip(LaneCondition.self)
-    assertRoundTrip(CardState.self)
-    assertRoundTrip(CardMemberRoleType.self)
-    assertRoundTrip(TextFormatType.self)
-    assertRoundTrip(CardPosition.self)
-    assertRoundTrip(ColumnType.self)
-    assertRoundTrip(WipLimitType.self)
-    assertRoundTrip(CardHistoryCondition.self)
-  }
-
-  @Test("invalid raw values return nil for all public enums")
-  func invalidRawValue() {
-    #expect(CardCondition(rawValue: 999) == nil)
-    #expect(LaneCondition(rawValue: 999) == nil)
-    #expect(CardState(rawValue: 999) == nil)
-    #expect(CardMemberRoleType(rawValue: 999) == nil)
-    #expect(TextFormatType(rawValue: 999) == nil)
-    #expect(CardPosition(rawValue: 999) == nil)
-    #expect(ColumnType(rawValue: 999) == nil)
-    #expect(WipLimitType(rawValue: 999) == nil)
-    #expect(CardHistoryCondition(rawValue: 999) == nil)
+  @Test("unknown raw values produce .unknown case for all public enums")
+  func unknownRawValue() {
+    #expect(CardCondition(rawValue: 999) == .unknown(999))
+    #expect(LaneCondition(rawValue: 999) == .unknown(999))
+    #expect(CardState(rawValue: 999) == .unknown(999))
+    #expect(CardMemberRoleType(rawValue: 999) == .unknown(999))
+    #expect(TextFormatType(rawValue: 999) == .unknown(999))
+    #expect(CardPosition(rawValue: 999) == .unknown(999))
+    #expect(ColumnType(rawValue: 999) == .unknown(999))
+    #expect(WipLimitType(rawValue: 999) == .unknown(999))
+    #expect(CardHistoryCondition(rawValue: 999) == .unknown(999))
   }
 
   @Test("case counts are stable for public enums")
@@ -78,5 +88,17 @@ struct EnumsTests {
     let requestPath = String(describing: transport.recordedRequests[0].request.path)
     #expect(requestPath.contains("condition=2"))
     #expect(requestPath.contains("states=1,3") || requestPath.contains("states=1%2C3"))
+  }
+
+  @Test("unknown raw values round-trip through Codable")
+  func unknownCodableRoundTrip() throws {
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+
+    let original = CardCondition.unknown(42)
+    let data = try encoder.encode(original)
+    let decoded = try decoder.decode(CardCondition.self, from: data)
+    #expect(decoded == original)
+    #expect(decoded.rawValue == 42)
   }
 }

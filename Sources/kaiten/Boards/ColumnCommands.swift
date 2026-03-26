@@ -3,7 +3,8 @@ import KaitenSDK
 
 func parseColumnType(_ rawValue: Int?) throws -> ColumnType? {
   guard let rawValue else { return nil }
-  guard let type = ColumnType(rawValue: rawValue) else {
+  let type = ColumnType(rawValue: rawValue)
+  guard ColumnType.allCases.contains(type) else {
     throw ValidationError(
       "Invalid column type: \(rawValue). Allowed values: 1 (queue), 2 (in progress), 3 (done)"
     )
