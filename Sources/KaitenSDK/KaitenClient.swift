@@ -31,12 +31,13 @@ public struct KaitenClient: Sendable {
     else {
       throw KaitenError.invalidURL(baseURL)
     }
+    let gate = RateLimitGate()
     self.client = Client(
       serverURL: url,
       transport: transport,
       middlewares: [
         AuthenticationMiddleware(token: token),
-        RetryMiddleware(),
+        RetryMiddleware(gate: gate),
       ]
     )
   }

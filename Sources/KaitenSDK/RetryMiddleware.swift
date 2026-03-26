@@ -11,16 +11,24 @@ struct RetryMiddleware: ClientMiddleware {
   private let maxAttempts: Int
   private let baseDelay: TimeInterval
   private let maxDelay: TimeInterval
+  private let gate: RateLimitGate
 
   /// Creates a retry middleware.
   /// - Parameters:
   ///   - maxAttempts: Maximum number of attempts (default 3).
   ///   - baseDelay: Initial backoff delay in seconds (default 1.0).
   ///   - maxDelay: Maximum retry delay in seconds (default 60.0).
-  init(maxAttempts: Int = 3, baseDelay: TimeInterval = 1.0, maxDelay: TimeInterval = 60.0) {
+  ///   - gate: Shared rate-limit gate that coordinates 429 back-off across concurrent requests.
+  init(
+    maxAttempts: Int = 3,
+    baseDelay: TimeInterval = 1.0,
+    maxDelay: TimeInterval = 60.0,
+    gate: RateLimitGate = RateLimitGate()
+  ) {
     self.maxAttempts = maxAttempts
     self.baseDelay = baseDelay
     self.maxDelay = maxDelay
+    self.gate = gate
   }
 
   // NOTE: Retrying with the same `body` reference is safe.
@@ -35,10 +43,10 @@ struct RetryMiddleware: ClientMiddleware {
   ) async throws -> (HTTPResponse, HTTPBody?) {
     var lastError: (any Error)?
     var lastRetryAfter: TimeInterval?
-    // Non-idempotent methods get exactly 1 attempt (no retries) to prevent duplicate side effects.
-    let attempts = isRetryableMethod(request.method) ? maxAttempts : 1
+    // Wait for any in-progress rate-limit window before starting.
+    try await gate.waitIfNeeded()
 
-    for attempt in 0..<attempts {
+    for attempt in 0..<maxAttempts {
       let response: HTTPResponse
       let responseBody: HTTPBody?
 
@@ -46,9 +54,12 @@ struct RetryMiddleware: ClientMiddleware {
         (response, responseBody) = try await next(request, body, baseURL)
       } catch {
         if isTransientURLError(error) {
-          // Transient network error — retry with backoff
+          // Transient network errors are only retried for idempotent methods.
+          guard isRetryableMethod(request.method) else {
+            throw KaitenError.networkError(underlying: error)
+          }
           lastError = error
-          if attempt < attempts - 1 {
+          if attempt < maxAttempts - 1 {
             try await sleep(backoffDelay(attempt: attempt))
             continue
           }
@@ -59,19 +70,25 @@ struct RetryMiddleware: ClientMiddleware {
 
       let statusCode = response.status.code
 
-      // Success or non-retryable status
+      // 429 — rate-limited. Retry ALL methods (server-side, method-agnostic).
       if statusCode == 429 {
         let retryAfter = resolveRateLimitDelay(response: response, attempt: attempt)
         lastRetryAfter = retryAfter
-        if attempt < attempts - 1 {
-          try await sleep(retryAfter)
+        let deadline = ContinuousClock.now + .seconds(retryAfter)
+        await gate.markRateLimited(until: deadline)
+        if attempt < maxAttempts - 1 {
+          try await gate.waitIfNeeded()
           continue
         }
         throw KaitenError.rateLimited(retryAfter: lastRetryAfter)
       }
 
+      // 5xx — only retry idempotent methods.
       if (500...599).contains(statusCode) {
-        if attempt < attempts - 1 {
+        guard isRetryableMethod(request.method) else {
+          throw KaitenError.serverError(statusCode: statusCode, body: nil)
+        }
+        if attempt < maxAttempts - 1 {
           try await sleep(backoffDelay(attempt: attempt))
           continue
         }

@@ -288,6 +288,57 @@ struct RetryMiddlewareTests {
     #expect(callCount.withLock { $0 } == 2)
   }
 
+  @Test("POST requests are retried on 429")
+  func postRetriedOnRateLimit() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
+    let callCount = Mutex(0)
+
+    let (response, _) = try await middleware.intercept(
+      HTTPRequest(method: .post, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+      body: HTTPBody("{}"),
+      baseURL: URL(string: "https://test.kaiten.ru")!,
+      operationID: "test"
+    ) { _, _, _ in
+      let count = callCount.withLock { val in
+        val += 1
+        return val
+      }
+      if count == 1 {
+        return (
+          HTTPResponse(
+            status: .tooManyRequests,
+            headerFields: HTTPFields([
+              HTTPField(name: HTTPField.Name("Retry-After")!, value: "0")
+            ])), nil
+        )
+      }
+      return (HTTPResponse(status: .ok), HTTPBody("{}"))
+    }
+
+    #expect(response.status == .ok)
+    #expect(callCount.withLock { $0 } == 2)
+  }
+
+  @Test("POST network errors are not retried")
+  func postNotRetriedOnNetworkError() async throws {
+    let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
+    let callCount = Mutex(0)
+
+    await #expect(throws: KaitenError.self) {
+      _ = try await middleware.intercept(
+        HTTPRequest(method: .post, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
+        body: HTTPBody("{}"),
+        baseURL: URL(string: "https://test.kaiten.ru")!,
+        operationID: "test"
+      ) { _, _, _ in
+        callCount.withLock { $0 += 1 }
+        throw URLError(.timedOut)
+      }
+    }
+
+    #expect(callCount.withLock { $0 } == 1)
+  }
+
   @Test("429 caps very large Retry-After delay")
   func capsLargeRetryAfter() async throws {
     let middleware = RetryMiddleware(maxAttempts: 1, baseDelay: 0.01, maxDelay: 2)
