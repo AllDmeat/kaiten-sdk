@@ -10,14 +10,17 @@ public struct KaitenClient: Sendable {
 
   // MARK: - Initialization
 
-  /// Creates a client with a custom transport (for testing).
+  /// Creates a client with a custom transport.
+  ///
+  /// Use this initializer to supply a `URLSessionTransport` backed by a custom
+  /// `URLSession` (e.g. one configured with Replay for HTTP record/playback testing).
   ///
   /// - Parameters:
   ///   - baseURL: Full Kaiten API base URL (e.g. `https://mycompany.kaiten.ru/api/latest`).
   ///   - token: API bearer token.
   ///   - transport: Custom `ClientTransport` implementation.
   /// - Throws: ``KaitenError/invalidURL(_:)`` if `baseURL` cannot be parsed.
-  init(baseURL: String, token: String, transport: any ClientTransport) throws(KaitenError) {
+  public init(baseURL: String, token: String, transport: any ClientTransport) throws(KaitenError) {
     guard
       let url = URL(string: baseURL),
       url.scheme?.lowercased() == "https"
