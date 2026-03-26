@@ -98,19 +98,28 @@ struct RetryMiddlewareTests {
     #expect(callCount.withLock { $0 } == 2)
   }
 
-  @Test("5xx exhausted retries throws serverError")
+  @Test("5xx exhausted retries throws serverError with body")
   func serverErrorExhausted() async throws {
     let middleware = RetryMiddleware(maxAttempts: 3, baseDelay: 0.01)
+    let errorBody = #"{"error":"bad gateway"}"#
 
-    await #expect(throws: KaitenError.self) {
+    do {
       _ = try await middleware.intercept(
         HTTPRequest(method: .get, scheme: "https", authority: "test.kaiten.ru", path: "/test"),
         body: nil,
         baseURL: URL(string: "https://test.kaiten.ru")!,
         operationID: "test"
       ) { _, _, _ in
-        (HTTPResponse(status: .badGateway), nil)
+        (HTTPResponse(status: .badGateway), HTTPBody(errorBody))
       }
+      Issue.record("Expected serverError to be thrown")
+    } catch let error as KaitenError {
+      guard case .serverError(let statusCode, let body) = error else {
+        Issue.record("Unexpected error: \(error)")
+        return
+      }
+      #expect(statusCode == 502)
+      #expect(body == errorBody)
     }
   }
 
