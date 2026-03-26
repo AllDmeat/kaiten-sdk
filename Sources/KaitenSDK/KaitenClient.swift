@@ -106,6 +106,14 @@ public struct KaitenClient: Sendable {
     }
   }
 
+  /// Checks whether the response body is empty (nil or zero bytes).
+  ///
+  /// The `catch` block handles two iteration behaviors of `HTTPBody`:
+  /// - `.multiple` bodies (e.g. from `HTTPBody(data:)`): re-readable, works normally.
+  /// - `.single` bodies already consumed: throws `TooManyIterationsError`.
+  ///
+  /// Returning `false` on error means "treat as non-empty", so the caller
+  /// propagates the original decoding error rather than silently swallowing it.
   private func isEmptyBody(_ body: HTTPBody?) async -> Bool {
     guard let body else { return true }
 

@@ -34,6 +34,7 @@ struct RetryMiddleware: ClientMiddleware {
   ) async throws -> (HTTPResponse, HTTPBody?) {
     var lastError: (any Error)?
     var lastRetryAfter: TimeInterval?
+    // Non-idempotent methods get exactly 1 attempt (no retries) to prevent duplicate side effects.
     let attempts = isRetryableMethod(request.method) ? maxAttempts : 1
 
     for attempt in 0..<attempts {
@@ -97,6 +98,11 @@ struct RetryMiddleware: ClientMiddleware {
     try await Task.sleep(for: .seconds(duration))
   }
 
+  /// Returns `true` for idempotent, safe HTTP methods eligible for automatic retry.
+  ///
+  /// Only GET and HEAD are retried. Mutating methods (POST, PUT, DELETE, PATCH)
+  /// are not idempotent per RFC 9110 §9.2.2 and must not be automatically retried
+  /// to avoid duplicate side effects (e.g. double-creating a resource).
   private func isRetryableMethod(_ method: HTTPRequest.Method) -> Bool {
     method == .get || method == .head
   }
