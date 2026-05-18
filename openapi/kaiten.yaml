@@ -4289,19 +4289,19 @@ components:
           type: string
           description: Last update timestamp
         blocked_card:
-          allOf:
+          anyOf:
           - $ref: '#/components/schemas/Card'
-          nullable: true
+          - type: 'null'
           description: Blocked card info
         card:
-          allOf:
+          anyOf:
           - $ref: '#/components/schemas/Card'
-          nullable: true
+          - type: 'null'
           description: Blocking card info
         blocker:
-          allOf:
+          anyOf:
           - $ref: '#/components/schemas/User'
-          nullable: true
+          - type: 'null'
           description: Info of user who blocked card
     CreateCardBlockerRequest:
       type: object
