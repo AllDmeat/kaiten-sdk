@@ -2547,7 +2547,6 @@ components:
           type: object
           description: Inline column summary
         board:
-          # DOC_MISMATCH: docs list full Board schema (created, updated, description, email_key, columns, lanes, cards, …), actual API returns only 7 fields: id, uid, title, external_id, card_properties, settings, spaces — https://developers.kaiten.ru/cards/retrieve-card
           $ref: '#/components/schemas/CardBoardSummary'
         type:
           $ref: '#/components/schemas/CardType'
@@ -3600,9 +3599,10 @@ components:
           type: integer
           description: Card id
         checklist_id:
-          # DOC_MISMATCH: field not listed in docs, present in actual API responses (inlined checklists in /cards/{id}); type=integer — https://developers.kaiten.ru/card-checklists/retrieve-card-checklist
-          type: integer
-          description: Checklist id
+          type:
+          - integer
+          - 'null'
+          description: Parent template checklist id (if this checklist was created from a template)
         sort_order:
           type: number
           description: Position
@@ -3857,7 +3857,6 @@ components:
         - 'null'
     CardBoardSummary:
       type: object
-      # DOC_MISMATCH: docs list full Board schema (created, updated, description, email_key, columns, lanes, cards, …), actual API returns only 7 fields: id, uid, title, external_id, card_properties, settings, spaces — https://developers.kaiten.ru/cards/retrieve-card
       required:
       - id
       - uid
