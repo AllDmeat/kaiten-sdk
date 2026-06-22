@@ -5,9 +5,13 @@ lockfile = true
 [tools]
 node = "latest"
 "npm:playwright" = "latest"
-python = "latest"
-"pipx:specify-cli" = "latest"
-swift = "latest"
+# Swift and Python are intentionally NOT managed by mise. Their core:* backends
+# do not persist per-platform download URLs in mise.lock, so `mise install`
+# hard-fails under locked enforcement (lockfile = true) on a cache miss on
+# Linux/Windows. See https://github.com/jdx/mise/discussions/10572
+# Swift is installed in CI via SwiftyLab/setup-swift (Linux) and
+# compnerd/gha-setup-swift (Windows); macOS uses the Xcode toolchain.
+# Python (for the speckit/specify-cli dev tool) is installed locally as needed.
 
 [tasks.kaiten-docs-install-browsers]
 description = "Install Playwright Chromium browser binaries"
