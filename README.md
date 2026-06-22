@@ -40,10 +40,6 @@ mise use github:alldmeat/kaiten-sdk
 
 Download the binary for your platform from the [releases page](https://github.com/AllDmeat/kaiten-sdk/releases).
 
-> **Windows:** the archive includes the Swift runtime DLLs — no additional installation required. Extract and run `kaiten.exe` directly.
-
-
-
 ## Quick Start
 
 ### As a library
@@ -331,7 +327,7 @@ do {
 ## Requirements
 
 - Swift 6.2+
-- macOS 15+ (ARM) / Linux (x86-64, ARM) / Windows 10+ (x86-64, ARM64)
+- macOS 15+ (ARM) / Linux (x86-64, ARM)
 
 ## License
 
